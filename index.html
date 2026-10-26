@@ -56,7 +56,7 @@
         /* Header UI (Mirip Poster) */
         header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border-bottom: 2px dashed #3a221d;
             padding-bottom: 15px;
         }
@@ -96,6 +96,34 @@
             margin-top: 5px;
             transform: skewX(-10deg);
             text-transform: uppercase;
+        }
+
+        /* Navigasi Kategori (Tab Makanan & Minuman) */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: #14110f;
+            border: 1px solid #3a221d;
+            color: var(--text-muted);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(211,47,47,0.4);
         }
 
         /* Menu List */
@@ -343,6 +371,12 @@
         <div class="tagline">Lezatnya Daging Pilihan</div>
     </header>
 
+    <!-- Tombol Tab Kategori Menu -->
+    <div class="category-tabs">
+        <button class="tab-btn active" id="tab-makanan" onclick="switchCategory('makanan')">🌯 Makanan</button>
+        <button class="tab-btn" id="tab-minuman" onclick="switchCategory('minuman')">🥤 Minuman</button>
+    </div>
+
     <!-- List Menu Dinamis -->
     <div id="menu-container"></div>
 
@@ -355,7 +389,7 @@
         
         <div class="input-box">
             <label for="order-notes">Catatan Tambahan</label>
-            <textarea id="order-notes" rows="2" placeholder="Contoh: Pedas sekali, tidak pakai sayur, dll."></textarea>
+            <textarea id="order-notes" rows="2" placeholder="Contoh: Pedas sekali, tidak pakai sayur, atau minuman dingin/panas..."></textarea>
         </div>
 
         <div class="input-box" style="margin-bottom: 0;">
@@ -383,41 +417,71 @@
 </div>
 
 <script>
-    // Konfigurasi Nomor WA dan Data Menu Sesuai Poster
+    // Konfigurasi Nomor WA dan Data Menu Sesuai Pesanan
     const WHATSAPP_NUMBER = "6287881318261"; 
     
     const menuData = [
-        { id: 1, type: "KEBAB", name: "Telur Sosis", price: 10000, desc: "Daging juicy, telur, sosis, sayuran segar, dan saus spesial.", emoji: "🌯" },
-        { id: 2, type: "KEBAB", name: "Daging", price: 10000, desc: "Daging juicy, sayuran segar, dan saus spesial.", emoji: "🌯" },
-        { id: 3, type: "KEBAB", name: "Daging Sosis", price: 13000, desc: "Daging juicy, sosis, sayuran segar, dan saus spesial.", emoji: "🌯" },
-        { id: 4, type: "KEBAB", name: "Daging Telur", price: 13000, desc: "Daging juicy, telur, sayuran segar, dan saus spesial.", emoji: "🌯" },
-        { id: 5, type: "KEBAB", name: "Daging Telur Sosis", price: 15000, desc: "Daging juicy, telur, sosis, dan saus spesial.", emoji: "🌯" },
-        { id: 6, type: "KEBAB", name: "Daging Telur Sosis Keju", price: 18000, desc: "Daging juicy, telur, sosis, keju, sayuran segar, dan saus spesial.", emoji: "🌯" }
+        // Kategori Makanan (Kebab)
+        { id: 1, category: "makanan", type: "KEBAB", name: "Telur Sosis", price: 10000, desc: "Daging juicy, telur, sosis, sayuran segar, dan saus spesial.", emoji: "🌯" },
+        { id: 2, category: "makanan", type: "KEBAB", name: "Daging", price: 10000, desc: "Daging juicy, sayuran segar, dan saus spesial.", emoji: "🌯" },
+        { id: 3, category: "makanan", type: "KEBAB", name: "Daging Sosis", price: 13000, desc: "Daging juicy, sosis, sayuran segar, dan saus spesial.", emoji: "🌯" },
+        { id: 4, category: "makanan", type: "KEBAB", name: "Daging Telur", price: 13000, desc: "Daging juicy, telur, sayuran segar, dan saus spesial.", emoji: "🌯" },
+        { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, desc: "Daging juicy, telur, sosis, dan saus spesial.", emoji: "🌯" },
+        { id: 6, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis Keju", price: 18000, desc: "Daging juicy, telur, sosis, keju, sayuran segar, dan saus spesial.", emoji: "🌯" },
+        
+        // Kategori Minuman (Sesuai List ABG Mursalat)
+        { id: 7, category: "minuman", type: "MINUMAN", name: "Sanger Dingin/Panas", price: 10000, desc: "Minuman kopi sanger khas Aceh (bisa pilih dingin/panas di catatan).", emoji: "☕" },
+        { id: 8, category: "minuman", type: "MINUMAN", name: "Americano Dingin/Panas", price: 10000, desc: "Kopi hitam americano segar.", emoji: "☕" },
+        { id: 9, category: "minuman", type: "MINUMAN", name: "Americano Gula Aren", price: 12000, desc: "Americano dengan manisnya gula aren alami.", emoji: "🧋" },
+        { id: 10, category: "minuman", type: "MINUMAN", name: "Teh Hijau Dingin", price: 8000, desc: "Teh hijau pilihan disajikan dingin menyegarkan.", emoji: "🍵" },
+        { id: 11, category: "minuman", type: "MINUMAN", name: "Teh Hijau Panas", price: 5000, desc: "Teh hijau hangat yang menenangkan.", emoji: "🍵" },
+        { id: 12, category: "minuman", type: "MINUMAN", name: "Kopi Caramel", price: 15000, desc: "Perpaduan kopi dan rasa caramel yang nikmat.", emoji: "🥤" },
+        { id: 13, category: "minuman", type: "MINUMAN", name: "Kopi Latte", price: 15000, desc: "Espresso lembut dengan susu segar.", emoji: "☕" },
+        { id: 14, category: "minuman", type: "MINUMAN", name: "Sirup Kurnia Dingin", price: 8000, desc: "Minuman sirup legendaris khas Aceh disajikan dingin.", emoji: "🍧" },
+        { id: 15, category: "minuman", type: "MINUMAN", name: "Capucino", price: 15000, desc: "Capucino kaya rasa dengan foam lembut.", emoji: "☕" },
+        { id: 16, category: "minuman", type: "MINUMAN", name: "Long Black Dingin/Panas", price: 10000, desc: "Kopi long black nikmat pilihan.", emoji: "☕" },
+        { id: 17, category: "minuman", type: "MINUMAN", name: "Sanger Double Shoot", price: 18000, desc: "Sanger dengan ekstra takaran kopi yang lebih mantap.", emoji: "☕" },
+        { id: 18, category: "minuman", type: "MINUMAN", name: "Kopi Milo Dingin", price: 15000, desc: "Kopi dicampur milo dingin yang manis dan creamy.", emoji: "🧋" }
     ];
 
     let cart = {};
+    let currentCategory = 'makanan';
     let userLocation = "";
 
-    // Render Menu ke UI
+    // Ganti Kategori Tab (Makanan / Minuman)
+    function switchCategory(category) {
+        currentCategory = category;
+        document.getElementById('tab-makanan').classList.remove('active');
+        document.getElementById('tab-minuman').classList.remove('active');
+        document.getElementById(`tab-${category}`).classList.add('active');
+        renderMenu();
+    }
+
+    // Render Menu ke UI Berdasarkan Kategori yang Dipilih
     function renderMenu() {
         const container = document.getElementById('menu-container');
-        container.innerHTML = menuData.map(item => `
-            <div class="menu-item">
-                <div class="menu-img">${item.emoji}</div>
-                <div class="menu-details">
-                    <div class="menu-title">${item.type} <span>${item.name}</span></div>
-                    <div class="menu-desc">${item.desc}</div>
-                </div>
-                <div class="menu-price-action">
-                    <div class="price">${item.price.toLocaleString('id-ID')},-</div>
-                    <div class="counter">
-                        <button onclick="updateQty(${item.id}, -1)">-</button>
-                        <span id="qty-${item.id}">0</span>
-                        <button onclick="updateQty(${item.id}, 1)">+</button>
+        const filteredMenu = menuData.filter(item => item.category === currentCategory);
+
+        container.innerHTML = filteredMenu.map(item => {
+            const qty = cart[item.id] || 0;
+            return `
+                <div class="menu-item">
+                    <div class="menu-img">${item.emoji}</div>
+                    <div class="menu-details">
+                        <div class="menu-title">${item.type} <span>${item.name}</span></div>
+                        <div class="menu-desc">${item.desc}</div>
+                    </div>
+                    <div class="menu-price-action">
+                        <div class="price">${item.price.toLocaleString('id-ID')},-</div>
+                        <div class="counter">
+                            <button onclick="updateQty(${item.id}, -1)">-</button>
+                            <span id="qty-${item.id}">${qty}</span>
+                            <button onclick="updateQty(${item.id}, 1)">+</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     // Update Kuantitas Item
@@ -426,7 +490,10 @@
         cart[id] += change;
         if (cart[id] < 0) cart[id] = 0;
         
-        document.getElementById(`qty-${id}`).innerText = cart[id];
+        const qtyElement = document.getElementById(`qty-${id}`);
+        if (qtyElement) {
+            qtyElement.innerText = cart[id];
+        }
         calculateTotal();
     }
 
@@ -489,7 +556,7 @@
         });
 
         if (!hasItems) {
-            alert("Silakan pilih minimal 1 kebab terlebih dahulu!");
+            alert("Silakan pilih minimal 1 menu terlebih dahulu!");
             return;
         }
 
@@ -505,15 +572,4 @@
             orderText += `📍 *Link Shareloc Tujuan:* ${userLocation}\n`;
         } else {
             orderText += `📍 *Link Shareloc Tujuan:* (Pelanggan belum klik tombol shareloc)\n`;
-        }
-
-        const encodedText = encodeURIComponent(orderText);
-        window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedText}`, '_blank');
-    }
-
-    // Jalankan fungsi saat web dibuka
-    renderMenu();
-</script>
-
-</body>
-</html>
+        
