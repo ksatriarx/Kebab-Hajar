@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>Kebab Turki Hajar — Idi Rayeuk</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-main: #000000;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #262626;
+            --bg-input: #121212;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --primary: #e53935;
+            --accent: #ffb300;
+            --wa-color: #25D366;
+            --border: #333333;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --nav-height: 65px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding-bottom: calc(var(--nav-height) + 15px);
+        }
+
+        .app {
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ===== STICKY HEADER ===== */
+        .main-header {
+            position: fixed;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px;
+            padding: 16px 20px; z-index: 100;
+            transition: all 0.3s ease; background: transparent;
+            display: flex; flex-direction: column;
+        }
+
+        .main-header.scrolled {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); padding: 12px 20px;
+        }
+
+        .header-top {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+        }
+
+        .nav-logo {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 18px; font-weight: 800; font-style: italic;
+            color: var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .main-header.scrolled .nav-logo { text-shadow: none; }
+        .nav-logo span { color: var(--text-main); font-style: normal;}
+
+        .nav-icons { display: flex; flex-direction: row; gap: 8px; }
+
+        .icon-btn {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(26,26,26,0.6); backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-main); font-size: 12px; cursor: pointer; text-decoration: none;
+        }
+
+        .main-header.scrolled .icon-btn { background: var(--bg-input); border-color: var(--border); }
+
+        /* SEARCH MINI */
+        .search-box {
+            position: relative; display: flex; align-items: center;
+            width: 100%; max-width: 180px;
+        }
+        
+        .search-box input {
+            width: 100%; background: rgba(20, 20, 20, 0.65); backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm);
+            padding: 6px 10px 6px 28px; color: var(--text-main); font-size: 10px; outline: none;
+        }
+
+        .main-header.scrolled .search-box input { background: var(--bg-card); border-color: var(--border); }
+        .search-box input:focus { border-color: var(--primary); }
+        
+        .search-icon { position: absolute; left: 10px; color: rgba(255,255,255,0.6); font-size: 10px; }
+
+        /* ===== HERO SLIDER ===== */
+        .hero-slider {
+            position: relative; height: 380px;
+            border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg);
+            overflow: hidden; background: #000;
+        }
+
+        .slide {
+            position: absolute; inset: 0; opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            background-size: cover; background-position: center;
+        }
+
+        .slide.active { opacity: 1; }
+
+        .hero-gradient {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, #000000 100%);
+            z-index: 1;
+        }
+
+        .slider-dots {
+            position: absolute; bottom: 20px; right: 20px;
+            display: flex; gap: 5px; z-index: 3;
+        }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: all 0.3s; }
+        .dot.active { background: var(--primary); width: 14px; border-radius: 4px; }
+
+        .hero-content {
+            position: absolute; bottom: 20px; left: 20px; right: 50px; z-index: 2;
+        }
+
+        .hero-title { font-size: 24px; font-weight: 800; line-height: 1.1; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .hero-desc { font-size: 10px; color: #ccc; line-height: 1.4; margin-bottom: 10px; max-width: 85%; }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+            margin-bottom: 12px; text-transform: uppercase;
+        }
+        .status-buka { background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 1px solid #4caf50; }
+        .status-tutup { background: rgba(229, 57, 53, 0.2); color: var(--primary); border: 1px solid var(--primary); }
+
+        .hero-stats { display: flex; gap: 8px; }
+
+        .stat-box {
+            background: rgba(26, 26, 26, 0.75); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px;
+            border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 2px;
+        }
+
+        .stat-value { font-size: 12px; font-weight: 700; }
+        .stat-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main { padding: 16px; }
+
+        /* BANNER PESAN LAGI */
+        .reorder-banner {
+            display: none; background: linear-gradient(135deg, rgba(255, 179, 0, 0.15) 0%, rgba(229, 57, 53, 0.15) 100%);
+            border: 1px dashed var(--accent); border-radius: var(--radius-md); padding: 12px;
+            margin-bottom: 16px; align-items: center; justify-content: space-between; gap: 10px;
+        }
+        .reorder-banner.show { display: flex; }
+        .reorder-text { font-size: 11px; color: var(--text-main); line-height: 1.4; }
+        .reorder-text b { color: var(--accent); }
+        .btn-reorder {
+            background: var(--accent); color: #000; border: none; padding: 8px 12px;
+            border-radius: var(--radius-sm); font-size: 10px; font-weight: 800; cursor: pointer; white-space: nowrap;
+        }
+
+        /* CATEGORIES */
+        .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scroll-snap-type: x mandatory; }
+
+        .cat-card {
+            flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+            background: var(--bg-card); border: 1px solid transparent;
+            padding: 8px 12px; border-radius: var(--radius-md);
+            cursor: pointer; transition: all 0.2s; scroll-snap-align: start;
+        }
+
+        .cat-card img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+        .cat-card span { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+        .cat-card.active { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
+        .cat-card.active span { color: var(--text-main); }
+
+        /* DELIVERY TOGGLE */
+        .delivery-pill { display: flex; background: var(--bg-card); border-radius: 20px; padding: 3px; margin-bottom: 16px; }
+
+        .delivery-btn {
+            flex: 1; background: transparent; border: none; color: var(--text-muted);
+            padding: 8px; border-radius: 18px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+
+        .delivery-btn.active { background: var(--text-main); color: var(--bg-main); }
+
+        /* SECTION HEADER */
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+
+        .section-title { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; position: relative; padding-bottom: 6px; }
+        .section-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 20px; height: 2px; background: var(--primary); border-radius: 2px; }
+
+        /* ===== MENU LIST (GRID 3 MINIMALIS) ===== */
+        .menu-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; }
+
+        .menu-card {
+            background: var(--bg-card); border-radius: var(--radius-md);
+            padding: 6px; display: flex; flex-direction: column; position: relative;
+        }
+
+        .menu-img {
+            width: 100%; aspect-ratio: 1 / 1; border-radius: var(--radius-sm);
+            object-fit: cover; background: var(--bg-input); margin-bottom: 6px;
+        }
+
+        .menu-badge {
+            position: absolute; top: 10px; left: 10px;
+            background: var(--primary); color: #fff;
+            font-size: 7px; font-weight: 800; padding: 2px 4px; border-radius: 3px; z-index: 2;
+        }
+
+        .menu-title {
+            font-size: 10px; font-weight: 700; margin-bottom: 2px; line-height: 1.2;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .menu-type { font-size: 8px; color: var(--text-muted); margin-bottom: 6px; }
+
+        .menu-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .menu-price { font-size: 11px; font-weight: 800; color: var(--accent); }
+
+        .btn-add {
+            background: var(--primary); color: #fff; border: none;
+            width: 22px; height: 22px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-add:active { transform: scale(0.9); }
+
+        .qty-wrap { display: flex; align-items: center; gap: 4px; background: var(--bg-input); padding: 2px; border-radius: 12px; }
+
+        .qty-btn {
+            background: var(--bg-card-hover); border: none; color: #fff;
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 9px; cursor: pointer;
+        }
+
+        .qty-num { font-size: 10px; font-weight: 700; min-width: 10px; text-align: center; }
+
+        /* FORM SECTION */
+        .form-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 24px; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+
+        .form-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text-main); font-size: 12px; outline: none;
+        }
+
+        textarea.form-input { resize: vertical; min-height: 60px; line-height: 1.5; font-family: inherit; }
+
+        .btn-loc {
+            width: 100%; background: transparent; border: 1px dashed var(--primary); color: var(--primary);
+            padding: 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 6px;
+        }
+
+        .auto-gps-info {
+            display: none; background: rgba(76, 175, 80, 0.1); border: 1px solid #4caf50;
+            color: #4caf50; padding: 10px; border-radius: var(--radius-sm);
+            font-size: 11px; font-weight: 600; text-align: center;
+        }
+
+        /* CART BAR FIXED */
+        .cart-bar {
+            position: fixed; bottom: calc(var(--nav-height) + 10px); left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            width: calc(100% - 32px); max-width: 440px;
+            background: var(--primary); border-radius: var(--radius-md);
+            padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 8px 24px rgba(229, 57, 53, 0.4); transition: transform 0.3s; z-index: 90; cursor: pointer;
+        }
+
+        .cart-bar.show { transform: translateX(-50%) translateY(0); }
+        .cart-count { font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 600; }
+        .cart-total { font-size: 15px; font-weight: 800; color: #fff; }
+
+        .cart-btn { background: #fff; color: var(--primary); border: none; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 800; font-size: 11px; }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; height: var(--nav-height);
+            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); text-decoration: none; font-size: 9px; font-weight: 600; }
+        .nav-item i { font-size: 18px; }
+        .nav-item.active { color: var(--primary); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
+        .modal-overlay.show { display: flex; }
+        
+        .modal-box {
+            background: var(--bg-card); border-radius: 20px 20px 0 0; width: 100%; max-width: 480px;
+            padding: 20px 16px; animation: slideUp 0.3s ease; padding-bottom: calc(16px + env(safe-area-inset-bottom));
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .modal-handle { width: 30px; height: 3px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+        .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; text-align: center; }
+        
+        .summary-box { background: var(--bg-input); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px; font-size: 12px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--text-muted); }
+        .summary-row.total { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); color: var(--text-main); font-weight: 800; font-size: 14px; }
+
+        .btn-wa {
+            width: 100%; background: var(--wa-color); color: #fff; border: none; padding: 14px;
+            border-radius: var(--radius-md); font-size: 13px; font-weight: 800; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    
+    <!-- STICKY HEADER -->
+    <div class="main-header" id="main-header">
+        <div class="header-top">
+            <div class="nav-logo">
+                <i class="fa-solid fa-utensils"></i> <span>Kebab</span>Hajar
+            </div>
+            <div class="nav-icons">
+                <a href="https://maps.google.com/?q=4.9509491,97.7697946" target="_blank" class="icon-btn"><i class="fa-solid fa-location-dot"></i></a>
+                <button class="icon-btn" onclick="shareWeb('wa')"><i class="fa-solid fa-share-nodes"></i></button>
+            </div>
+        </div>
+        
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="search-input" placeholder="Cari menu..." oninput="handleSearch(this.value)" autocomplete="off">
+            <button id="clear-search" onclick="clearSearch()" style="display:none; position:absolute; right:8px; background:var(--bg-main); border:none; color:#fff; width:14px; height:14px; border-radius:50%; font-size:7px; cursor:pointer;">✕</button>
+        </div>
+    </div>
+
+    <!-- HERO SLIDER -->
+    <div class="hero-slider" id="hero-slider">
+        <!-- GANTI URL INI DENGAN FOTO BANNER ANDA -->
+        <div class="slide active" style="background-image: url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg');"></div>
+        <div class="slide" style="background-image: url('https://i.ibb.co.com/SZCStwz/Gemini-Generated-Image-kqtryfkqtryfkqtr.jpg');"></div>
+        <div class="slide" style="background-image: url('https://i.ibb.co.com/wNKsnJxq/file-000000004a2c82118f1b6e2a3d065d2b-2.jpg');"></div>
+
+        <div class="hero-gradient"></div>
+
+        <div class="hero-content">
+            <div id="store-status" class="status-badge status-buka">
+                <i class="fa-solid fa-circle"></i> <span id="status-text">Mengecek jam...</span>
+            </div>
+
+            <h1 class="hero-title">Pesan Kebab<br>Antar ke Rumah</h1>
+            <p class="hero-desc">Kebab Turki asli dengan daging juicy, sayuran segar, dan saus rahasia. Antar area Idi Rayeuk.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <span class="stat-value">20-30 mnt</span>
+                    <span class="stat-label">Waktu Antar</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value">Rp 10.000</span>
+                    <span class="stat-label">Min. Order</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="slider-dots" id="slider-dots"></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        
+        <!-- BANNER PESAN LAGI -->
+        <div class="reorder-banner" id="reorder-banner">
+            <div class="reorder-text">Halo <b id="reorder-name">Kak</b>, mau pesan yang sama seperti kemarin?</div>
+            <button class="btn-reorder" onclick="prosesPesanLagi()">Pesan Lagi</button>
+        </div>
+
+        <!-- KATEGORI -->
+        <div class="category-scroll hide-scrollbar">
+            <div class="cat-card active" id="tab-makanan" onclick="switchCategory('makanan')">
+                <img src="https://images.unsplash.com/photo-1561651823-34feb02250e4?q=80&w=100&auto=format&fit=crop" alt="Kebab">
+                <span>Makanan</span>
+            </div>
+            <div class="cat-card" id="tab-minuman" onclick="switchCategory('minuman')">
+                <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=100&auto=format&fit=crop" alt="Minuman">
+                <span>Minuman</span>
+            </div>
+        </div>
+
+        <!-- TOGGLE -->
+        <div class="delivery-pill">
+            <button class="delivery-btn active" id="method-delivery" onclick="switchMethod('delivery')">Diantar</button>
+            <button class="delivery-btn" id="method-pickup" onclick="switchMethod('pickup')">Ambil Sendiri</button>
+        </div>
+
+        <!-- SECTION TITLE -->
+        <div class="section-header">
+            <h2 class="section-title" id="section-title-text">Menu Populer</h2>
+            <span style="font-size:10px; color:var(--text-muted); cursor:pointer;" onclick="switchCategory('makanan')">Lihat Semua <i class="fa-solid fa-chevron-right" style="font-size:8px;"></i></span>
+        </div>
+
+        <!-- MENU GRID (3 KOLOM) -->
+        <div class="menu-list" id="menu-container"></div>
+
+        <!-- FORM -->
+        <div class="form-card">
+            <h3 style="font-size:12px; font-weight:800; margin-bottom:12px;">Detail Pengiriman</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Nama Pembeli</label>
+                <input type="text" id="buyer-name" class="form-input" placeholder="Masukkan nama Anda...">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Catatan (Opsional)</label>
+                <textarea id="order-notes" class="form-input" rows="2" placeholder="Pedas, tanpa sayur, dll..."></textarea>
+            </div>
+
+            <div class="form-group" id="gps-box">
+                <label class="form-label">Lokasi Pengiriman</label>
+                <button class="btn-loc" id="location-btn" onclick="getLocationManual()">
+                    <i class="fa-solid fa-location-crosshairs"></i> Klik untuk Bagikan GPS
+                </button>
+                <div class="auto-gps-info" id="auto-gps-info">
+                    <i class="fa-solid fa-check-circle"></i> <span id="auto-gps-text">Lokasi terdeteksi otomatis...</span>
+                </div>
+            </div>
+
+            <div id="pickup-info" style="display:none; background:var(--bg-input); padding:12px; border-radius:var(--radius-sm); text-align:center;">
+                <div style="color:var(--accent); font-weight:800; font-size:11px; margin-bottom:4px;">Ambil di Toko</div>
+                <div style="font-size:10px; color:var(--text-muted); line-height:1.4;">Kebab Turki Hajar<br>Idi Rayeuk, Aceh Timur</div>
+            </div>
+        </div>
+        
+        <div style="text-align:center; padding:10px 0; color:var(--text-muted); font-size:9px;">
+            &copy; 2026 Kebab Turki Hajar.
+        </div>
+
+    </div>
+</div>
+
+<!-- CART BAR -->
+<div class="cart-bar" id="cart-bar" onclick="openConfirmModal()">
+    <div class="cart-info">
+        <span class="cart-count" id="cart-count">0 Item</span>
+        <span class="cart-total" id="cart-total">Rp 0</span>
+    </div>
+    <button class="cart-btn">Pesan</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+    <a href="#" class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">
+        <i class="fa-solid fa-house"></i><span>Home</span>
+    </a>
+    <a href="#" class="nav-item" onclick="document.getElementById('menu-container').scrollIntoView({behavior:'smooth'}); return false;">
+        <i class="fa-solid fa-bowl-food"></i><span>Menu</span>
+    </a>
+    <a href="#" class="nav-item" onclick="openConfirmModal(); return false;">
+        <i class="fa-solid fa-cart-shopping"></i><span>Keranjang</span>
+    </a>
+    <a href="#" class="nav-item" onclick="chatLangsung(); return false;">
+        <i class="fa-brands fa-whatsapp"></i><span>Chat</span>
+    </a>
+</div>
+
+<!-- MODAL KONFIRMASI -->
+<div class="modal-overlay" id="confirm-modal" onclick="if(event.target===this) closeConfirmModal()">
+    <div class="modal-box">
+        <div class="modal-handle"></div>
+        <h3 class="modal-title">Konfirmasi Pesanan</h3>
+        
+        <div class="summary-box" id="confirm-summary"></div>
+        
+        <button class="btn-wa" onclick="confirmAndSend()">
+            <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Kirim via WA
+        </button>
+        <button onclick="closeConfirmModal()" style="width:100%; background:transparent; border:none; color:var(--text-muted); padding:12px; font-size:11px; font-weight:700; cursor:pointer;">Batal</button>
+    </div>
+</div>
+
+<script>
+    /* ========== 1. KONFIGURASI ========== */
+    const FORCE_CLOSE = false; 
+    const JAM_BUKA = 10;
+    const JAM_TUTUP_DELIVERY = 23;
+    const JAM_TUTUP_PICKUP = 2;
+    const SHIPPING_RATES = [
+        { maxKm: 2,  fee: 5000 },
+        { maxKm: 5,  fee: 10000 },
+        { maxKm: 10, fee: 15000 }
+    ];
+    const MAX_DELIVERY_KM = 10;
+
+    function cekStatusToko() {
+        if (FORCE_CLOSE) return false;
+        const jamSekarang = new Date().getHours();
+        if (deliveryMethod === 'delivery') {
+            return (jamSekarang >= JAM_BUKA && jamSekarang < JAM_TUTUP_DELIVERY);
+        } else {
+            return (jamSekarang >= JAM_BUKA || jamSekarang < JAM_TUTUP_PICKUP);
+        }
+    }
+
+    function updateStatusUI() {
+        const isOpen = cekStatusToko();
+        const badge = document.getElementById('store-status');
+        if (isOpen) {
+            badge.className = 'status-badge status-buka';
+            badge.innerHTML = '<i class="fa-solid fa-circle"></i> <span>Buka Sekarang</span>';
+        } else {
+            badge.className = 'status-badge status-tutup';
+            badge.innerHTML = '<i class="fa-solid fa-circle"></i> <span>Toko Tutup</span>';
+        }
+    }
+
+    /* ========== 2. HERO SLIDER ========== */
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('slider-dots');
+    let currentSlide = 0;
+    let slideInterval;
+
+    slides.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (index === 0) dot.classList.add('active');
+        dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function goToSlide(n) {
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function startSlide() { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 3500); }
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const sliderElement = document.getElementById('hero-slider');
+
+    sliderElement.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+        clearInterval(slideInterval);
+    }, {passive: true});
+
+    sliderElement.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 50) { nextSlide(); }
+        if (touchEndX - touchStartX > 50) { goToSlide(currentSlide - 1); }
+        startSlide();
+    }, {passive: true});
+
+    startSlide();
+
+    /* ========== 3. STICKY HEADER ========== */
+    window.addEventListener('scroll', function() {
+        const header = document.getElementById('main-header');
+        if (window.scrollY > 30) { header.classList.add('scrolled'); } 
+        else { header.classList.remove('scrolled'); }
+    });
+
+    /* ========== 4. KONFIGURASI MENU & FOTO SEMENTARA ========== */
+    const WHATSAPP_NUMBER = "6287881318261";
+    const STORE_LAT = 4.9509491;
+    const STORE_LON = 97.7697946;
+    const STORE_NAME = "Kebab Turki Hajar";
+    
+    // Jika foto menu tidak diisi (image: ""), gunakan foto default ini
+    const DEFAULT_FOOD_IMAGE = "https://images.unsplash.com/photo-1561651823-34feb02250e4?q=80&w=400&auto=format&fit=crop";
+    const DEFAULT_DRINK_IMAGE = "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop"; 
+
+    const menuData = [
+        // MAKANAN
+        { id: 1, category: "makanan", type: "Kebab", name: "Telur Sosis", price: 10000, image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 4, category: "makanan", type: "Kebab", name: "Daging Telur", price: 13000, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 5, category: "makanan", type: "Kebab", name: "Daging Telur Sosis", price: 15000, image: "https://images.unsplash.com/photo-1529042410759-befb1204b468?q=80&w=400&auto=format&fit=crop", badge: "BEST" },
+        { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=400&auto=format&fit=crop", badge: "" },
+        
+        // MINUMAN
+        { id: 7, category: "minuman", type: "Minuman", name: "Sanger Dingin/Panas", price: 10000, image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 8, category: "minuman", type: "Minuman", name: "Americano Dingin/Panas", price: 10000, image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 9, category: "minuman", type: "Minuman", name: "Americano Gula Aren", price: 12000, image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 10, category: "minuman", type: "Minuman", name: "Teh Hijau Dingin", price: 8000, image: "https://images.unsplash.com/photo-1556881286-fc6915169721?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 11, category: "minuman", type: "Minuman", name: "Teh Hijau Panas", price: 5000, image: "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 12, category: "minuman", type: "Minuman", name: "Kopi Caramel", price: 15000, image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 13, category: "minuman", type: "Minuman", name: "Kopi Latte", price: 15000, image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 14, category: "minuman", type: "Minuman", name: "Sirup Kurnia Dingin", price: 8000, image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 15, category: "minuman", type: "Minuman", name: "Capucino", price: 15000, image: "https://images.unsplash.com/photo-1534778101976-62847782c213?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 16, category: "minuman", type: "Minuman", name: "Long Black", price: 10000, image: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 17, category: "minuman", type: "Minuman", name: "Sanger Double Shoot", price: 18000, image: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=400&auto=format&fit=crop", badge: "" },
+        { id: 18, category: "minuman", type: "Minuman", name: "Kopi Milo Dingin", price: 15000, image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=400&auto=format&fit=crop", badge: "" }
+    ];
+
+    function getItemImage(item) {
+        if (item.image) return item.image;
+        return item.category === "makanan" ? DEFAULT_FOOD_IMAGE : DEFAULT_DRINK_IMAGE;
+    }
+
+    let cart = JSON.parse(localStorage.getItem('kebabCart') || '{}');
+    let buyerNameSaved = localStorage.getItem('kebabName') || '';
+    let deliveryMethod = localStorage.getItem('kebabMethod') || 'delivery';
+    let lastOrderData = JSON.parse(localStorage.getItem('kebabLastOrder') || 'null'); 
+    
+    let currentCategory = 'makanan';
+    let searchQuery = '';
+    let userLocation = "";
+    let userCoords = null;
+    let shippingFee = 0;
+    let distanceKm = 0;
+
+    /* ========== FUNGSI CHAT LANGSUNG ========== */
+    function chatLangsung() {
+        const pesan = "Halo Kebab Turki Hajar, saya mau tanya-tanya dulu sebelum pesan 😊";
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
+
+    /* ========== FUNGSI PESAN LAGI ========== */
+    function cekRiwayatPesanan() {
+        if (lastOrderData && lastOrderData.cart) {
+            const hasItems = Object.values(cart).some(v => v > 0);
+            if (!hasItems) {
+                document.getElementById('reorder-banner').classList.add('show');
+                if(lastOrderData.nama) {
+                    document.getElementById('reorder-name').innerText = lastOrderData.nama;
+                }
+            }
+        }
+    }
+
+    function prosesPesanLagi() {
+        if (!lastOrderData || !lastOrderData.cart) return;
+        
+        cart = JSON.parse(JSON.stringify(lastOrderData.cart)); 
+        localStorage.setItem('kebabCart', JSON.stringify(cart));
+        
+        if (lastOrderData.nama) document.getElementById('buyer-name').value = lastOrderData.nama;
+        if (lastOrderData.notes) document.getElementById('order-notes').value = lastOrderData.notes;
+        if (lastOrderData.metode) switchMethod(lastOrderData.metode);
+        
+        document.getElementById('reorder-banner').classList.remove('show');
+        renderMenu();
+        calculateTotal();
+        alert("Pesanan kemarin berhasil dimasukkan ke keranjang!");
+    }
+
+    /* ========== GPS OTOMATIS ========== */
+    function autoDetectGPS() {
+        if (deliveryMethod !== 'delivery') return;
+        if (!navigator.geolocation) return;
+
+        document.getElementById('location-btn').style.display = 'none';
+        const infoBox = document.getElementById('auto-gps-info');
+        const infoText = document.getElementById('auto-gps-text');
+        infoBox.style.display = 'block';
+        infoText.innerText = "Melacak lokasi otomatis...";
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                userLocation = `https://maps.google.com/?q=${userCoords.lat},${userCoords.lon}`;
+                calculateTotal(); 
+                
+                if (distanceKm > MAX_DELIVERY_KM) {
+                    infoText.innerText = `⚠️ Jarak terlalu jauh (${distanceKm.toFixed(1)} km)`;
+                    infoBox.style.borderColor = 'var(--primary)';
+                    infoBox.style.background = 'rgba(229, 57, 53, 0.1)';
+                    infoBox.style.color = 'var(--primary)';
+                } else {
+                    infoText.innerText = `✔ Lokasi ditemukan (${distanceKm.toFixed(1)} km)`;
+                }
+            },
+            (err) => {
+                infoBox.style.display = 'none';
+                document.getElementById('location-btn').style.display = 'flex';
+            },
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+        );
+    }
+
+    function getLocationManual() {
+        const btn = document.getElementById('location-btn');
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Melacak...`;
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                userLocation = `https://maps.google.com/?q=${userCoords.lat},${userCoords.lon}`;
+                calculateTotal();
+                
+                document.getElementById('auto-gps-info').style.display = 'block';
+                document.getElementById('auto-gps-text').innerText = `✔ Lokasi ditemukan (${distanceKm.toFixed(1)} km)`;
+                btn.style.display = 'none';
+            },
+            (err) => {
+                alert("Gagal melacak. Pastikan GPS aktif dan izin browser diberikan.");
+                btn.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i> Coba Lagi`;
+            }, { enableHighAccuracy: true }
+        );
+    }
+
+    /* ========== SEARCH & RENDER ========== */
+    function handleSearch(value) {
+        searchQuery = value.trim().toLowerCase();
+        document.getElementById('clear-search').style.display = searchQuery.length > 0 ? 'block' : 'none';
+        renderMenu();
+    }
+    function clearSearch() {
+        const input = document.getElementById('search-input');
+        input.value = '';
+        handleSearch('');
+        input.focus();
+    }
+
+    function switchCategory(category) {
+        currentCategory = category;
+        document.getElementById('tab-makanan').classList.remove('active');
+        document.getElementById('tab-minuman').classList.remove('active');
+        document.getElementById(`tab-${category}`).classList.add('active');
+        if (searchQuery) { clearSearch(); } else { renderMenu(); }
+    }
+
+    function renderMenu() {
+        const container = document.getElementById('menu-container');
+        const titleEl = document.getElementById('section-title-text');
+
+        let items = searchQuery 
+            ? menuData.filter(item => `${item.type} ${item.name} ${item.category}`.toLowerCase().includes(searchQuery))
+            : menuData.filter(item => item.category === currentCategory);
+
+        titleEl.innerText = searchQuery ? 'Hasil Pencarian' : (currentCategory === 'makanan' ? 'Menu Kebab' : 'Menu Minuman');
+
+        if (items.length === 0) {
+            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Menu tidak ditemukan.</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map(item => {
+            const qty = cart[item.id] || 0;
+            const imgUrl = getItemImage(item);
+            
+            return `
+                <div class="menu-card">
+                    ${item.badge ? `<span class="menu-badge">${item.badge}</span>` : ''}
+                    <img src="${imgUrl}" class="menu-img" loading="lazy" alt="${item.name}">
+                    <div class="menu-title">${item.name}</div>
+                    <div class="menu-type">${item.type}</div>
+                    
+                    <div class="menu-bottom">
+                        <span class="menu-price">Rp${(item.price/1000)}k</span>
+                        ${qty === 0 
+                            ? `<button class="btn-add" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>`
+                            : `<div class="qty-wrap">
+                                <button class="qty-btn" onclick="updateQty(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
+                                <span class="qty-num">${qty}</span>
+                                <button class="qty-btn" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
+                               </div>`
+                        }
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function updateQty(id, change) {
+        if (!cart[id]) cart[id] = 0;
+        cart[id] += change;
+        if (cart[id] < 0) cart[id] = 0;
+        
+        localStorage.setItem('kebabCart', JSON.stringify(cart));
+        renderMenu(); 
+        calculateTotal();
+        
+        document.getElementById('reorder-banner').classList.remove('show');
+    }
+
+    function switchMethod(method) {
+        deliveryMethod = method;
+        localStorage.setItem('kebabMethod', method);
+        document.getElementById('method-delivery').classList.toggle('active', method === 'delivery');
+        document.getElementById('method-pickup').classList.toggle('active', method === 'pickup');
+
+        document.getElementById('gps-box').style.display = method === 'pickup' ? 'none' : 'block';
+        document.getElementById('pickup-info').style.display = method === 'pickup' ? 'block' : 'none';
+
+        if(method === 'pickup') {
+            userLocation = ""; userCoords = null; shippingFee = 0; distanceKm = 0;
+        } else {
+            autoDetectGPS();
+        }
+        updateStatusUI();
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let subtotal = 0, itemCount = 0;
+        menuData.forEach(item => {
+            const qty = cart[item.id] || 0;
+            subtotal += qty * item.price;
+            itemCount += qty;
+        });
+
+        if (deliveryMethod === 'delivery' && userCoords) {
+            const R = 6371;
+            const dLat = (userCoords.lat - STORE_LAT) * Math.PI / 180;
+            const dLon = (userCoords.lon - STORE_LON) * Math.PI / 180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(STORE_LAT*Math.PI/180) * Math.cos(userCoords.lat*Math.PI/180) * Math.sin(dLon/2)**2;
+            distanceKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            
+            if (distanceKm > MAX_DELIVERY_KM) {
+                shippingFee = -1;
+            } else {
+                shippingFee = 15000; 
+                for (const rate of SHIPPING_RATES) {
+                    if (distanceKm <= rate.maxKm) { shippingFee = rate.fee; break; }
+                }
+            }
+        }
+
+        const total = subtotal + (shippingFee > 0 ? shippingFee : 0);
+        
+        const cartBar = document.getElementById('cart-bar');
+        if (itemCount > 0) {
+            cartBar.classList.add('show');
+            document.getElementById('cart-count').innerText = `${itemCount} Item`;
+            document.getElementById('cart-total').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        } else {
+            cartBar.classList.remove('show');
+        }
+        return { subtotal, total, itemCount };
+    }
+
+    function openConfirmModal() {
+        if (!cekStatusToko()) { alert("Mohon maaf, toko sedang TUTUP atau di luar jam operasional."); return; }
+
+        const name = document.getElementById('buyer-name').value.trim();
+        if (!name) { alert("Masukkan nama Anda!"); document.getElementById('buyer-name').focus(); return; }
+        localStorage.setItem('kebabName', name);
+
+        const totals = calculateTotal();
+        if (totals.itemCount === 0) { alert("Pilih minimal 1 menu!"); return; }
+        if (deliveryMethod === 'delivery' && !userLocation) { alert("Lokasi GPS belum terdeteksi. Pastikan izin lokasi aktif."); return; }
+        if (deliveryMethod === 'delivery' && shippingFee === -1) { alert("Lokasi terlalu jauh!"); return; }
+
+        let html = `<div class="summary-row"><span>Nama</span><span>${name}</span></div>`;
+        menuData.forEach(item => {
+            const qty = cart[item.id] || 0;
+            if (qty > 0) html += `<div class="summary-row"><span>${item.name} (${qty}x)</span><span>Rp ${(item.price*qty).toLocaleString('id-ID')}</span></div>`;
+        });
+        
+        html += `<div class="summary-row" style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px;"><span>Subtotal</span><span>Rp ${totals.subtotal.toLocaleString('id-ID')}</span></div>`;
+        
+        if(deliveryMethod === 'delivery'){
+            html += `<div class="summary-row"><span>Ongkir (${distanceKm.toFixed(1)} km)</span><span>Rp ${shippingFee.toLocaleString('id-ID')}</span></div>`;
+        } else {
+            html += `<div class="summary-row"><span>Ongkir</span><span style="color:#4caf50;">GRATIS</span></div>`;
+        }
+        
+        html += `<div class="summary-row total"><span>TOTAL</span><span>Rp ${totals.total.toLocaleString('id-ID')}</span></div>`;
+
+        document.getElementById('confirm-summary').innerHTML = html;
+        document.getElementById('confirm-modal').classList.add('show');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirm-modal').classList.remove('show');
+    }
+
+    function confirmAndSend() {
+        closeConfirmModal();
+        const name = document.getElementById('buyer-name').value.trim();
+        const notes = document.getElementById('order-notes').value.trim();
+        const totals = calculateTotal();
+
+        const orderHistory = {
+            nama: name,
+            notes: notes,
+            metode: deliveryMethod,
+            cart: JSON.parse(JSON.stringify(cart))
+        };
+        localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
+
+        let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
+        txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n--------------------------------\n`;
+
+        menuData.forEach(item => {
+            const qty = cart[item.id] || 0;
+            if (qty > 0) txt += `▪ ${item.name} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
+        });
+
+        txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`;
+        if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`;
+        else txt += `Ongkir: GRATIS\n`;
+        
+        txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
+        if (notes) txt += `📝 Catatan: ${notes}\n\n`;
+        txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
+
+        window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
+    }
+
+    function shareWeb(platform) {
+        const url = window.location.href;
+        const text = "Yuk pesan Kebab Turki Hajar! Lezat & murah.";
+        if (platform === 'wa') window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+    }
+
+    /* INIT */
+    if (buyerNameSaved) document.getElementById('buyer-name').value = buyerNameSaved;
+    switchMethod(deliveryMethod);
+    updateStatusUI();
+    renderMenu();
+    calculateTotal();
+    cekRiwayatPesanan(); 
+    setInterval(() => updateStatusUI(), 60000);
+
+</script>
+
+</body>
+</html>
