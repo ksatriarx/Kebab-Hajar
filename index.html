@@ -21,6 +21,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- ===== FILE PROFIL TERPISAH ===== -->
+    <link rel="stylesheet" href="profile.css">
+
     <style>
         :root {
             --bg-main: #000000;
@@ -142,10 +145,12 @@
         
         .search-icon { position: absolute; left: 10px; color: rgba(255,255,255,0.6); font-size: 10px; }
 
-        /* ===== HERO SLIDER (480px) ===== */
+        /* ===== HERO SLIDER (SESUAI PERMINTAAN 480px) ===== */
         .hero-slider {
-            position: relative; height: 480px;
-            border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg);
+            position: relative; 
+            height: 480px;
+            border-bottom-left-radius: var(--radius-lg); 
+            border-bottom-right-radius: var(--radius-lg);
             overflow: hidden; background: #000;
         }
 
@@ -371,6 +376,7 @@
         .modal-handle { width: 30px; height: 3px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; flex-shrink: 0; }
         .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; text-align: center; flex-shrink: 0; }
         
+        /* List Item di Keranjang */
         .cart-list { overflow-y: auto; margin-bottom: 16px; flex-grow: 1; }
         .cart-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
         .cart-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
@@ -669,6 +675,41 @@
     </div>
 
     <!-- ==========================================
+         TAMBAHAN HTML SIDEBAR PROFIL (DARI FILE TERPISAH)
+         ========================================== -->
+    <!-- Tombol Profil Melayang -->
+    <button class="profile-toggle-btn" onclick="bukaProfil()">
+        <i class="fa-solid fa-user"></i>
+    </button>
+
+    <!-- Overlay Gelap -->
+    <div class="profile-overlay" id="profile-overlay" onclick="tutupProfil()"></div>
+
+    <!-- Sidebar Profil -->
+    <div class="profile-sidebar" id="profile-sidebar">
+        <div class="profile-header">
+            <div class="profile-avatar" id="prof-avatar">?</div>
+            <div class="profile-name" id="prof-name">Nama Pelanggan</div>
+            <div class="profile-status" id="prof-status">Pelanggan Aktif</div>
+        </div>
+        
+        <div class="profile-details">
+            <div class="detail-item">
+                <label>Email / Kontak</label>
+                <div class="value" id="prof-email">-</div>
+            </div>
+            <div class="detail-item">
+                <label>Status Akun</label>
+                <div class="value" id="prof-type">-</div>
+            </div>
+        </div>
+
+        <button class="btn-logout-sidebar" id="btn-logout-sidebar">
+            <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
+        </button>
+    </div>
+
+    <!-- ==========================================
          SCRIPT FIREBASE & LOGIKA APLIKASI
          ========================================== -->
     <script type="module">
@@ -706,7 +747,6 @@
             showLoading();
             try {
                 await signInWithPopup(auth, provider);
-                // onAuthStateChanged akan menangani perpindahan halaman
             } catch (error) {
                 alert("Gagal masuk dengan Google: " + error.message);
             } finally {
@@ -716,45 +756,50 @@
 
         // 6. FUNGSI MASUK SEBAGAI TAMU
         window.masukTamu = () => {
-            // Simpan status tamu di localStorage
             localStorage.setItem('kebabGuest', 'true');
-            bukaAplikasi("Tamu");
+            bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
         };
 
         // 7. FUNGSI LOGOUT
         window.prosesLogout = () => {
             if (confirm("Yakin ingin keluar?")) {
-                // Hapus status tamu
                 localStorage.removeItem('kebabGuest');
-                // Logout dari Firebase
                 signOut(auth);
-                // Kembali ke halaman login
+                // Tutup sidebar profil jika sedang terbuka
+                if(typeof tutupProfil === 'function') tutupProfil();
+                
                 authScreen.style.display = 'flex';
                 appScreen.classList.remove('show');
             }
         };
 
         // 8. FUNGSI MEMBUKA APLIKASI UTAMA
-        function bukaAplikasi(namaUser) {
+        function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
             authScreen.style.display = 'none';
             appScreen.classList.add('show');
             buyerNameInput.value = namaUser;
-            btnLogout.style.display = 'flex'; // Tampilkan tombol logout
-            initApp(); // Jalankan logika kebab
+            btnLogout.style.display = 'flex';
+            
+            // Isi data ke dalam Sidebar Profil
+            if (typeof isiDataProfil === 'function') {
+                isiDataProfil(namaUser, emailUser || "Tidak ada email", fotoUser);
+                document.getElementById('prof-type').innerText = tipeUser;
+            }
+
+            initApp();
         }
 
         // 9. PANTAU STATUS LOGIN FIREBASE
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Jika login via Google berhasil
                 const namaUser = user.displayName || "Pelanggan";
-                bukaAplikasi(namaUser);
+                const emailUser = user.email || "";
+                const fotoUser = user.photoURL || "";
+                bukaAplikasi(namaUser, emailUser, fotoUser, "Akun Google");
             } else {
-                // Jika tidak ada user Firebase, cek apakah dia tamu
                 if (localStorage.getItem('kebabGuest') === 'true') {
-                    bukaAplikasi("Tamu");
+                    bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
                 } else {
-                    // Jika bukan tamu dan belum login, tampilkan halaman login
                     authScreen.style.display = 'flex';
                     appScreen.classList.remove('show');
                 }
@@ -765,7 +810,6 @@
         // LOGIKA APLIKASI KEBAB (SAMA SEPERTI SEBELUMNYA)
         // ==========================================
         function initApp() {
-            // Cek apakah sudah diinisialisasi untuk mencegah duplikasi event
             if (window.appInitialized) return;
             window.appInitialized = true;
 
@@ -1046,7 +1090,7 @@
                 localStorage.setItem('kebabCart', JSON.stringify(cart));
                 renderMenu(); 
                 calculateTotal();
-                renderCartModal(); // Update isi keranjang di modal jika sedang terbuka
+                renderCartModal(); 
                 document.getElementById('reorder-banner').classList.remove('show');
             }
 
@@ -1086,7 +1130,6 @@
                                     <span class="qty-num">${qty}</span>
                                     <button class="qty-btn" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
                                 </div>
-                                <!-- Tombol Hapus -->
                                 <button onclick="hapusItem(${item.id})" style="background:rgba(229,57,53,0.1); border:none; color:var(--primary); width:28px; height:28px; border-radius:6px; cursor:pointer; margin-left:6px;">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
@@ -1106,8 +1149,6 @@
                 renderMenu();
                 calculateTotal();
                 renderCartModal();
-                
-                // Jika keranjang jadi kosong, tutup modal
                 const totals = calculateTotal();
                 if (totals.itemCount === 0) {
                     closeCartModal();
@@ -1126,9 +1167,7 @@
 
             window.openConfirmModalFromCart = () => {
                 closeCartModal();
-                // Scroll ke form pengiriman
                 document.querySelector('.form-card').scrollIntoView({behavior:'smooth', block:'center'});
-                // Beri sedikit jeda agar animasi scroll selesai, lalu buka modal konfirmasi
                 setTimeout(() => {
                     openConfirmModal();
                 }, 400);
@@ -1287,5 +1326,8 @@
             }
         }
     </script>
+
+    <!-- Panggil Script Profil Terpisah -->
+    <script src="profile.js"></script>
 </body>
 </html>
