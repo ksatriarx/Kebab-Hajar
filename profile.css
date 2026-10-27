@@ -1,5 +1,5 @@
 /* ==========================================
-   CSS UNTUK PROFIL PELANGGAN (SIDEBAR PROFESIONAL)
+   CSS PROFIL PELANGGAN (SUPER MINIMALIS)
    ========================================== */
 
 /* Tombol Melayang di Pinggir Kanan */
@@ -8,34 +8,35 @@
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
+    width: 32px; /* Lebih kecil */
     height: 40px;
-    background: rgba(229, 57, 53, 0.9);
+    background: rgba(229, 57, 53, 0.85);
     backdrop-filter: blur(5px);
     color: white;
     border: none;
-    border-radius: 10px 0 0 10px;
+    border-radius: 8px 0 0 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     z-index: 900;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+    box-shadow: -2px 0 8px rgba(0,0,0,0.3);
     transition: all 0.3s;
 }
 
 .profile-toggle-btn:hover {
     background: var(--primary);
+    width: 36px;
 }
 
-/* Overlay Gelap & Burem (Blur) */
+/* Overlay Burem */
 .profile-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6); /* Lebih transparan */
-    backdrop-filter: blur(8px); /* Efek kaca buram */
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.4); /* Lebih tipis */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     z-index: 998;
     opacity: 0;
     pointer-events: none;
@@ -47,54 +48,50 @@
     pointer-events: auto;
 }
 
-/* Sidebar Slide dari Kanan */
+/* Sidebar Slide dari Kanan (Compact & Glassmorphism) */
 .profile-sidebar {
     position: fixed;
-    top: 10px; /* Jarak dari atas */
-    right: -320px; /* Sembunyi di luar layar */
-    width: 280px;
-    height: calc(100vh - 90px); /* Dikurangi tinggi menu bawah agar tidak tertutup */
-    background: rgba(20, 20, 20, 0.85); /* Warna gelap transparan */
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    top: 15px;
+    right: -260px; /* Lebar total 240px */
+    width: 240px;
+    height: calc(100vh - 110px); /* Jarak aman dari atas & menu bawah */
+    background: rgba(20, 20, 20, 0.75); /* Transparan gelap */
+    backdrop-filter: blur(20px); /* Efek kaca tebal */
+    -webkit-backdrop-filter: blur(20px);
     z-index: 999;
-    box-shadow: -5px 0 30px rgba(0,0,0,0.6);
+    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
     transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    padding: 25px 20px;
-    border-left: 1px solid rgba(255,255,255,0.1);
-    border-top-left-radius: 16px;
-    border-bottom-left-radius: 16px;
+    padding: 20px 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; /* Melengkung semua sudut */
 }
 
 .profile-sidebar.show {
-    right: 10px; /* Muncul ke layar dengan jarak 10px dari kanan */
+    right: 15px; /* Muncul dengan jarak dari tepi layar */
 }
 
-/* Konten Profil */
+/* Header Profil */
 .profile-header {
     text-align: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px dashed rgba(255,255,255,0.1);
+    margin-bottom: 20px;
 }
 
 .profile-avatar {
-    width: 85px;
-    height: 85px;
+    width: 60px; /* Lebih kecil */
+    height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+    background: var(--primary);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 34px;
+    font-size: 24px;
     font-weight: 800;
-    margin: 0 auto 15px;
-    box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
+    margin: 0 auto 10px;
+    box-shadow: 0 4px 10px rgba(229, 57, 53, 0.3);
     overflow: hidden;
-    border: 3px solid rgba(255,255,255,0.1);
 }
 
 .profile-avatar img {
@@ -104,73 +101,80 @@
 }
 
 .profile-name {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 800;
     color: #fff;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
 }
 
 .profile-status {
-    font-size: 10px;
+    font-size: 9px;
     color: #4caf50;
-    background: rgba(76, 175, 80, 0.15);
+    background: transparent; /* Hilangkan background kotak */
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.5px;
-    border: 1px solid rgba(76, 175, 80, 0.3);
+    text-transform: uppercase;
 }
 
+/* Detail Informasi */
 .profile-details {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Jarak antar item */
+    margin-top: 10px;
 }
 
 .detail-item {
-    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px dashed rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
 }
 
 .detail-item label {
-    display: block;
-    font-size: 9px;
+    font-size: 8px;
     color: #888;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
     font-weight: 700;
 }
 
 .detail-item .value {
-    font-size: 13px;
+    font-size: 11px;
     color: #fff;
     font-weight: 600;
     word-break: break-all;
-    background: rgba(255,255,255,0.05);
-    padding: 8px 12px;
-    border-radius: 8px;
 }
 
-/* Tombol Aksi di Sidebar */
+/* Tombol Logout Minimalis (Teks Saja) */
 .btn-logout-sidebar {
     width: 100%;
-    background: rgba(229, 57, 53, 0.15);
+    background: transparent;
     color: #e53935;
-    border: 1px solid rgba(229, 57, 53, 0.5);
-    padding: 14px;
-    border-radius: 10px;
-    font-weight: 800;
-    font-size: 13px;
+    border: none;
+    padding: 10px;
+    font-weight: 700;
+    font-size: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.3s;
-    margin-top: auto; /* Mendorong tombol ke paling bawah */
+    margin-top: auto;
+    opacity: 0.8;
 }
 
 .btn-logout-sidebar:hover {
-    background: #e53935;
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4);
+    opacity: 1;
+    background: rgba(229, 57, 53, 0.1);
+    border-radius: 8px;
 }
