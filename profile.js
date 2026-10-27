@@ -1,47 +1,69 @@
-/* ==========================================
-   SCRIPT UNTUK SIDEBAR PROFIL
-   ========================================== */
+// ==========================================
+// SCRIPT UNTUK SIDEBAR PROFIL & SALDO (FIREBASE)
+// ==========================================
 
-// Fungsi untuk membuka Sidebar
+// Fungsi Buka/Tutup Sidebar
 function bukaProfil() {
     document.getElementById('profile-sidebar').classList.add('show');
     document.getElementById('profile-overlay').classList.add('show');
 }
 
-// Fungsi untuk menutup Sidebar
 function tutupProfil() {
     document.getElementById('profile-sidebar').classList.remove('show');
     document.getElementById('profile-overlay').classList.remove('show');
 }
 
-// Fungsi untuk mengisi data profil dari data Firebase
-// Fungsi ini akan dipanggil otomatis oleh index.html saat login berhasil
+// Fungsi untuk mengisi data profil dari Firebase
 function isiDataProfil(nama, email, fotoUrl) {
-    // Isi Nama
     document.getElementById('prof-name').innerText = nama;
-    
-    // Isi Email
     document.getElementById('prof-email').innerText = email;
-
-    // Isi Avatar (Foto atau Huruf Depan)
+    
     const avatarDiv = document.getElementById('prof-avatar');
     if (fotoUrl) {
         avatarDiv.innerHTML = `<img src="${fotoUrl}" alt="Foto Profil">`;
     } else {
-        // Ambil huruf pertama dari nama
         const inisial = nama.charAt(0).toUpperCase();
         avatarDiv.innerHTML = inisial;
     }
 }
 
-// Tombol Logout di Sidebar
+// ===== SISTEM SALDO SEMENTARA (SIMULASI) =====
+// Karena belum ada backend, saldo disimpan di localStorage
+function ambilSaldo() {
+    const saldo = localStorage.getItem('kebabSaldo');
+    return saldo ? parseInt(saldo) : 0;
+}
+
+function perbaruiTampilanSaldo() {
+    const saldoSaatIni = ambilSaldo();
+    const elSaldo = document.getElementById('prof-saldo');
+    if (elSaldo) {
+        elSaldo.innerText = "Rp " + saldoSaatIni.toLocaleString('id-ID');
+    }
+}
+
+// Fungsi untuk simulasi isi saldo (Hanya untuk uji coba)
+function simulasiTopUp() {
+    const nominal = prompt("Simulasi Top Up (Uji Coba):\nMasukkan nominal saldo (contoh: 50000)");
+    if (nominal && !isNaN(nominal)) {
+        let saldoBaru = ambilSaldo() + parseInt(nominal);
+        localStorage.setItem('kebabSaldo', saldoBaru);
+        perbaruiTampilanSaldo();
+        alert("Top Up Berhasil! Saldo Anda sekarang: Rp " + saldoBaru.toLocaleString('id-ID'));
+    }
+}
+
+// Tombol Logout
 document.getElementById('btn-logout-sidebar').addEventListener('click', () => {
-    // Panggil fungsi logout Firebase yang ada di index.html
     if (typeof prosesLogout === 'function') {
         prosesLogout();
     } else {
-        // Fallback jika fungsi tidak ada
         localStorage.removeItem('kebabGuest');
         window.location.reload();
     }
+});
+
+// Panggil fungsi saldo saat file dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    perbaruiTampilanSaldo();
 });
