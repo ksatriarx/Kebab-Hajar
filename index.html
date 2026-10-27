@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- ===== FILE PROFIL TERPISAH ===== -->
-    <link rel="stylesheet" href="profile.css?v=3">
+    <link rel="stylesheet" href="profile.css?v=2">
 
     <style>
         :root {
@@ -695,12 +695,14 @@
         
         <div class="profile-details">
     <!-- KOTAK SALDO BARU -->
-    <div class="wallet-card">
+<div class="wallet-card">
+    <div class="wallet-info">
         <div class="wallet-label">Saldo Dompet</div>
         <div class="wallet-balance" id="prof-saldo">Rp 0</div>
-        <button class="btn-topup" onclick="simulasiTopUp()">+ Isi Saldo (Uji Coba)</button>
     </div>
-    <!-- BATAS KOTAK SALDO -->
+    <button class="btn-topup" onclick="simulasiTopUp()">+ Isi</button>
+</div>
+<!-- BATAS KOTAK SALDO -->
 
     <div class="detail-item">
         <label>Email / Kontak</label>
