@@ -11,21 +11,21 @@
   "lang": "id",
   "icons": [
     {
-      "src": "https://i.ibb.co.com/bggdt5nz/1000587288.webp",
+      "src": "https://i.ibb.co.com/QFk2vtzb/1000587297.png",
       "sizes": "192x192",
-      "type": "image/webp",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://i.ibb.co.com/bggdt5nz/1000587288.webp",
+      "src": "https://i.ibb.co.com/QFk2vtzb/1000587297.png",
       "sizes": "512x512",
-      "type": "image/webp",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://i.ibb.co.com/bggdt5nz/1000587288.webp",
+      "src": "https://i.ibb.co.com/QFk2vtzb/1000587297.png",
       "sizes": "512x512",
-      "type": "image/webp",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]
