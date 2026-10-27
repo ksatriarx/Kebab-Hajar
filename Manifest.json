@@ -1,0 +1,32 @@
+{
+  "name": "Kebab IDI — Kebab Turki Hajar",
+  "short_name": "Kebab IDI",
+  "description": "Kebab Turki asli, antar ke rumah area Idi Rayeuk, Aceh Timur.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#e53935",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "https://i.ibb.co.com/cXSfTtLw/1783186521710-1.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co.com/cXSfTtLw/1783186521710-1.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co.com/cXSfTtLw/1783186521710-1.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ]
+}
