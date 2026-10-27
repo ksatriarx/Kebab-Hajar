@@ -8,13 +8,13 @@
     <meta name="description" content="Kebab IDI — Pesan kebab Turki asli, antar ke rumah area Idi Rayeuk, Aceh Timur.">
 
     <!-- ===== PWA META ===== -->
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="https://i.ibb.co.com/QFk2vtzb/1000587297.png">
-<link rel="apple-touch-icon" href="https://i.ibb.co.com/QFk2vtzb/1000587297.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Kebab IDI">
-    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="https://i.ibb.co.com/QFk2vtzb/1000587297.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co.com/QFk2vtzb/1000587297.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kebab IDI">
+
     <!-- ===== FONTS ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -93,7 +93,7 @@
         .main-header.scrolled .nav-logo { text-shadow: none; }
         .nav-logo span { color: var(--text-main); font-style: normal;}
 
-        .nav-icons { display: flex; flex-direction: row; gap: 8px; }
+        .nav-icons { display: flex; flex-direction: row; gap: 6px; }
 
         .icon-btn {
             width: 32px; height: 32px; border-radius: 50%;
@@ -101,9 +101,30 @@
             border: 1px solid rgba(255,255,255,0.15);
             display: flex; align-items: center; justify-content: center;
             color: var(--text-main); font-size: 12px; cursor: pointer; text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Tombol Install Spesial */
+        .btn-install {
+            background: rgba(229, 57, 53, 0.2);
+            border-color: var(--primary);
+            color: var(--primary);
+            animation: pulse-install 2s infinite;
+        }
+
+        @keyframes pulse-install {
+            0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(229, 57, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
         }
 
         .main-header.scrolled .icon-btn { background: var(--bg-input); border-color: var(--border); }
+        .main-header.scrolled .btn-install { background: rgba(229, 57, 53, 0.2); border-color: var(--primary); }
 
         /* SEARCH MINI */
         .search-box {
@@ -370,7 +391,13 @@
                 <i class="fa-solid fa-utensils"></i> <span>Kebab</span>Hajar
             </div>
             <div class="nav-icons">
+                <!-- TOMBOL INSTALL BARU -->
+                <button class="icon-btn btn-install" id="btn-install-pwa" onclick="picuInstall()" style="display: none;" title="Install Aplikasi">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <!-- Ikon Lokasi -->
                 <a href="https://maps.google.com/?q=4.9509491,97.7697946" target="_blank" class="icon-btn"><i class="fa-solid fa-location-dot"></i></a>
+                <!-- Ikon Share -->
                 <button class="icon-btn" onclick="shareWeb('wa')"><i class="fa-solid fa-share-nodes"></i></button>
             </div>
         </div>
@@ -923,14 +950,45 @@
     cekRiwayatPesanan(); 
     setInterval(() => updateStatusUI(), 60000);
 
-    /* ===== REGISTER SERVICE WORKER (PWA) ===== */
+    /* ==========================================
+       LOGIKA TOMBOL INSTALL PWA (TAMBAHAN BARU)
+       ========================================== */
+    let deferredPrompt;
+
+    // 1. Tangkap event 'beforeinstallprompt' dari Chrome
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Munculkan tombol install di samping ikon share
+        document.getElementById('btn-install-pwa').style.display = 'flex';
+    });
+
+    // 2. Fungsi saat tombol install di-klik
+    function picuInstall() {
+        if (deferredPrompt) {
+            // Jika browser mendukung, tampilkan pop-up install bawaan Chrome
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User menerima install');
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            // Jika browser tidak mendukung (atau sudah terinstall), tampilkan instruksi manual
+            alert("Untuk Install Aplikasi:\n\n1. Klik titik tiga (⋮) di pojok kanan atas Chrome.\n2. Pilih 'Install App' atau 'Tambahkan ke Layar Utama'.\n\nJika menu tersebut tidak ada, pastikan Anda membuka web ini menggunakan Chrome.");
+        }
+    }
+
+    // 3. Daftarkan Service Worker (Wajib PWA)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('PWA siap:', reg.scope))
+                .then(reg => console.log('PWA Service Worker siap:', reg.scope))
                 .catch(err => console.log('PWA gagal:', err));
         });
     }
+
 </script>
 
 </body>
