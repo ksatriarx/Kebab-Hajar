@@ -622,7 +622,7 @@
         <a href="#" class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">
             <i class="fa-solid fa-house"></i><span>Home</span>
         </a>
-        <a href="#" class="nav-item" onclick="document.getElementById('menu-container').scrollIntoView({behavior:'smooth'}); return false;">
+        <a href="#" class="nav-item" onclick="window.scrollTo({top: document.getElementById('menu-container').offsetTop - 130, behavior: 'smooth'}); return false;">
             <i class="fa-solid fa-bowl-food"></i><span>Menu</span>
         </a>
         <a href="#" class="nav-item" onclick="openCartModal(); return false;">
