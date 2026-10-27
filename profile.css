@@ -178,40 +178,56 @@
     background: rgba(229, 57, 53, 0.1);
     border-radius: 8px;
 }
-/* ===== TAMPILAN DOMPET DIGITAL ===== */
+/* ===== TAMPILAN DOMPET DIGITAL (MINIMALIS MODERN) ===== */
 .wallet-card {
-    background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+    background: rgba(255, 255, 255, 0.03); /* Latar transparan tipis */
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
-    padding: 15px;
-    color: white;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(229, 57, 53, 0.3);
+    padding: 14px 16px;
+    margin-bottom: 20px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
     gap: 10px;
 }
 
-.wallet-balance {
-    font-size: 22px;
-    font-weight: 800;
+.wallet-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .wallet-label {
-    font-size: 10px;
-    opacity: 0.8;
+    font-size: 9px;
+    color: #888;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.wallet-balance {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent); /* Warna emas */
+    letter-spacing: -0.5px;
 }
 
 .btn-topup {
-    background: #fff;
-    color: #e53935;
+    background: var(--primary);
+    color: white;
     border: none;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
-    text-align: center;
-    width: 100%;
+    white-space: nowrap;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-topup:hover {
+    background: #c62828;
 }
