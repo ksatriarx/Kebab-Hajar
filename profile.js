@@ -44,12 +44,12 @@ function perbaruiTampilanSaldo() {
 
 // Fungsi untuk simulasi isi saldo (Hanya untuk uji coba)
 function simulasiTopUp() {
-    const nominal = prompt("Simulasi Top Up (Uji Coba):\nMasukkan nominal saldo (contoh: 50000)");
+    const nominal = prompt("Masukkan nominal saldo (Uji Coba):\nContoh: 50000");
     if (nominal && !isNaN(nominal)) {
         let saldoBaru = ambilSaldo() + parseInt(nominal);
         localStorage.setItem('kebabSaldo', saldoBaru);
         perbaruiTampilanSaldo();
-        alert("Top Up Berhasil! Saldo Anda sekarang: Rp " + saldoBaru.toLocaleString('id-ID'));
+        alert("✅ Top Up Berhasil!\nSaldo Anda sekarang: Rp " + saldoBaru.toLocaleString('id-ID'));
     }
 }
 
