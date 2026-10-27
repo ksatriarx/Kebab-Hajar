@@ -1,4 +1,4 @@
-// Service Worker Minimalis untuk Syarat PWA
+// Service Worker Minimalis - Syarat Mutlak PWA Chrome Android
 self.addEventListener('install', (e) => {
   self.skipWaiting();
 });
@@ -7,7 +7,6 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(clients.claim());
 });
 
-// Biarkan kosong, yang penting ada event 'fetch'
 self.addEventListener('fetch', (e) => {
-  // Kosong
+  // Biarkan kosong. Kehadiran event 'fetch' ini cukup untuk lolos seleksi Chrome.
 });
