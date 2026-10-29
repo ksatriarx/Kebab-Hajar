@@ -1286,8 +1286,20 @@
                 txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
                 if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
-                window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
-            }
+                    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
+    
+    // ==========================================
+    // FITUR BARU: OTOMATIS KOSONGKAN KERANJANG
+    // ==========================================
+    cart = {}; // 1. Kosongkan data keranjang di JavaScript
+    localStorage.removeItem('kebabCart'); // 2. Hapus memori keranjang di HP pelanggan
+    
+    renderMenu(); // 3. Gambar ulang menu (tombol + kembali muncul)
+    calculateTotal(); // 4. Hitung ulang total jadi Rp 0 (bar merah hilang)
+    
+    // Opsional: Munculkan notifikasi sukses
+    alert("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.");
+}
 
             window.shareWeb = (platform) => {
                 const url = window.location.href;
