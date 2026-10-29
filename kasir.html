@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kebab IDI - Sistem Kasir</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #000000; --bg-card: #1a1a1a; --bg-input: #121212;
+            --text-main: #ffffff; --text-muted: #888888;
+            --primary: #e53935; --accent: #ffb300;
+            --border: #333333; --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- LAYAR DIBLOKIR --- */
+        .access-denied {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; width: 100vw; text-align: center; background: var(--bg-main);
+        }
+        .access-denied h1 { font-size: 30px; color: var(--primary); margin-bottom: 10px; }
+        .access-denied p { color: var(--text-muted); margin-bottom: 20px; }
+        .btn-back { background: var(--primary); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
+
+        /* --- LAYOUT POS --- */
+        .pos-container { display: none; width: 100%; height: 100vh; }
+        
+        /* KIRI: MENU MAKANAN */
+        .menu-area { flex-grow: 1; padding: 20px; overflow-y: auto; border-right: 1px solid var(--border); }
+        .header-pos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-pos h2 { font-size: 20px; font-weight: 800; }
+        .btn-logout { background: rgba(229, 57, 53, 0.2); color: var(--primary); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+        .menu-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .menu-item:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .menu-img { width: 50px; height: 50px; background: #241c1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 10px; }
+        .menu-name { font-size: 11px; font-weight: 700; margin-bottom: 4px; line-height: 1.2; }
+        .menu-price { font-size: 12px; font-weight: 800; color: var(--accent); }
+
+        /* KANAN: KERANJANG & PEMBAYARAN */
+        .cart-area { width: 380px; background: var(--bg-card); display: flex; flex-direction: column; padding: 20px; }
+        .cart-title { font-size: 18px; font-weight: 800; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        
+        .cart-list { flex-grow: 1; overflow-y: auto; margin-bottom: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
+        .cart-item-info { flex-grow: 1; }
+        .cart-item-name { font-weight: 700; }
+        .cart-item-price { color: var(--accent); font-size: 12px; }
+        .qty-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { background: #000; border: 1px solid var(--border); color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; }
+        .qty-num { font-weight: 700; width: 15px; text-align: center; }
+
+        .cart-total-box { border-top: 2px solid var(--border); padding-top: 15px; margin-bottom: 15px; }
+        .total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; margin-bottom: 15px; }
+        .total-row span:last-child { color: var(--primary); font-size: 20px; }
+
+        .btn-pay { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer; }
+
+        /* --- MODAL PEMBAYARAN --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-box { background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 400px; padding: 24px; text-align: center; }
+        .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 15px; }
+        
+        .payment-methods { display: flex; gap: 10px; margin-bottom: 20px; }
+        .pay-method-btn { flex: 1; padding: 15px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: white; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .pay-method-btn.active { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); color: var(--primary); }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 16px; font-weight: 700; }
+        
+        .change-box { background: var(--bg-input); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
+        .change-box div { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; }
+        .change-box .kembalian { color: var(--accent); font-size: 18px; font-weight: 800; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px; }
+
+        .modal-actions { display: flex; gap: 10px; }
+        .btn-cancel { flex: 1; padding: 15px; border-radius: 8px; border: none; background: #333; color: white; font-weight: 700; cursor: pointer; }
+        .btn-confirm { flex: 2; padding: 15px; border-radius: 8px; border: none; background: var(--success); color: white; font-weight: 700; cursor: pointer; }
+        
+        /* Tampilan HP */
+        @media (max-width: 768px) {
+            .pos-container { flex-direction: column; }
+            .cart-area { width: 100%; height: 50vh; border-top: 1px solid var(--border); }
+            .menu-area { height: 50vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LAYAR DIBLOKIR (Bukan Kasir) -->
+    <div class="access-denied" id="access-denied">
+        <i class="fa-solid fa-lock" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
+        <h1>Akses Ditolak</h1>
+        <p>Halaman ini hanya untuk Akun Kasir resmi Kebab IDI.</p>
+        <a href="index.html" class="btn-back">Kembali ke Beranda</a>
+    </div>
+
+    <!-- LAYAR UTAMA KASIR -->
+    <div class="pos-container" id="pos-app">
+        
+        <!-- KIRI: DAFTAR MENU -->
+        <div class="menu-area">
+            <div class="header-pos">
+                <h2>👨‍🍳 Kasir Kebab IDI</h2>
+                <button class="btn-logout" onclick="prosesLogout()"><i class="fa-solid fa-right-from-bracket"></i> Tutup Kasir</button>
+            </div>
+            <div class="menu-grid" id="menu-grid"></div>
+        </div>
+
+        <!-- KANAN: KERANJANG -->
+        <div class="cart-area">
+            <div class="cart-title">🛒 Pesanan Saat Ini</div>
+            <div class="cart-list" id="cart-list">
+                <div style="text-align: center; color: var(--text-muted); margin-top: 20px;">Belum ada pesanan.</div>
+            </div>
+            
+            <div class="cart-total-box">
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span id="total-price">Rp 0</span>
+                </div>
+                <button class="btn-pay" onclick="bukaPembayaran()">Bayar Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PEMBAYARAN -->
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal-box">
+            <div class="modal-title">Pilih Pembayaran</div>
+            
+            <div class="payment-methods">
+                <button class="pay-method-btn active" id="btn-cash" onclick="pilihMetode('cash')">💵 Tunai</button>
+                <button class="pay-method-btn" id="btn-qris" onclick="pilihMetode('qris')">📱 QRIS</button>
+            </div>
+
+            <!-- Area Tunai -->
+            <div id="area-cash">
+                <div class="form-group">
+                    <label>Uang Diterima (Rp)</label>
+                    <input type="number" id="uang-diterima" placeholder="Contoh: 50000" oninput="hitungKembalian()">
+                </div>
+                <div class="change-box">
+                    <div><span>Total Tagihan:</span><span id="modal-total">Rp 0</span></div>
+                    <div class="kembalian"><span>Kembalian:</span><span id="modal-kembalian">Rp 0</span></div>
+                </div>
+            </div>
+
+            <!-- Area QRIS (Simulasi) -->
+            <div id="area-qris" style="display: none; margin-bottom: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; display: inline-block;">
+                    <i class="fa-solid fa-qrcode" style="font-size: 100px; color: black;"></i>
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">Minta pelanggan scan QRIS ini, lalu pastikan uang masuk.</p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="tutupPembayaran()">Batal</button>
+                <button class="btn-confirm" onclick="selesaikanPesanan()">✔ Simpan & Lunas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Konfigurasi Firebase KEBAB IDI
+        const firebaseConfig = {
+            apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
+            authDomain: "kebab-idi.firebaseapp.com",
+            projectId: "kebab-idi",
+            storageBucket: "kebab-idi.firebasestorage.app",
+            messagingSenderId: "303997052314",
+            appId: "1:303997052314:web:1db122bc5911297b710623"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // EMAIL YANG DIIZINKAN
+        const ALLOWED_EMAIL = "rxstore101@gmail.com";
+
+        // Data Menu (Sama seperti di index)
+        const menuData = [
+            { id: 1, name: "Telur Sosis", price: 10000, emoji: "🌯" },
+            { id: 2, name: "Daging", price: 10000, emoji: "🌯" },
+            { id: 3, name: "Daging Sosis", price: 13000, emoji: "🌯" },
+            { id: 4, name: "Daging Telur", price: 13000, emoji: "🌯" },
+            { id: 5, name: "Daging Telur Sosis", price: 15000, emoji: "🌯" },
+            { id: 6, name: "Daging Telur Sosis Keju", price: 18000, emoji: "🌯" },
+            { id: 7, name: "Sanger Dingin/Panas", price: 10000, emoji: "☕" },
+            { id: 8, name: "Americano", price: 10000, emoji: "☕" },
+            { id: 9, name: "Americano Gula Aren", price: 12000, emoji: "🧋" },
+            { id: 10, name: "Teh Hijau Dingin", price: 8000, emoji: "🍵" },
+            { id: 11, name: "Teh Hijau Panas", price: 5000, emoji: "🍵" },
+            { id: 12, name: "Kopi Caramel", price: 15000, emoji: "🥤" },
+            { id: 13, name: "Kopi Latte", price: 15000, emoji: "☕" },
+            { id: 14, name: "Sirup Kurnia", price: 8000, emoji: "🍧" },
+            { id: 15, name: "Capucino", price: 15000, emoji: "☕" },
+            { id: 16, name: "Long Black", price: 10000, emoji: "☕" },
+            { id: 17, name: "Sanger Double Shoot", price: 18000, emoji: "☕" },
+            { id: 18, name: "Kopi Milo Dingin", price: 15000, emoji: "🧋" }
+        ];
+
+        let cart = {};
+        let metodePembayaran = 'cash';
+
+        // 1. CEK APAKAH YANG LOGIN ADALAH KASIR
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ALLOWED_EMAIL) {
+                document.getElementById('access-denied').style.display = 'none';
+                document.getElementById('pos-app').style.display = 'flex';
+                renderMenu();
+            } else {
+                document.getElementById('access-denied').style.display = 'flex';
+                document.getElementById('pos-app').style.display = 'none';
+            }
+        });
+
+        // 2. RENDER MENU
+        function renderMenu() {
+            const container = document.getElementById('menu-grid');
+            container.innerHTML = menuData.map(item => `
+                <div class="menu-item" onclick="tambahKeKeranjang(${item.id})">
+                    <div class="menu-img">${item.emoji}</div>
+                    <div class="menu-name">${item.name}</div>
+                    <div class="menu-price">Rp ${(item.price/1000)}k</div>
+                </div>
+            `).join('');
+        }
+
+        // 3. LOGIKA KERANJANG
+        window.tambahKeKeranjang = (id) => {
+            if (!cart[id]) cart[id] = 0;
+            cart[id]++;
+            renderKeranjang();
+        };
+
+        window.kurangiKeranjang = (id) => {
+            if (cart[id] > 0) {
+                cart[id]--;
+                if (cart[id] === 0) delete cart[id];
+                renderKeranjang();
+            }
+        };
+
+        function renderKeranjang() {
+            const list = document.getElementById('cart-list');
+            let total = 0;
+            let html = '';
+
+            if (Object.keys(cart).length === 0) {
+                html = '<div style="text-align: center; color: var(--text-muted); margin-top: 20px;">Belum ada pesanan.</div>';
+            } else {
+                menuData.forEach(item => {
+                    const qty = cart[item.id] || 0;
+                    if (qty > 0) {
+                        total += item.price * qty;
+                        html += `
+                            <div class="cart-item">
+                                <div class="cart-item-info">
+                                    <div class="cart-item-name">${item.name}</div>
+                                    <div class="cart-item-price">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
+                                </div>
+                                <div class="qty-controls">
+                                    <button class="qty-btn" onclick="kurangiKeranjang(${item.id})">-</button>
+                                    <span class="qty-num">${qty}</span>
+                                    <button class="qty-btn" onclick="tambahKeKeranjang(${item.id})">+</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            list.innerHTML = html;
+            document.getElementById('total-price').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('modal-total').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            hitungKembalian();
+        }
+
+        // 4. LOGIKA PEMBAYARAN
+        window.bukaPembayaran = () => {
+            if (Object.keys(cart).length === 0) {
+                alert("Pilih menu terlebih dahulu!");
+                return;
+            }
+            document.getElementById('payment-modal').style.display = 'flex';
+            document.getElementById('uang-diterima').value = '';
+            pilihMetode('cash');
+        };
+
+        window.tutupPembayaran = () => {
+            document.getElementById('payment-modal').style.display = 'none';
+        };
+
+        window.pilihMetode = (metode) => {
+            metodePembayaran = metode;
+            if (metode === 'cash') {
+                document.getElementById('btn-cash').classList.add('active');
+                document.getElementById('btn-qris').classList.remove('active');
+                document.getElementById('area-cash').style.display = 'block';
+                document.getElementById('area-qris').style.display = 'none';
+            } else {
+                document.getElementById('btn-qris').classList.add('active');
+                document.getElementById('btn-cash').classList.remove('active');
+                document.getElementById('area-cash').style.display = 'none';
+                document.getElementById('area-qris').style.display = 'block';
+            }
+        };
+
+        window.hitungKembalian = () => {
+            let total = 0;
+            menuData.forEach(item => {
+                const qty = cart[item.id] || 0;
+                total += item.price * qty;
+            });
+            const diterima = parseInt(document.getElementById('uang-diterima').value) || 0;
+            const kembalian = diterima - total;
+            
+            document.getElementById('modal-kembalian').innerText = kembalian > 0 ? `Rp ${kembalian.toLocaleString('id-ID')}` : 'Rp 0';
+        };
+
+        // 5. SIMPAN TRANSAKSI KE FIREBASE
+        window.selesaikanPesanan = async () => {
+            let total = 0;
+            let rincian = [];
+            menuData.forEach(item => {
+                const qty = cart[item.id] || 0;
+                if (qty > 0) {
+                    total += item.price * qty;
+                    rincian.push({ nama: item.name, qty: qty, harga: item.price });
+                }
+            });
+
+            const diterima = parseInt(document.getElementById('uang-diterima').value) || 0;
+            if (metodePembayaran === 'cash' && diterima < total) {
+                alert("Uang yang diterima kurang dari total tagihan!");
+                return;
+            }
+
+            try {
+                // Simpan ke database Firebase (collection: transaksi_kasir)
+                await addDoc(collection(db, "transaksi_kasir"), {
+                    waktu: new Date().toISOString(),
+                    rincian: rincian,
+                    total: total,
+                    metode: metodePembayaran,
+                    uangDiterima: metodePembayaran === 'cash' ? diterima : total,
+                    kembalian: metodePembayaran === 'cash' ? (diterima - total) : 0,
+                    kasir: auth.currentUser.email
+                });
+
+                alert("✅ Transaksi Berhasil Disimpan!");
+                
+                // Reset
+                cart = {};
+                renderKeranjang();
+                tutupPembayaran();
+
+            } catch (error) {
+                alert("❌ Gagal menyimpan transaksi: " + error.message);
+            }
+        };
+
+        window.prosesLogout = () => {
+            if (confirm("Tutup sesi kasir?")) {
+                signOut(auth).then(() => window.location.href = 'index.html');
+            }
+        };
+    </script>
+</body>
+</html>
