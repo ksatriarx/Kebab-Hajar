@@ -142,6 +142,7 @@
     const ALLOWED_EMAIL = "rxstore101@gmail.com";
     let statusTerpilih = "auto";
     let statusSaatIni = "auto";
+    let isSaving = false;
 
     // Cek login
     onAuthStateChanged(auth, (user) => {
@@ -166,6 +167,9 @@
             statusTerpilih = statusSaatIni;
             tampilkanStatus(statusSaatIni);
             highlightOption(statusSaatIni);
+        }, (error) => {
+            console.error("Error membaca database: ", error);
+            alert("Gagal terhubung ke database. Pastikan aturan Firestore diizinkan (Test Mode).");
         });
     }
 
@@ -216,11 +220,22 @@
     };
 
     window.simpanPengaturan = async () => {
+        if (isSaving) return;
+        
+        if (!auth.currentUser) {
+            alert("Sesi login Anda berakhir. Silakan muat ulang halaman ini (refresh) lalu login kembali.");
+            return;
+        }
+
         const btn = document.getElementById('btn-save');
+        const btnText = document.getElementById('btn-save-text');
+        
+        isSaving = true;
         btn.disabled = true;
-        document.getElementById('btn-save-text').innerText = 'Menyimpan...';
+        btnText.innerText = 'Menyimpan...';
 
         try {
+            // Simpan ke Firebase
             await setDoc(doc(db, "pengaturan", "toko"), {
                 status: statusTerpilih,
                 updatedAt: new Date().toISOString(),
@@ -229,11 +244,14 @@
 
             statusSaatIni = statusTerpilih;
             alert("✅ Pengaturan berhasil disimpan!");
-            document.getElementById('btn-save-text').innerText = 'Pilih Status';
+            btnText.innerText = 'Tersimpan';
         } catch (error) {
-            alert("❌ Gagal menyimpan: " + error.message);
-            document.getElementById('btn-save-text').innerText = 'Simpan Pengaturan';
+            console.error("Error simpan: ", error);
+            alert("❌ Gagal menyimpan: " + error.message + "\n\nPastikan koneksi internet lancar dan aturan Firestore Anda mengizinkan penulisan data (Test Mode).");
+            btnText.innerText = 'Simpan Pengaturan';
             btn.disabled = false;
+        } finally {
+            isSaving = false;
         }
     };
 </script>
