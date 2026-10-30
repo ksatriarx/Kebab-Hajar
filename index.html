@@ -452,9 +452,6 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-     
-        
     </style>
 </head>
 <body>
@@ -697,27 +694,15 @@
         </div>
         
         <div class="profile-details">
-    <!-- KOTAK SALDO BARU -->
-      <!--
-<div class="wallet-card">
-    <div class="wallet-info">
-        <div class="wallet-label">Saldo Dompet</div>
-        <div class="wallet-balance" id="prof-saldo">Rp 0</div>
-    </div>
-    <button class="btn-topup" onclick="simulasiTopUp()">+ Isi</button>
-</div>
--->
-<!-- BATAS KOTAK SALDO -->
-
-    <div class="detail-item">
-        <label>Email / Kontak</label>
-        <div class="value" id="prof-email">-</div>
-    </div>
-    <div class="detail-item">
-        <label>Status Akun</label>
-        <div class="value" id="prof-type">-</div>
-    </div>
-</div>
+            <div class="detail-item">
+                <label>Email / Kontak</label>
+                <div class="value" id="prof-email">-</div>
+            </div>
+            <div class="detail-item">
+                <label>Status Akun</label>
+                <div class="value" id="prof-type">-</div>
+            </div>
+        </div>
 
         <button class="btn-logout-sidebar" id="btn-logout-sidebar">
             <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
@@ -730,7 +715,8 @@
     <script type="module">
         // 1. IMPORT FIREBASE SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"; import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // 2. KONFIGURASI FIREBASE
         const firebaseConfig = {
@@ -742,19 +728,14 @@
             appId: "1:303997052314:web:1db122bc5911297b710623"
         };
 
-        // 3. INISIALISASI FIREBASE
+        // 3. INISIALISASI FIREBASE (GLOBAL SCOPE)
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-const db = getFirestore(app);
-
-// Listener: Pantau status toko dari Firebase secara real-time
-onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
-    if (docSnap.exists()) {
-        manualStoreStatus = docSnap.data().status || "auto";
-    }
-    if (typeof updateStatusUI === 'function') updateStatusUI();
-});
+        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
+        
+        // STATE GLOBAL UNTUK STATUS TOKO
+        let manualStoreStatus = "auto";
 
         // 4. FUNGSI BANTUAN UI
         const loadingOverlay = document.getElementById('loading');
@@ -789,7 +770,6 @@ onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
             if (confirm("Yakin ingin keluar?")) {
                 localStorage.removeItem('kebabGuest');
                 signOut(auth);
-                // Tutup sidebar profil jika sedang terbuka
                 if(typeof tutupProfil === 'function') tutupProfil();
                 
                 authScreen.style.display = 'flex';
@@ -804,11 +784,10 @@ onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
             buyerNameInput.value = namaUser;
             btnLogout.style.display = 'flex';
             
-            // Isi data ke dalam Sidebar Profil
             if (typeof isiDataProfil === 'function') {
-    isiDataProfil(namaUser, emailUser || "Tidak ada email", fotoUser, tipeUser);
-    document.getElementById('prof-type').innerText = tipeUser;
-        }
+                isiDataProfil(namaUser, emailUser || "Tidak ada email", fotoUser, tipeUser);
+                document.getElementById('prof-type').innerText = tipeUser;
+            }
 
             initApp();
         }
@@ -831,14 +810,13 @@ onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
         });
 
         // ==========================================
-        // LOGIKA APLIKASI KEBAB (SAMA SEPERTI SEBELUMNYA)
+        // LOGIKA APLIKASI KEBAB
         // ==========================================
         function initApp() {
             if (window.appInitialized) return;
             window.appInitialized = true;
 
             /* ========== KONFIGURASI ========== */
-            let manualStoreStatus = "auto"; // Diisi otomatis dari database Firebase 
             const JAM_BUKA = 10;
             const JAM_TUTUP_DELIVERY = 23;
             const JAM_TUTUP_PICKUP = 2;
@@ -860,19 +838,16 @@ onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
 
             /* STATUS TOKO */
             function cekStatusToko() {
-    // Prioritas 1: Owner pilih "Paksa Buka"
-    if (manualStoreStatus === "buka") return true;
-    // Prioritas 2: Owner pilih "Paksa Tutup"
-    if (manualStoreStatus === "tutup") return false;
-    
-    // Prioritas 3: "Otomatis" -> ikut jadwal normal
-    const jamSekarang = new Date().getHours();
-    if (deliveryMethod === 'delivery') {
-        return (jamSekarang >= JAM_BUKA && jamSekarang < JAM_TUTUP_DELIVERY);
-    } else {
-        return (jamSekarang >= JAM_BUKA || jamSekarang < JAM_TUTUP_PICKUP);
-    }
-}
+                if (manualStoreStatus === "buka") return true;
+                if (manualStoreStatus === "tutup") return false;
+                
+                const jamSekarang = new Date().getHours();
+                if (deliveryMethod === 'delivery') {
+                    return (jamSekarang >= JAM_BUKA && jamSekarang < JAM_TUTUP_DELIVERY);
+                } else {
+                    return (jamSekarang >= JAM_BUKA || jamSekarang < JAM_TUTUP_PICKUP);
+                }
+            }
 
             function updateStatusUI() {
                 const isOpen = cekStatusToko();
@@ -890,6 +865,14 @@ onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
                     text.innerText = 'Tutup';
                 }
             }
+
+            /* LISTENER FIREBASE UNTUK STATUS TOKO (DIPINDAHKAN KE DALAM SINI) */
+            onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
+                if (docSnap.exists()) {
+                    manualStoreStatus = docSnap.data().status || "auto";
+                }
+                updateStatusUI();
+            });
 
             /* HERO SLIDER */
             const slides = document.querySelectorAll('.slide');
@@ -945,7 +928,7 @@ onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
                 { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?q=80&w=400&auto=format&fit=crop", badge: "" },
                 { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?q=80&w=400&auto=format&fit=crop", badge: "" },
                 { id: 4, category: "makanan", type: "Kebab", name: "Daging Telur", price: 13000, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 5, category: "makanan", type: "Kebab", name: "Daging Telur Sosis", price: 15000, image: "https://images.unsplash.com/photo-1529042410759-befb1204b468?q=80&w=400&auto=format&fit=crop", badge: "BEST" },
+                { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, image: "https://images.unsplash.com/photo-1529042410759-befb1204b468?q=80&w=400&auto=format&fit=crop", badge: "BEST" },
                 { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=400&auto=format&fit=crop", badge: "" },
                 { id: 7, category: "minuman", type: "Minuman", name: "Sanger Dingin/Panas", price: 10000, image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop", badge: "" },
                 { id: 8, category: "minuman", type: "Minuman", name: "Americano Dingin/Panas", price: 10000, image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?q=80&w=400&auto=format&fit=crop", badge: "" },
@@ -1303,20 +1286,15 @@ onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
                 txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
                 if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
-                    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
-    
-    // ==========================================
-    // FITUR BARU: OTOMATIS KOSONGKAN KERANJANG
-    // ==========================================
-    cart = {}; // 1. Kosongkan data keranjang di JavaScript
-    localStorage.removeItem('kebabCart'); // 2. Hapus memori keranjang di HP pelanggan
-    
-    renderMenu(); // 3. Gambar ulang menu (tombol + kembali muncul)
-    calculateTotal(); // 4. Hitung ulang total jadi Rp 0 (bar merah hilang)
-    
-    // Opsional: Munculkan notifikasi sukses
-    alert("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.");
-}
+                window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
+                
+                // OTOMATIS KOSONGKAN KERANJANG
+                cart = {}; 
+                localStorage.removeItem('kebabCart'); 
+                renderMenu(); 
+                calculateTotal(); 
+                alert("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.");
+            }
 
             window.shareWeb = (platform) => {
                 const url = window.location.href;
