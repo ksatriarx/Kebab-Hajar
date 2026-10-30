@@ -730,7 +730,7 @@
     <script type="module">
         // 1. IMPORT FIREBASE SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"; import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // 2. KONFIGURASI FIREBASE
         const firebaseConfig = {
@@ -745,6 +745,15 @@
         // 3. INISIALISASI FIREBASE
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Listener: Pantau status toko dari Firebase secara real-time
+onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
+    if (docSnap.exists()) {
+        manualStoreStatus = docSnap.data().status || "auto";
+    }
+    if (typeof updateStatusUI === 'function') updateStatusUI();
+});
         const provider = new GoogleAuthProvider();
 
         // 4. FUNGSI BANTUAN UI
@@ -829,7 +838,7 @@
             window.appInitialized = true;
 
             /* ========== KONFIGURASI ========== */
-            const FORCE_CLOSE = false; 
+            let manualStoreStatus = "auto"; // Diisi otomatis dari database Firebase 
             const JAM_BUKA = 10;
             const JAM_TUTUP_DELIVERY = 23;
             const JAM_TUTUP_PICKUP = 2;
@@ -851,14 +860,19 @@
 
             /* STATUS TOKO */
             function cekStatusToko() {
-                if (FORCE_CLOSE) return false;
-                const jamSekarang = new Date().getHours();
-                if (deliveryMethod === 'delivery') {
-                    return (jamSekarang >= JAM_BUKA && jamSekarang < JAM_TUTUP_DELIVERY);
-                } else {
-                    return (jamSekarang >= JAM_BUKA || jamSekarang < JAM_TUTUP_PICKUP);
-                }
-            }
+    // Prioritas 1: Owner pilih "Paksa Buka"
+    if (manualStoreStatus === "buka") return true;
+    // Prioritas 2: Owner pilih "Paksa Tutup"
+    if (manualStoreStatus === "tutup") return false;
+    
+    // Prioritas 3: "Otomatis" -> ikut jadwal normal
+    const jamSekarang = new Date().getHours();
+    if (deliveryMethod === 'delivery') {
+        return (jamSekarang >= JAM_BUKA && jamSekarang < JAM_TUTUP_DELIVERY);
+    } else {
+        return (jamSekarang >= JAM_BUKA || jamSekarang < JAM_TUTUP_PICKUP);
+    }
+}
 
             function updateStatusUI() {
                 const isOpen = cekStatusToko();
