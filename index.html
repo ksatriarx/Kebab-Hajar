@@ -18,7 +18,8 @@
     <!-- ===== FONTS ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Menambahkan font Bebas Neue untuk judul hero -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- ===== FILE PROFIL TERPISAH ===== -->
@@ -206,7 +207,17 @@
         .blink-colon { animation: blink 1s step-end infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        .hero-title { font-size: 22px; font-weight: 800; line-height: 1.1; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        /* PERUBAHAN HANYA DI SINI: Font-family ditambahkan, ukuran & spasi disesuaikan sedikit agar proporsional */
+        .hero-title { 
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 28px; /* Sedikit dinaikkan karena Bebas Neue karakternya lebih ramping */
+            font-weight: 400; /* Bebas Neue hanya memiliki weight 400 */
+            letter-spacing: 1px; /* Memberi jarak antar huruf agar lebih elegan */
+            line-height: 1.1; 
+            margin-bottom: 6px; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+        }
+
         .hero-desc { font-size: 10px; color: #ccc; line-height: 1.4; margin-bottom: 10px; max-width: 85%; }
 
         .hero-stats { display: flex; gap: 8px; }
