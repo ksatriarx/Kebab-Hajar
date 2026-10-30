@@ -160,7 +160,6 @@
             background-size: cover; background-position: center;
         }
 
-        /* CSS UNTUK IFRAME STREAMABLE */
         .slide .iframe-wrapper {
             position: absolute; inset: 0; overflow: hidden; pointer-events: none;
         }
@@ -169,7 +168,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            transform: scale(1.8); /* Trik zoom agar video vertikal memenuhi layar */
+            transform: scale(1.8);
         }
 
         .slide.active { opacity: 1; }
@@ -407,6 +406,15 @@
         .summary-box { background: var(--bg-input); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px; font-size: 12px; flex-shrink: 0; }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--text-muted); }
         .summary-row.total { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); color: var(--text-main); font-weight: 800; font-size: 14px; }
+
+        /* TOMBOL PEMBAYARAN ONLINE BARU */
+        .btn-online {
+            width: 100%; background: #3b82f6; color: #fff; border: none; padding: 14px;
+            border-radius: var(--radius-md); font-size: 13px; font-weight: 800; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 8px; flex-shrink: 0;
+            margin-bottom: 10px;
+        }
+        .btn-online:hover { background: #2563eb; }
 
         .btn-wa {
             width: 100%; background: var(--wa-color); color: #fff; border: none; padding: 14px;
@@ -698,9 +706,16 @@
             
             <div class="summary-box" id="confirm-summary"></div>
             
+            <!-- TOMBOL PEMBAYARAN ONLINE (BARU) -->
+            <button class="btn-online" onclick="prosesPembayaranOnline()">
+                <i class="fa-solid fa-credit-card" style="font-size:16px;"></i> Bayar Online (QRIS / E-Wallet / Bank)
+            </button>
+            
+            <!-- TOMBOL WA (TETAP ADA) -->
             <button class="btn-wa" onclick="confirmAndSend()">
                 <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Kirim via WA
             </button>
+            
             <button onclick="closeConfirmModal()" style="width:100%; background:transparent; border:none; color:var(--text-muted); padding:12px; font-size:11px; font-weight:700; cursor:pointer;">Batal</button>
         </div>
     </div>
@@ -1460,6 +1475,11 @@
 
             window.closeConfirmModal = () => {
                 document.getElementById('confirm-modal').classList.remove('show');
+            }
+
+            /* ===== FUNGSI TOMBOL PEMBAYARAN ONLINE BARU ===== */
+            window.prosesPembayaranOnline = () => {
+                alert("Mohon maaf, sistem pembayaran online (QRIS/E-Wallet/Bank) saat ini sedang dalam proses verifikasi oleh pihak ketiga (Midtrans).\n\nSementara ini, silakan gunakan opsi 'Kirim via WA' untuk menyelesaikan pesanan Anda.");
             }
 
             window.confirmAndSend = () => {
