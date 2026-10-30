@@ -166,11 +166,10 @@
         }
         
         .slide .iframe-wrapper iframe {
-            /* Trik scale agar video vertikal menutupi area horizontal */
             width: 100%;
             height: 100%;
             border: none;
-            transform: scale(1.8); 
+            transform: scale(1.8); /* Trik zoom agar video vertikal memenuhi layar */
         }
 
         .slide.active { opacity: 1; }
@@ -523,8 +522,8 @@
 
         <!-- HERO SLIDER -->
         <div class="hero-slider" id="hero-slider">
-            <!-- SLIDE 1 (VIDEO STREAMABLE) -->
-            <div class="slide active" id="slide-1">
+            <!-- SLIDE 1 (VIDEO STREAMABLE + WALLPAPER) -->
+            <div class="slide active" id="slide-1" style="background-image: url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg');">
                 <div class="iframe-wrapper">
                     <iframe allow="fullscreen;autoplay" allowfullscreen src="https://streamable.com/e/7wiifz?autoplay=1&muted=1&loop=0" style="border:none; pointer-events: none;"></iframe>
                 </div>
@@ -887,7 +886,7 @@
             let currentSlide = 0;
             let slideInterval;
             let videoModeActive = true; 
-            let videoTimer; // Timer untuk mematikan iframe Streamable
+            let videoTimer; 
 
             slides.forEach((_, index) => {
                 const dot = document.createElement('div');
@@ -915,12 +914,9 @@
                 if (!videoModeActive) return;
                 videoModeActive = false;
                 
-                // Hapus iframe video
+                // Hapus iframe video agar tidak memakan kuota/memori lagi
                 const iframeWrapper = document.querySelector('#slide-1 .iframe-wrapper');
                 if (iframeWrapper) iframeWrapper.remove();
-                
-                // Kembalikan gambar background untuk slide 1
-                document.getElementById('slide-1').style.backgroundImage = "url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg')";
                 
                 if (skipToNext) {
                     nextSlide();
@@ -928,8 +924,7 @@
                 }
             }
 
-            // Mulai timer untuk video Streamable (Contoh: 15 detik = 15000 ms)
-            // Silakan ubah angka 15000 sesuai durasi asli video Anda!
+            // Timer 39 Detik (39000 ms) sebelum pindah ke gambar
             videoTimer = setTimeout(() => {
                 switchToImageMode(true);
             }, 39000);
@@ -948,7 +943,7 @@
                 
                 if (touchStartX - touchEndX > 50) { // Swipe kiri
                     if (videoModeActive) {
-                        clearTimeout(videoTimer); // Batalkan timer video
+                        clearTimeout(videoTimer); 
                         switchToImageMode(false); 
                         nextSlide();
                         startSlide();
