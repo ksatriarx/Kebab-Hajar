@@ -18,7 +18,6 @@
     <!-- ===== FONTS ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Menambahkan font Bebas Neue untuk judul hero -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -146,7 +145,7 @@
         
         .search-icon { position: absolute; left: 10px; color: rgba(255,255,255,0.6); font-size: 10px; }
 
-        /* ===== HERO SLIDER (SESUAI PERMINTAAN 480px) ===== */
+        /* ===== HERO SLIDER ===== */
         .hero-slider {
             position: relative; 
             height: 480px;
@@ -159,6 +158,14 @@
             position: absolute; inset: 0; opacity: 0;
             transition: opacity 0.5s ease-in-out;
             background-size: cover; background-position: center;
+        }
+
+        /* CSS KHUSUS VIDEO AGAR MENUTUPI AREA SEPERTI GAMBAR */
+        .slide video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none; /* Agar tidak mengganggu swipe */
         }
 
         .slide.active { opacity: 1; }
@@ -207,12 +214,11 @@
         .blink-colon { animation: blink 1s step-end infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* PERUBAHAN HANYA DI SINI: Font-family ditambahkan, ukuran & spasi disesuaikan sedikit agar proporsional */
         .hero-title { 
             font-family: 'Bebas Neue', sans-serif; 
-            font-size: 28px; /* Sedikit dinaikkan karena Bebas Neue karakternya lebih ramping */
-            font-weight: 400; /* Bebas Neue hanya memiliki weight 400 */
-            letter-spacing: 1px; /* Memberi jarak antar huruf agar lebih elegan */
+            font-size: 28px; 
+            font-weight: 400; 
+            letter-spacing: 1px; 
             line-height: 1.1; 
             margin-bottom: 6px; 
             text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
@@ -261,7 +267,6 @@
         .cat-card.active { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
         .cat-card.active span { color: var(--text-main); }
 
-        /* JARAK DIPERDEKAT */
         .delivery-pill { display: flex; background: var(--bg-card); border-radius: 20px; padding: 3px; margin-bottom: 16px; margin-top: 4px; }
 
         .delivery-btn {
@@ -387,7 +392,6 @@
         .modal-handle { width: 30px; height: 3px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; flex-shrink: 0; }
         .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; text-align: center; flex-shrink: 0; }
         
-        /* List Item di Keranjang */
         .cart-list { overflow-y: auto; margin-bottom: 16px; flex-grow: 1; }
         .cart-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
         .cart-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
@@ -451,7 +455,6 @@
         }
         .btn-guest:hover { background: var(--bg-input); color: var(--text-main); }
 
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             display: none; align-items: center; justify-content: center; z-index: 10005;
@@ -467,14 +470,10 @@
 </head>
 <body>
 
-    <!-- LOADING -->
     <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
     </div>
 
-    <!-- ==========================================
-         HALAMAN LOGIN GOOGLE & TAMU
-         ========================================== -->
     <div class="auth-container" id="auth-screen">
         <div class="auth-box">
             <img src="https://i.ibb.co.com/QFk2vtzb/1000587297.png" alt="Logo" class="auth-logo">
@@ -493,12 +492,8 @@
         </div>
     </div>
 
-    <!-- ==========================================
-         APLIKASI UTAMA (TAMPIL SETELAH LOGIN/TAMU)
-         ========================================== -->
     <div class="app" id="app-screen">
         
-        <!-- STICKY HEADER -->
         <div class="main-header" id="main-header">
             <div class="header-top">
                 <div class="nav-logo">
@@ -523,7 +518,12 @@
 
         <!-- HERO SLIDER -->
         <div class="hero-slider" id="hero-slider">
-            <div class="slide active" style="background-image: url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg');"></div>
+            <!-- SLIDE 1 (VIDEO) -->
+            <div class="slide active" id="slide-1">
+                <video id="hero-video" src="https://files.catbox.moe/vrbc7l.mp4" muted playsinline poster="https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg"></video>
+            </div>
+
+            <!-- SLIDE 2 & 3 (GAMBAR) -->
             <div class="slide" style="background-image: url('https://i.ibb.co.com/SZCStwz/Gemini-Generated-Image-kqtryfkqtryfkqtr.jpg');"></div>
             <div class="slide" style="background-image: url('https://i.ibb.co.com/wNKsnJxq/file-000000004a2c82118f1b6e2a3d065d2b-2.jpg');"></div>
 
@@ -536,7 +536,6 @@
                         <span id="status-text" class="status-text-mini buka">Buka</span>
                     </div>
                     
-                    <!-- KOTAK PENGUMUMAN -->
                     <div id="announcement-box" style="display: none; background: rgba(229, 57, 53, 0.2); border: 1px solid var(--primary); border-radius: var(--radius-sm); padding: 6px 10px; margin-bottom: 8px; font-size: 10px; color: #ff9e9e; font-weight: 600; text-align: left;">
                         <i class="fa-solid fa-bullhorn"></i> <span id="announcement-text">-</span>
                     </div>
@@ -566,7 +565,6 @@
             <div class="slider-dots" id="slider-dots"></div>
         </div>
 
-        <!-- MAIN CONTENT -->
         <div class="main">
             <div class="reorder-banner" id="reorder-banner">
                 <div class="reorder-text">Halo <b id="reorder-name">Kak</b>, mau pesan yang sama seperti kemarin?</div>
@@ -631,7 +629,6 @@
         </div>
     </div>
 
-    <!-- CART BAR -->
     <div class="cart-bar" id="cart-bar" onclick="openCartModal()">
         <div class="cart-info">
             <span class="cart-count" id="cart-count">0 Item</span>
@@ -640,7 +637,6 @@
         <button class="cart-btn">Lihat Keranjang</button>
     </div>
 
-    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
         <a href="#" class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">
             <i class="fa-solid fa-house"></i><span>Home</span>
@@ -656,7 +652,6 @@
         </a>
     </div>
 
-    <!-- ===== MODAL KERANJANG ===== -->
     <div class="modal-overlay" id="cart-modal" onclick="if(event.target===this) closeCartModal()">
         <div class="modal-box">
             <div class="modal-handle"></div>
@@ -676,7 +671,6 @@
         </div>
     </div>
 
-    <!-- ===== MODAL KONFIRMASI PESANAN ===== -->
     <div class="modal-overlay" id="confirm-modal" onclick="if(event.target===this) closeConfirmModal()">
         <div class="modal-box">
             <div class="modal-handle"></div>
@@ -691,18 +685,12 @@
         </div>
     </div>
 
-    <!-- ==========================================
-         TAMBAHAN HTML SIDEBAR PROFIL (DARI FILE TERPISAH)
-         ========================================== -->
-    <!-- Tombol Profil Melayang -->
     <button class="profile-toggle-btn" onclick="bukaProfil()">
         <i class="fa-solid fa-user"></i>
     </button>
 
-    <!-- Overlay Gelap -->
     <div class="profile-overlay" id="profile-overlay" onclick="tutupProfil()"></div>
 
-    <!-- Sidebar Profil -->
     <div class="profile-sidebar" id="profile-sidebar">
         <div class="profile-header">
             <div class="profile-avatar" id="prof-avatar">?</div>
@@ -726,16 +714,11 @@
         </button>
     </div>
 
-    <!-- ==========================================
-         SCRIPT FIREBASE & LOGIKA APLIKASI
-         ========================================== -->
     <script type="module">
-        // 1. IMPORT FIREBASE SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 2. KONFIGURASI FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
             authDomain: "kebab-idi.firebaseapp.com",
@@ -745,16 +728,13 @@
             appId: "1:303997052314:web:1db122bc5911297b710623"
         };
 
-        // 3. INISIALISASI FIREBASE (GLOBAL SCOPE)
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
         
-        // STATE GLOBAL UNTUK STATUS TOKO
         let manualStoreStatus = "auto";
 
-        // 4. FUNGSI BANTUAN UI
         const loadingOverlay = document.getElementById('loading');
         const showLoading = () => loadingOverlay.classList.add('show');
         const hideLoading = () => loadingOverlay.classList.remove('show');
@@ -764,7 +744,6 @@
         const btnLogout = document.getElementById('btn-logout');
         const buyerNameInput = document.getElementById('buyer-name');
 
-        // 5. FUNGSI LOGIN GOOGLE
         window.loginGoogle = async () => {
             showLoading();
             try {
@@ -776,13 +755,11 @@
             }
         };
 
-        // 6. FUNGSI MASUK SEBAGAI TAMU
         window.masukTamu = () => {
             localStorage.setItem('kebabGuest', 'true');
             bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
         };
 
-        // 7. FUNGSI LOGOUT
         window.prosesLogout = () => {
             if (confirm("Yakin ingin keluar?")) {
                 localStorage.removeItem('kebabGuest');
@@ -794,7 +771,6 @@
             }
         };
 
-        // 8. FUNGSI MEMBUKA APLIKASI UTAMA
         function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
             authScreen.style.display = 'none';
             appScreen.classList.add('show');
@@ -809,7 +785,6 @@
             initApp();
         }
 
-        // 9. PANTAU STATUS LOGIN FIREBASE
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const namaUser = user.displayName || "Pelanggan";
@@ -826,14 +801,10 @@
             }
         });
 
-        // ==========================================
-        // LOGIKA APLIKASI KEBAB
-        // ==========================================
         function initApp() {
             if (window.appInitialized) return;
             window.appInitialized = true;
 
-            /* ========== KONFIGURASI ========== */
             const JAM_BUKA = 10;
             const JAM_TUTUP_DELIVERY = 23;
             const JAM_TUTUP_PICKUP = 2;
@@ -844,7 +815,6 @@
             ];
             const MAX_DELIVERY_KM = 10;
 
-            /* JAM BERJALAN */
             function updateLiveClock() {
                 const now = new Date();
                 document.getElementById('live-h').innerText = String(now.getHours()).padStart(2, '0');
@@ -853,7 +823,6 @@
             updateLiveClock();
             setInterval(updateLiveClock, 5000);
 
-            /* STATUS TOKO */
             function cekStatusToko() {
                 if (manualStoreStatus === "buka") return true;
                 if (manualStoreStatus === "tutup") return false;
@@ -883,7 +852,6 @@
                 }
             }
 
-            /* LISTENER FIREBASE UNTUK STATUS TOKO (DIPINDAHKAN KE DALAM SINI) */
             onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
                 const annBox = document.getElementById('announcement-box');
                 const annText = document.getElementById('announcement-text');
@@ -891,7 +859,6 @@
                 if (docSnap.exists()) {
                     manualStoreStatus = docSnap.data().status || "auto";
                     
-                    // Cek apakah ada pengumuman
                     const alasan = docSnap.data().alasanTutup;
                     if (alasan && alasan.trim() !== "") {
                         annText.innerText = alasan;
@@ -905,12 +872,16 @@
                 updateStatusUI();
             });
 
-            /* HERO SLIDER */
+            /* ==========================================
+               LOGIKA HERO SLIDER (VIDEO -> GAMBAR -> LOOP)
+               ========================================== */
             const slides = document.querySelectorAll('.slide');
             const dotsContainer = document.getElementById('slider-dots');
             let currentSlide = 0;
             let slideInterval;
+            let videoModeActive = true; // Penanda apakah masih di mode video atau sudah gambar
 
+            // Buat titik-titik navigasi (dots)
             slides.forEach((_, index) => {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
@@ -926,19 +897,95 @@
                 slides[currentSlide].classList.add('active');
                 dots[currentSlide].classList.add('active');
             }
+            
             function nextSlide() { goToSlide(currentSlide + 1); }
-            function startSlide() { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 3500); }
+            function startSlide() { 
+                clearInterval(slideInterval); 
+                slideInterval = setInterval(nextSlide, 3500); 
+            }
 
+            // Fungsi saat video selesai atau dibatalkan
+            function switchToImageMode(skipToNext = true) {
+                if (!videoModeActive) return;
+                videoModeActive = false;
+                
+                // Hapus elemen video agar tidak memakan kuota/memori
+                const video = document.getElementById('hero-video');
+                if (video) {
+                    video.pause();
+                    video.remove();
+                }
+                
+                // Kembalikan gambar background untuk slide pertama
+                document.getElementById('slide-1').style.backgroundImage = "url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg')";
+                
+                // Jika video selesai sendiri, lanjut ke slide berikutnya
+                if (skipToNext) {
+                    nextSlide();
+                    startSlide();
+                }
+            }
+
+            // Deteksi koneksi internet
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            const isSlow = connection && (connection.saveData || ['slow-2g', '2g', '3g'].includes(connection.effectiveType));
+            const videoEl = document.getElementById('hero-video');
+
+            if (isSlow || !videoEl) {
+                // Jika internet lelet atau tidak ada video: Langsung pakai gambar
+                switchToImageMode(false); 
+                startSlide();
+            } else {
+                // Jika internet cepat: Putar video
+                videoEl.play().catch(() => {
+                    // Jika autoplay diblokir browser (misal karena kebijakan), langsung pindah ke gambar
+                    switchToImageMode(false);
+                    startSlide();
+                });
+                
+                // Saat video selesai, panggil fungsi untuk pindah ke gambar
+                videoEl.addEventListener('ended', () => switchToImageMode(true));
+            }
+
+            // Logika Swipe (Geser) manual
             let touchStartX = 0, touchEndX = 0;
             const sliderElement = document.getElementById('hero-slider');
-            sliderElement.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; clearInterval(slideInterval); }, {passive: true});
+            
+            sliderElement.addEventListener('touchstart', e => { 
+                touchStartX = e.changedTouches[0].screenX; 
+                if(!videoModeActive) clearInterval(slideInterval); // Pause timer jika sudah mode gambar
+            }, {passive: true});
+            
             sliderElement.addEventListener('touchend', e => {
                 touchEndX = e.changedTouches[0].screenX;
-                if (touchStartX - touchEndX > 50) { nextSlide(); }
-                if (touchEndX - touchStartX > 50) { goToSlide(currentSlide - 1); }
-                startSlide();
+                
+                if (touchStartX - touchEndX > 50) { // Swipe kiri
+                    if (videoModeActive) {
+                        switchToImageMode(false); // Matikan video jika di-swipe
+                        nextSlide();
+                        startSlide();
+                    } else {
+                        nextSlide(); 
+                        startSlide();
+                    }
+                }
+                if (touchEndX - touchStartX > 50) { // Swipe kanan
+                    if (videoModeActive) {
+                        switchToImageMode(false); // Matikan video jika di-swipe
+                        goToSlide(currentSlide - 1);
+                        startSlide();
+                    } else {
+                        goToSlide(currentSlide - 1); 
+                        startSlide();
+                    }
+                }
+                
+                // Jika hanya tap (tidak geser) dan dalam mode gambar, lanjutkan timer
+                if (!videoModeActive && Math.abs(touchStartX - touchEndX) <= 50) {
+                    startSlide();
+                }
             }, {passive: true});
-            startSlide();
+
 
             /* STICKY HEADER */
             window.addEventListener('scroll', function() {
@@ -1137,7 +1184,6 @@
                 document.getElementById('reorder-banner').classList.remove('show');
             }
 
-            /* ===== FITUR KERANJANG MODAL ===== */
             window.openCartModal = () => {
                 const totals = calculateTotal();
                 if (totals.itemCount === 0) {
@@ -1216,7 +1262,6 @@
                 }, 400);
             }
 
-            /* ===== LOGIKA APLIKASI LAINNYA ===== */
             window.switchMethod = (method) => {
                 deliveryMethod = method;
                 localStorage.setItem('kebabMethod', method);
@@ -1319,7 +1364,6 @@
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                 window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
                 
-                // OTOMATIS KOSONGKAN KERANJANG
                 cart = {}; 
                 localStorage.removeItem('kebabCart'); 
                 renderMenu(); 
@@ -1333,7 +1377,6 @@
                 if (platform === 'wa') window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
             }
 
-            /* INIT */
             if (buyerNameSaved && !buyerNameInput.value) buyerNameInput.value = buyerNameSaved;
             switchMethod(deliveryMethod);
             updateStatusUI();
@@ -1342,9 +1385,6 @@
             cekRiwayatPesanan(); 
             setInterval(() => updateStatusUI(), 60000);
 
-            /* ==========================================
-               LOGIKA TOMBOL INSTALL PWA
-               ========================================== */
             let deferredPrompt;
 
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -1377,7 +1417,6 @@
         }
     </script>
 
-    <!-- Panggil Script Profil Terpisah -->
     <script src="profile.js?v=3"></script>
 </body>
 </html>
