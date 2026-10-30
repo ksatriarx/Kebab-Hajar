@@ -54,6 +54,15 @@
         }
         .option-text h4 { font-size: 15px; margin-bottom: 2px; }
         .option-text p { font-size: 12px; color: var(--text-muted); }
+
+        /* Dropdown Alasan */
+        .select-alasan {
+            width: 100%; padding: 14px; background: var(--bg-main);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            color: var(--text-main); font-size: 14px; outline: none;
+            margin-top: 5px; appearance: none; -webkit-appearance: none;
+        }
+        .select-alasan:focus { border-color: var(--primary); }
         
         .btn-save { 
             width: 100%; background: var(--success); color: white; 
@@ -82,7 +91,7 @@
     </div>
 
     <div class="card">
-        <div class="option-title">Pilih Status Toko</div>
+        <div class="option-title">1. Pilih Status Toko</div>
         
         <button class="option-btn" id="opt-auto" onclick="pilihStatus('auto')">
             <div class="option-icon"><i class="fa-solid fa-clock"></i></div>
@@ -109,8 +118,35 @@
         </button>
     </div>
 
+    <!-- AREA PENGUMUMAN -->
+    <div class="card">
+        <div class="option-title">2. Pengumuman (Muncul di Web)</div>
+        <select class="select-alasan" id="pilih-alasan">
+            <option value="">-- Tidak ada pengumuman --</option>
+            
+            <!-- PILIHAN HARI LIBUR / BESAR -->
+            <option value="Libur Nasional (Tanggal Merah) 🇮🇩">Libur Nasional (Tanggal Merah) 🇮🇩</option>
+            <option value="Libur Hari Raya Idul Fitri 🎉">Libur Hari Raya Idul Fitri 🎉</option>
+            <option value="Libur Hari Raya Idul Adha 🐐">Libur Hari Raya Idul Adha 🐐</option>
+            <option value="Libur Tahun Baru 🎆">Libur Tahun Baru 🎆</option>
+            <option value="Libur Khusus / Cuti Bersama 🏖️">Libur Khusus / Cuti Bersama 🏖️</option>
+            
+            <!-- PILIHAN LUCU & SEHARI-HARI -->
+            <option value="Owner masih molor, tunggu ya 😴">Owner masih molor, tunggu ya 😴</option>
+            <option value="Habis solat Magrib dulu ya 🕌">Habis solat Magrib dulu ya 🕌</option>
+            <option value="Dagingnya lagi dianter kurir, sabar ya 🛵">Dagingnya lagi dianter kurir, sabar ya 🛵</option>
+            <option value="Toko sedang dibersihkan, bentar lagi buka 🧹">Toko sedang dibersihkan, bentar lagi buka 🧹</option>
+            <option value="Saus rahasia habis, owner lagi belanja 🛒">Saus rahasia habis, owner lagi belanja 🛒</option>
+            <option value="Istirahat sejenak, ngopi dulu ☕">Istirahat sejenak, ngopi dulu ☕</option>
+            <option value="Tutup dulu ya, owner mau kondangan 💍">Tutup dulu ya, owner mau kondangan 💍</option>
+            <option value="Libur dulu, jangan kangen ya 👋">Libur dulu, jangan kangen ya 👋</option>
+            <option value="Stok daging habis, besok lagi ya 🥩">Stok daging habis, besok lagi ya 🥩</option>
+            <option value="Cuaca lagi hujan, owner malas keluar 🌧️">Cuaca lagi hujan, owner malas keluar 🌧️</option>
+        </select>
+    </div>
+
     <button class="btn-save" id="btn-save" onclick="simpanPengaturan()" disabled>
-        <i class="fa-solid fa-floppy-disk"></i> <span id="btn-save-text">Pilih Status</span>
+        <i class="fa-solid fa-floppy-disk"></i> <span id="btn-save-text">Simpan Pengaturan</span>
     </button>
 </div>
 
@@ -141,10 +177,10 @@
 
     const ALLOWED_EMAIL = "rxstore101@gmail.com";
     let statusTerpilih = "auto";
+    let alasanTerpilih = "";
     let statusSaatIni = "auto";
-    let isSaving = false;
+    let alasanSaatIni = "";
 
-    // Cek login
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === ALLOWED_EMAIL) {
             document.getElementById('app-content').style.display = 'block';
@@ -156,20 +192,22 @@
         }
     });
 
-    // Baca status dari Firestore (real-time)
     function loadStatus() {
         onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
             if (docSnap.exists()) {
                 statusSaatIni = docSnap.data().status || "auto";
+                alasanSaatIni = docSnap.data().alasanTutup || "";
             } else {
                 statusSaatIni = "auto";
+                alasanSaatIni = "";
             }
             statusTerpilih = statusSaatIni;
+            alasanTerpilih = alasanSaatIni;
+            
             tampilkanStatus(statusSaatIni);
             highlightOption(statusSaatIni);
-        }, (error) => {
-            console.error("Error membaca database: ", error);
-            alert("Gagal terhubung ke database. Pastikan aturan Firestore diizinkan (Test Mode).");
+            document.getElementById('pilih-alasan').value = alasanSaatIni;
+            updateTombolSimpan();
         });
     }
 
@@ -206,52 +244,50 @@
     window.pilihStatus = (status) => {
         statusTerpilih = status;
         highlightOption(status);
-        
+        updateTombolSimpan();
+    };
+
+    // Pantau perubahan dropdown alasan
+    document.getElementById('pilih-alasan').addEventListener('change', (e) => {
+        alasanTerpilih = e.target.value;
+        updateTombolSimpan();
+    });
+
+    function updateTombolSimpan() {
         const btn = document.getElementById('btn-save');
         const btnText = document.getElementById('btn-save-text');
         
-        if (status === statusSaatIni) {
+        if (statusTerpilih === statusSaatIni && alasanTerpilih === alasanSaatIni) {
             btn.disabled = true;
-            btnText.innerText = 'Pilih Status';
         } else {
             btn.disabled = false;
             btnText.innerText = 'Simpan Pengaturan';
         }
-    };
+    }
 
     window.simpanPengaturan = async () => {
-        if (isSaving) return;
-        
-        if (!auth.currentUser) {
-            alert("Sesi login Anda berakhir. Silakan muat ulang halaman ini (refresh) lalu login kembali.");
-            return;
-        }
-
         const btn = document.getElementById('btn-save');
         const btnText = document.getElementById('btn-save-text');
         
-        isSaving = true;
         btn.disabled = true;
         btnText.innerText = 'Menyimpan...';
 
         try {
-            // Simpan ke Firebase
             await setDoc(doc(db, "pengaturan", "toko"), {
                 status: statusTerpilih,
+                alasanTutup: alasanTerpilih,
                 updatedAt: new Date().toISOString(),
                 updatedBy: auth.currentUser.email
             });
 
             statusSaatIni = statusTerpilih;
-            alert("✅ Pengaturan berhasil disimpan!");
+            alasanSaatIni = alasanTerpilih;
+            alert("✅ Pengaturan & Pengumuman berhasil disimpan!");
             btnText.innerText = 'Tersimpan';
         } catch (error) {
-            console.error("Error simpan: ", error);
-            alert("❌ Gagal menyimpan: " + error.message + "\n\nPastikan koneksi internet lancar dan aturan Firestore Anda mengizinkan penulisan data (Test Mode).");
+            alert("❌ Gagal menyimpan: " + error.message);
             btnText.innerText = 'Simpan Pengaturan';
             btn.disabled = false;
-        } finally {
-            isSaving = false;
         }
     };
 </script>
