@@ -331,28 +331,29 @@
 
         .qty-num { font-size: 10px; font-weight: 700; min-width: 10px; text-align: center; }
 
-        .form-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 24px; }
+        /* ===== UPDATE: FORM CARD DIBUAT LEBIH MINIMALIS ===== */
+        .form-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 12px; margin-bottom: 20px; }
 
-        .form-group { margin-bottom: 12px; }
-        .form-label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+        .form-group { margin-bottom: 8px; }
+        .form-label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; font-weight: 600; }
 
         .form-input {
             width: 100%; background: var(--bg-input); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text-main); font-size: 12px; outline: none;
+            border-radius: var(--radius-sm); padding: 8px 10px; color: var(--text-main); font-size: 12px; outline: none;
         }
 
-        textarea.form-input { resize: vertical; min-height: 60px; line-height: 1.5; font-family: inherit; }
+        textarea.form-input { resize: vertical; min-height: 50px; line-height: 1.4; font-family: inherit; }
 
         .btn-loc {
             width: 100%; background: transparent; border: 1px dashed var(--primary); color: var(--primary);
-            padding: 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer;
+            padding: 8px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer;
             display: flex; justify-content: center; align-items: center; gap: 6px;
         }
 
         .auto-gps-info {
             display: none; background: rgba(76, 175, 80, 0.1); border: 1px solid #4caf50;
-            color: #4caf50; padding: 10px; border-radius: var(--radius-sm);
-            font-size: 11px; font-weight: 600; text-align: center;
+            color: #4caf50; padding: 8px; border-radius: var(--radius-sm);
+            font-size: 11px; font-weight: 600; text-align: center; margin-top: 6px;
         }
 
         .cart-bar {
@@ -601,7 +602,7 @@
             <div class="menu-list" id="menu-container"></div>
 
             <div class="form-card">
-                <h3 style="font-size:12px; font-weight:800; margin-bottom:12px;">Detail Pengiriman</h3>
+                <h3 style="font-size:12px; font-weight:800; margin-bottom:10px;">Detail Pengiriman</h3>
                 
                 <div class="form-group">
                     <label class="form-label">Nama Pembeli</label>
@@ -623,9 +624,9 @@
                     </div>
                 </div>
 
-                <div id="pickup-info" style="display:none; background:var(--bg-input); padding:12px; border-radius:var(--radius-sm); text-align:center;">
-                    <div style="color:var(--accent); font-weight:800; font-size:11px; margin-bottom:4px;">Ambil di Toko</div>
-                    <div style="font-size:10px; color:var(--text-muted); line-height:1.4;">Kebab Turki Hajar<br>Idi Rayeuk, Aceh Timur</div>
+                <div id="pickup-info" style="display:none; background:var(--bg-input); padding:10px; border-radius:var(--radius-sm); text-align:center;">
+                    <div style="color:var(--accent); font-weight:800; font-size:11px; margin-bottom:2px;">Ambil di Toko</div>
+                    <div style="font-size:10px; color:var(--text-muted); line-height:1.3;">Kebab Turki Hajar<br>Idi Rayeuk, Aceh Timur</div>
                 </div>
             </div>
             
@@ -664,7 +665,6 @@
             <div class="modal-handle"></div>
             <h3 class="modal-title" id="variant-title" style="margin-bottom: 20px;">Pilih Varian</h3>
             <div id="variant-options" style="display: flex; flex-direction: column; gap: 10px;">
-                <!-- Buttons injected here -->
             </div>
             <button onclick="closeVariantModal()" style="margin-top: 20px; width:100%; background:transparent; border:none; color:var(--text-muted); padding:12px; font-size:11px; font-weight:700; cursor:pointer;">Batal</button>
         </div>
@@ -1011,7 +1011,7 @@
                 { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, image: "https://i.ibb.co.com/kgvMLdP8/file-00000000d1988211b11c4d18bd5327b4.png", badge: "BEST" },
                 { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://i.ibb.co.com/dsRW0mfZ/file-000000009c3482118de7254c91fc3d87.png", badge: "" },
                 
-                /* MINUMAN (UPDATE GAMBAR & VARIAN) */
+                /* MINUMAN */
                 { id: 7, category: "minuman", type: "Minuman", name: "Sanger", price: 10000, image: "https://i.ibb.co.com/PGj2LpX9/file-0000000031cc8211a6dcc107c336df45.png", badge: "", variants: ["Dingin", "Panas"] },
                 { id: 8, category: "minuman", type: "Minuman", name: "Americano", price: 10000, image: "https://i.ibb.co.com/9HM8M6XD/file-00000000e168821193186ccd0e44f53d.png", badge: "", variants: ["Dingin", "Panas"] },
                 { id: 9, category: "minuman", type: "Minuman", name: "Americano Gula Aren", price: 12000, image: "https://i.ibb.co.com/N2B6vQnP/file-00000000b264820796a3bac4a080e4b3.png", badge: "" },
@@ -1169,7 +1169,16 @@
                     
                     let actionButton = '';
                     if (hasVariants) {
-                        actionButton = `<button class="btn-add" onclick="openVariantModal(${item.id})"><i class="fa-solid fa-plus"></i></button>`;
+                        // UPDATE: Jika sudah ada qty, tampilkan tombol +/- juga
+                        if (totalQty === 0) {
+                            actionButton = `<button class="btn-add" onclick="openVariantModal(${item.id})"><i class="fa-solid fa-plus"></i></button>`;
+                        } else {
+                            actionButton = `<div class="qty-wrap">
+                                <button class="qty-btn" onclick="removeOneVariant(${item.id})"><i class="fa-solid fa-minus"></i></button>
+                                <span class="qty-num">${totalQty}</span>
+                                <button class="qty-btn" onclick="openVariantModal(${item.id})"><i class="fa-solid fa-plus"></i></button>
+                               </div>`;
+                        }
                     } else {
                         actionButton = totalQty === 0 
                             ? `<button class="btn-add" onclick="updateQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>`
@@ -1235,12 +1244,31 @@
                 document.getElementById('reorder-banner').classList.remove('show');
             }
 
+            /* ===== TAMBAHAN: KURANGI SATU VARIAN ===== */
+            // Kurangi qty dari varian yang paling banyak dipesan dulu
+            window.removeOneVariant = (id) => {
+                const keys = Object.keys(cart).filter(k => k.startsWith(id + '-') && cart[k] > 0);
+                if (keys.length > 0) {
+                    // Urutkan dari yang paling banyak qty-nya
+                    keys.sort((a, b) => cart[b] - cart[a]);
+                    const key = keys[0];
+                    cart[key] -= 1;
+                    if (cart[key] <= 0) delete cart[key];
+                    
+                    localStorage.setItem('kebabCart', JSON.stringify(cart));
+                    renderMenu();
+                    calculateTotal();
+                    renderCartModal();
+                    document.getElementById('reorder-banner').classList.remove('show');
+                }
+            }
+
             /* ===== LOGIKA KERANJANG LAINNYA ===== */
             window.updateQty = (cartKey, change) => {
                 if (!cart[cartKey]) cart[cartKey] = 0;
                 cart[cartKey] += change;
                 if (cart[cartKey] <= 0) {
-                    delete cart[cartKey]; // Hapus jika qty 0
+                    delete cart[cartKey]; 
                 }
                 localStorage.setItem('kebabCart', JSON.stringify(cart));
                 renderMenu(); 
