@@ -72,6 +72,8 @@
         /* List Metode Pembayaran */
         .payment-methods {
             padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .section-title {
@@ -120,7 +122,6 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            color: #4b5563;
         }
 
         .method-name {
@@ -143,6 +144,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .method-item.selected .radio-circle {
@@ -200,7 +202,7 @@
         <div class="header">
             <h1>Kebab Turki Hajar</h1>
             <p>Penyelesaian Pesanan</p>
-            <div class="total-amount">Rp 25.000</div>
+            <div class="total-amount">Rp 23.000</div>
             <div class="order-id">Order ID: KEBAB-172893</div>
         </div>
 
@@ -208,13 +210,37 @@
         <div class="payment-methods">
             <div class="section-title">Pilih Metode Pembayaran</div>
 
-            <!-- QRIS -->
+            <!-- ShopeePay -->
             <div class="method-item selected" onclick="selectMethod(this)">
+                <div class="method-info">
+                    <div class="method-icon" style="color: #ee4d2d;"><i class="fa-solid fa-shop"></i></div>
+                    <div>
+                        <div class="method-name">ShopeePay</div>
+                        <div class="method-desc">Bayar pakai saldo ShopeePay</div>
+                    </div>
+                </div>
+                <div class="radio-circle"></div>
+            </div>
+
+            <!-- SeaBank Virtual Account -->
+            <div class="method-item" onclick="selectMethod(this)">
+                <div class="method-info">
+                    <div class="method-icon" style="color: #ff5722;"><i class="fa-solid fa-building-columns"></i></div>
+                    <div>
+                        <div class="method-name">SeaBank Virtual Account</div>
+                        <div class="method-desc">Transfer via SeaBank (Bebas biaya admin)</div>
+                    </div>
+                </div>
+                <div class="radio-circle"></div>
+            </div>
+
+            <!-- QRIS -->
+            <div class="method-item" onclick="selectMethod(this)">
                 <div class="method-info">
                     <div class="method-icon" style="color: #111827;"><i class="fa-solid fa-qrcode"></i></div>
                     <div>
                         <div class="method-name">QRIS</div>
-                        <div class="method-desc">Scan pakai GoPay, OVO, Dana, dll</div>
+                        <div class="method-desc">Scan pakai GoPay, OVO, Dana, Shopee</div>
                     </div>
                 </div>
                 <div class="radio-circle"></div>
@@ -232,19 +258,7 @@
                 <div class="radio-circle"></div>
             </div>
 
-            <!-- BSI Virtual Account -->
-            <div class="method-item" onclick="selectMethod(this)">
-                <div class="method-info">
-                    <div class="method-icon" style="color: #0066cc;"><i class="fa-solid fa-building-columns"></i></div>
-                    <div>
-                        <div class="method-name">BSI Virtual Account</div>
-                        <div class="method-desc">Transfer otomatis via Bank Syariah Indonesia</div>
-                    </div>
-                </div>
-                <div class="radio-circle"></div>
-            </div>
-
-            <!-- Transfer Bank Lain -->
+            <!-- Bank Transfer Lain -->
             <div class="method-item" onclick="selectMethod(this)">
                 <div class="method-info">
                     <div class="method-icon" style="color: #ef4444;"><i class="fa-solid fa-money-bill-transfer"></i></div>
@@ -267,15 +281,13 @@
     </div>
 
     <script>
-        // Script sederhana untuk simulasi memilih metode pembayaran
+        // Script simulasi memilih metode pembayaran
         function selectMethod(element) {
-            // Hapus class 'selected' dari semua item
             document.querySelectorAll('.method-item').forEach(item => {
                 item.classList.remove('selected');
             });
-            // Tambahkan class 'selected' ke item yang diklik
             element.classList.add('selected');
         }
     </script>
 </body>
-  </html>
+</html>
