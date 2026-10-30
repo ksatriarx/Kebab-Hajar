@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup Pembayaran Midtrans - Kebab IDI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Container Utama (Tampilan seperti di HP) */
+        .payment-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Header Toko & Total */
+        .header {
+            background: #f9fafb;
+            padding: 24px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .total-amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .order-id {
+            font-size: 11px;
+            color: #6b7280;
+            background: #e5e7eb;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        /* List Metode Pembayaran */
+        .payment-methods {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .method-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .method-item:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .method-item.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .method-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #4b5563;
+        }
+
+        .method-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .method-desc {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .radio-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .method-item.selected .radio-circle {
+            border-color: #3b82f6;
+        }
+
+        .method-item.selected .radio-circle::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
+
+        /* Tombol Bayar */
+        .footer {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            background: #ffffff;
+        }
+
+        .btn-pay {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-pay:hover {
+            background: #059669;
+        }
+
+        .security-badge {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 11px;
+            color: #9ca3af;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="payment-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Kebab Turki Hajar</h1>
+            <p>Penyelesaian Pesanan</p>
+            <div class="total-amount">Rp 25.000</div>
+            <div class="order-id">Order ID: KEBAB-172893</div>
+        </div>
+
+        <!-- Metode Pembayaran -->
+        <div class="payment-methods">
+            <div class="section-title">Pilih Metode Pembayaran</div>
+
+            <!-- QRIS -->
+            <div class="method-item selected" onclick="selectMethod(this)">
+                <div class="method-info">
+                    <div class="method-icon" style="color: #111827;"><i class="fa-solid fa-qrcode"></i></div>
+                    <div>
+                        <div class="method-name">QRIS</div>
+                        <div class="method-desc">Scan pakai GoPay, OVO, Dana, dll</div>
+                    </div>
+                </div>
+                <div class="radio-circle"></div>
+            </div>
+
+            <!-- GoPay -->
+            <div class="method-item" onclick="selectMethod(this)">
+                <div class="method-info">
+                    <div class="method-icon" style="color: #00aaff;"><i class="fa-solid fa-wallet"></i></div>
+                    <div>
+                        <div class="method-name">GoPay</div>
+                        <div class="method-desc">Bayar pakai saldo GoPay</div>
+                    </div>
+                </div>
+                <div class="radio-circle"></div>
+            </div>
+
+            <!-- BSI Virtual Account -->
+            <div class="method-item" onclick="selectMethod(this)">
+                <div class="method-info">
+                    <div class="method-icon" style="color: #0066cc;"><i class="fa-solid fa-building-columns"></i></div>
+                    <div>
+                        <div class="method-name">BSI Virtual Account</div>
+                        <div class="method-desc">Transfer otomatis via Bank Syariah Indonesia</div>
+                    </div>
+                </div>
+                <div class="radio-circle"></div>
+            </div>
+
+            <!-- Transfer Bank Lain -->
+            <div class="method-item" onclick="selectMethod(this)">
+                <div class="method-info">
+                    <div class="method-icon" style="color: #ef4444;"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                    <div>
+                        <div class="method-name">Transfer Bank Lain</div>
+                        <div class="method-desc">BCA, BRI, Mandiri, BNI</div>
+                    </div>
+                </div>
+                <div class="radio-circle"></div>
+            </div>
+        </div>
+
+        <!-- Footer / Tombol Bayar -->
+        <div class="footer">
+            <button class="btn-pay">Bayar Sekarang</button>
+            <div class="security-badge">
+                <i class="fa-solid fa-shield-halved"></i> Pembayaran aman & terenkripsi oleh Midtrans
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script sederhana untuk simulasi memilih metode pembayaran
+        function selectMethod(element) {
+            // Hapus class 'selected' dari semua item
+            document.querySelectorAll('.method-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            // Tambahkan class 'selected' ke item yang diklik
+            element.classList.add('selected');
+        }
+    </script>
+</body>
+  </html>
