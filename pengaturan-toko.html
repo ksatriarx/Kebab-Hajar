@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kebab IDI - Pengaturan Toko</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #000; --bg-card: #1a1a1a; --text-main: #fff;
+            --text-muted: #888; --primary: #e53935; --accent: #ffb300;
+            --success: #10b981; --border: #333; --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .app { max-width: 480px; width: 100%; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 22px; margin-bottom: 5px; }
+        .header p { font-size: 12px; color: var(--text-muted); }
+        
+        .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
+        
+        .status-display { text-align: center; padding: 20px; margin-bottom: 20px; border-radius: var(--radius); border: 2px solid var(--border); }
+        .status-display.buka { border-color: var(--success); background: rgba(16, 185, 129, 0.1); }
+        .status-display.tutup { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
+        .status-display.auto { border-color: var(--accent); background: rgba(255, 179, 0, 0.1); }
+        
+        .status-icon { font-size: 50px; margin-bottom: 10px; }
+        .status-text { font-size: 24px; font-weight: 800; }
+        .status-display.buka .status-text { color: var(--success); }
+        .status-display.tutup .status-text { color: var(--primary); }
+        .status-display.auto .status-text { color: var(--accent); }
+        .status-info { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+
+        .option-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
+        
+        .option-btn { 
+            width: 100%; display: flex; align-items: center; gap: 15px; 
+            padding: 18px; margin-bottom: 10px; cursor: pointer; 
+            border-radius: var(--radius); border: 2px solid var(--border); 
+            background: var(--bg-main); color: var(--text-main); 
+            text-align: left; transition: all 0.2s;
+        }
+        .option-btn:hover { border-color: var(--text-muted); }
+        .option-btn.active { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
+        .option-btn.active .option-icon { background: var(--primary); }
+        
+        .option-icon { 
+            width: 45px; height: 45px; border-radius: 50%; 
+            background: var(--border); display: flex; align-items: center; 
+            justify-content: center; font-size: 20px; flex-shrink: 0;
+        }
+        .option-text h4 { font-size: 15px; margin-bottom: 2px; }
+        .option-text p { font-size: 12px; color: var(--text-muted); }
+        
+        .btn-save { 
+            width: 100%; background: var(--success); color: white; 
+            border: none; padding: 15px; border-radius: var(--radius); 
+            font-size: 15px; font-weight: 800; cursor: pointer; 
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-save:disabled { background: #555; cursor: not-allowed; }
+        
+        .access-denied { display: none; text-align: center; padding: 50px 20px; }
+        .access-denied h2 { color: var(--primary); margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+<div class="app" id="app-content" style="display: none;">
+    <div class="header">
+        <h1>⚙️ Pengaturan Toko</h1>
+        <p>Atur status buka/tutup Kebab IDI</p>
+    </div>
+
+    <div class="status-display auto" id="status-display">
+        <div class="status-icon" id="status-icon">⏰</div>
+        <div class="status-text" id="status-text">Memuat...</div>
+        <div class="status-info" id="status-info">Menghubungkan ke server...</div>
+    </div>
+
+    <div class="card">
+        <div class="option-title">Pilih Status Toko</div>
+        
+        <button class="option-btn" id="opt-auto" onclick="pilihStatus('auto')">
+            <div class="option-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="option-text">
+                <h4>Otomatis (Jadwal)</h4>
+                <p>Ikuti jam operasional (10:00 - 23:00)</p>
+            </div>
+        </button>
+        
+        <button class="option-btn" id="opt-buka" onclick="pilihStatus('buka')">
+            <div class="option-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="option-text">
+                <h4>Paksa Buka</h4>
+                <p>Buka terus, walau di luar jam jadwal</p>
+            </div>
+        </button>
+        
+        <button class="option-btn" id="opt-tutup" onclick="pilihStatus('tutup')">
+            <div class="option-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+            <div class="option-text">
+                <h4>Paksa Tutup</h4>
+                <p>Tutup toko (libur, habis, dll)</p>
+            </div>
+        </button>
+    </div>
+
+    <button class="btn-save" id="btn-save" onclick="simpanPengaturan()" disabled>
+        <i class="fa-solid fa-floppy-disk"></i> <span id="btn-save-text">Pilih Status</span>
+    </button>
+</div>
+
+<div class="access-denied" id="access-denied">
+    <i class="fa-solid fa-lock" style="font-size: 50px; color: var(--primary);"></i>
+    <h2>Akses Ditolak</h2>
+    <p>Halaman ini hanya untuk Akun Owner Kebab IDI.</p>
+    <a href="index.html" style="color: var(--accent);">Kembali ke Beranda</a>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
+        authDomain: "kebab-idi.firebaseapp.com",
+        projectId: "kebab-idi",
+        storageBucket: "kebab-idi.firebasestorage.app",
+        messagingSenderId: "303997052314",
+        appId: "1:303997052314:web:1db122bc5911297b710623"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const ALLOWED_EMAIL = "rxstore101@gmail.com";
+    let statusTerpilih = "auto";
+    let statusSaatIni = "auto";
+
+    // Cek login
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.email === ALLOWED_EMAIL) {
+            document.getElementById('app-content').style.display = 'block';
+            document.getElementById('access-denied').style.display = 'none';
+            loadStatus();
+        } else {
+            document.getElementById('app-content').style.display = 'none';
+            document.getElementById('access-denied').style.display = 'block';
+        }
+    });
+
+    // Baca status dari Firestore (real-time)
+    function loadStatus() {
+        onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
+            if (docSnap.exists()) {
+                statusSaatIni = docSnap.data().status || "auto";
+            } else {
+                statusSaatIni = "auto";
+            }
+            statusTerpilih = statusSaatIni;
+            tampilkanStatus(statusSaatIni);
+            highlightOption(statusSaatIni);
+        });
+    }
+
+    function tampilkanStatus(status) {
+        const display = document.getElementById('status-display');
+        const icon = document.getElementById('status-icon');
+        const text = document.getElementById('status-text');
+        const info = document.getElementById('status-info');
+
+        display.className = 'status-display ' + status;
+
+        if (status === 'buka') {
+            icon.innerText = '🟢';
+            text.innerText = 'TOKO BUKA';
+            info.innerText = 'Pelanggan bisa memesan sekarang';
+        } else if (status === 'tutup') {
+            icon.innerText = '🔴';
+            text.innerText = 'TOKO TUTUP';
+            info.innerText = 'Pelanggan tidak bisa memesan';
+        } else {
+            icon.innerText = '⏰';
+            text.innerText = 'OTOMATIS';
+            info.innerText = 'Mengikuti jadwal (10:00 - 23:00)';
+        }
+    }
+
+    function highlightOption(status) {
+        document.getElementById('opt-auto').classList.remove('active');
+        document.getElementById('opt-buka').classList.remove('active');
+        document.getElementById('opt-tutup').classList.remove('active');
+        document.getElementById('opt-' + status).classList.add('active');
+    }
+
+    window.pilihStatus = (status) => {
+        statusTerpilih = status;
+        highlightOption(status);
+        
+        const btn = document.getElementById('btn-save');
+        const btnText = document.getElementById('btn-save-text');
+        
+        if (status === statusSaatIni) {
+            btn.disabled = true;
+            btnText.innerText = 'Pilih Status';
+        } else {
+            btn.disabled = false;
+            btnText.innerText = 'Simpan Pengaturan';
+        }
+    };
+
+    window.simpanPengaturan = async () => {
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true;
+        document.getElementById('btn-save-text').innerText = 'Menyimpan...';
+
+        try {
+            await setDoc(doc(db, "pengaturan", "toko"), {
+                status: statusTerpilih,
+                updatedAt: new Date().toISOString(),
+                updatedBy: auth.currentUser.email
+            });
+
+            statusSaatIni = statusTerpilih;
+            alert("✅ Pengaturan berhasil disimpan!");
+            document.getElementById('btn-save-text').innerText = 'Pilih Status';
+        } catch (error) {
+            alert("❌ Gagal menyimpan: " + error.message);
+            document.getElementById('btn-save-text').innerText = 'Simpan Pengaturan';
+            btn.disabled = false;
+        }
+    };
+</script>
+</body>
+</html>
