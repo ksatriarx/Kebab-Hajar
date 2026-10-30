@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <!-- WARNA DIUBAH JADI HITAM DI SINI -->
     <meta name="theme-color" content="#000000">
     <title>Kebab IDI — Kebab Turki Hajar</title>
     <meta name="description" content="Kebab IDI — Pesan kebab Turki asli, antar ke rumah area Idi Rayeuk, Aceh Timur.">
@@ -380,7 +379,7 @@
             padding-bottom: env(safe-area-inset-bottom); 
         }
 
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); text-decoration: none; font-size: 9px; font-weight: 600; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); text-decoration: none; font-size: 9px; font-weight: 600; transition: color 0.3s;}
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--primary); }
 
@@ -654,17 +653,18 @@
         <button class="cart-btn">Lihat Keranjang</button>
     </div>
 
+    <!-- BOTTOM NAV DENGAN ID UNTUK MEMUDAHKAN JS -->
     <div class="bottom-nav">
-        <a href="#" class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">
+        <a href="#" class="nav-item active" id="nav-home" onclick="handleNavClick('home'); return false;">
             <i class="fa-solid fa-house"></i><span>Home</span>
         </a>
-        <a href="#" class="nav-item" onclick="window.scrollTo({top: document.getElementById('menu-container').offsetTop - 130, behavior: 'smooth'}); return false;">
+        <a href="#" class="nav-item" id="nav-menu" onclick="handleNavClick('menu'); return false;">
             <i class="fa-solid fa-bowl-food"></i><span>Menu</span>
         </a>
-        <a href="#" class="nav-item" onclick="openCartModal(); return false;">
+        <a href="#" class="nav-item" id="nav-cart" onclick="handleNavClick('cart'); return false;">
             <i class="fa-solid fa-cart-shopping"></i><span>Keranjang</span>
         </a>
-        <a href="#" class="nav-item" onclick="chatLangsung(); return false;">
+        <a href="#" class="nav-item" id="nav-chat" onclick="handleNavClick('chat'); return false;">
             <i class="fa-brands fa-whatsapp"></i><span>Chat</span>
         </a>
     </div>
@@ -1000,10 +1000,57 @@
             }, {passive: true});
 
 
-            /* STICKY HEADER */
+            /* ==========================================
+               UPDATE: STICKY HEADER & NAVIGASI DINAMIS
+               ========================================== */
             window.addEventListener('scroll', function() {
+                // Logika Header
                 document.getElementById('main-header').classList.toggle('scrolled', window.scrollY > 30);
+                
+                // Logika Warna Merah Navigasi Pindah Otomatis Saat Scroll
+                // Jangan jalankan jika modal keranjang sedang terbuka
+                if(!document.getElementById('cart-modal').classList.contains('show')) {
+                    const menuTop = document.getElementById('menu-container').offsetTop - 200;
+                    
+                    if (window.scrollY >= menuTop) {
+                        // Jika sudah scroll ke bawah, pindah ke "Menu"
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                        document.getElementById('nav-menu').classList.add('active');
+                    } else {
+                        // Jika scroll kembali ke atas, pindah ke "Home"
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                        document.getElementById('nav-home').classList.add('active');
+                    }
+                }
             });
+
+            // Fungsi Klik Navigasi Bawah
+            window.handleNavClick = (menuName) => {
+                // Hilangkan warna merah dari semua menu
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+                if (menuName === 'home') {
+                    document.getElementById('nav-home').classList.add('active');
+                    window.scrollTo({top:0, behavior:'smooth'});
+                } 
+                else if (menuName === 'menu') {
+                    document.getElementById('nav-menu').classList.add('active');
+                    window.scrollTo({top: document.getElementById('menu-container').offsetTop - 130, behavior: 'smooth'});
+                } 
+                else if (menuName === 'cart') {
+                    document.getElementById('nav-cart').classList.add('active');
+                    openCartModal();
+                } 
+                else if (menuName === 'chat') {
+                    document.getElementById('nav-chat').classList.add('active');
+                    chatLangsung();
+                    // Kembalikan merah ke home setelah buka WA (karena WA pindah tab)
+                    setTimeout(() => {
+                        document.getElementById('nav-home').classList.add('active');
+                        document.getElementById('nav-chat').classList.remove('active');
+                    }, 1000);
+                }
+            };
 
             /* KONFIGURASI MENU */
             const WHATSAPP_NUMBER = "6287881318261";
@@ -1301,6 +1348,9 @@
 
             window.closeCartModal = () => {
                 document.getElementById('cart-modal').classList.remove('show');
+                // Kembalikan merah ke Home jika keranjang ditutup
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.getElementById('nav-home').classList.add('active');
             }
 
             function renderCartModal() {
