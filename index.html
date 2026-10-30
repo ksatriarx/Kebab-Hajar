@@ -914,7 +914,6 @@
                 if (!videoModeActive) return;
                 videoModeActive = false;
                 
-                // Hapus iframe video agar tidak memakan kuota/memori lagi
                 const iframeWrapper = document.querySelector('#slide-1 .iframe-wrapper');
                 if (iframeWrapper) iframeWrapper.remove();
                 
@@ -985,6 +984,9 @@
             const DEFAULT_DRINK_IMAGE = "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop"; 
 
             const menuData = [
+                { id: 19, category: "makanan", type: "Kebab", name: "Kebab Sayur", price: 8000, image: "https://i.ibb.co.com/KpJZwKQy/file-000000001ecc82119383cae59bea6a5f.png", badge: "" },
+                { id: 20, category: "makanan", type: "Kebab", name: "Kebab Telur", price: 8000, image: "https://i.ibb.co.com/rCMZ8Cc/file-0000000000548211b52d0bfad661f748.png", badge: "" },
+                { id: 21, category: "makanan", type: "Kebab", name: "Kebab Sosis", price: 8000, image: "https://i.ibb.co.com/jXSzzLN/file-00000000e40c8211b085d5cc5c6f79be.png", badge: "" },
                 { id: 1, category: "makanan", type: "Kebab", name: "Telur Sosis", price: 10000, image: "https://i.ibb.co.com/hPwgw0f/file-000000003c388207a89749c0fe820b2b.png", badge: "" },
                 { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://i.ibb.co.com/35htZS9w/file-000000002c0082119ad5543f388247df.png", badge: "" },
                 { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://i.ibb.co.com/j90LH4YS/file-0000000040c882118a04f2e0ce8c402a.png", badge: "" },
