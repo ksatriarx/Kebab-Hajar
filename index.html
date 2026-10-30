@@ -524,6 +524,12 @@
                         <div id="status-dot" class="status-dot buka"></div>
                         <span id="status-text" class="status-text-mini buka">Buka</span>
                     </div>
+                    
+                    <!-- KOTAK PENGUMUMAN -->
+                    <div id="announcement-box" style="display: none; background: rgba(229, 57, 53, 0.2); border: 1px solid var(--primary); border-radius: var(--radius-sm); padding: 6px 10px; margin-bottom: 8px; font-size: 10px; color: #ff9e9e; font-weight: 600; text-align: left;">
+                        <i class="fa-solid fa-bullhorn"></i> <span id="announcement-text">-</span>
+                    </div>
+
                     <div class="op-hours">
                         <span id="live-h">00</span><span class="blink-colon">:</span><span id="live-m">00</span>
                         <span style="margin: 0 4px;">•</span>
@@ -868,8 +874,22 @@
 
             /* LISTENER FIREBASE UNTUK STATUS TOKO (DIPINDAHKAN KE DALAM SINI) */
             onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => {
+                const annBox = document.getElementById('announcement-box');
+                const annText = document.getElementById('announcement-text');
+
                 if (docSnap.exists()) {
                     manualStoreStatus = docSnap.data().status || "auto";
+                    
+                    // Cek apakah ada pengumuman
+                    const alasan = docSnap.data().alasanTutup;
+                    if (alasan && alasan.trim() !== "") {
+                        annText.innerText = alasan;
+                        annBox.style.display = 'block';
+                    } else {
+                        annBox.style.display = 'none';
+                    }
+                } else {
+                    annBox.style.display = 'none';
                 }
                 updateStatusUI();
             });
