@@ -2,9 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- TAMBAHAN viewport-fit=cover AGAR FULL SCREEN -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <!-- UBAH THEME COLOR MENJADI HITAM -->
+    <!-- WARNA DIUBAH JADI HITAM DI SINI -->
     <meta name="theme-color" content="#000000">
     <title>Kebab IDI — Kebab Turki Hajar</title>
     <meta name="description" content="Kebab IDI — Pesan kebab Turki asli, antar ke rumah area Idi Rayeuk, Aceh Timur.">
@@ -378,7 +377,7 @@
             background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
             display: flex; justify-content: space-around; align-items: center;
             border-top: 1px solid var(--border); z-index: 100; 
-            padding-bottom: env(safe-area-inset-bottom); /* Memastikan aman dari garis bawah HP */
+            padding-bottom: env(safe-area-inset-bottom); 
         }
 
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); text-decoration: none; font-size: 9px; font-weight: 600; }
@@ -1175,7 +1174,6 @@
                 container.innerHTML = items.map(item => {
                     const hasVariants = item.variants && item.variants.length > 0;
                     
-                    // Hitung total qty untuk item ini (termasuk semua varian)
                     let totalQty = 0;
                     Object.keys(cart).forEach(key => {
                         if (key.startsWith(item.id + '-') || key === item.id.toString()) {
@@ -1187,7 +1185,6 @@
                     
                     let actionButton = '';
                     if (hasVariants) {
-                        // UPDATE: Jika sudah ada qty, tampilkan tombol +/- juga
                         if (totalQty === 0) {
                             actionButton = `<button class="btn-add" onclick="openVariantModal(${item.id})"><i class="fa-solid fa-plus"></i></button>`;
                         } else {
@@ -1262,7 +1259,6 @@
                 document.getElementById('reorder-banner').classList.remove('show');
             }
 
-            /* ===== TAMBAHAN: KURANGI SATU VARIAN ===== */
             window.removeOneVariant = (id) => {
                 const keys = Object.keys(cart).filter(k => k.startsWith(id + '-') && cart[k] > 0);
                 if (keys.length > 0) {
