@@ -160,12 +160,17 @@
             background-size: cover; background-position: center;
         }
 
-        /* CSS KHUSUS VIDEO AGAR MENUTUPI AREA SEPERTI GAMBAR */
-        .slide video {
+        /* CSS UNTUK IFRAME STREAMABLE */
+        .slide .iframe-wrapper {
+            position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+        }
+        
+        .slide .iframe-wrapper iframe {
+            /* Trik scale agar video vertikal menutupi area horizontal */
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            pointer-events: none; /* Agar tidak mengganggu swipe */
+            border: none;
+            transform: scale(1.8); 
         }
 
         .slide.active { opacity: 1; }
@@ -518,9 +523,11 @@
 
         <!-- HERO SLIDER -->
         <div class="hero-slider" id="hero-slider">
-            <!-- SLIDE 1 (VIDEO) -->
+            <!-- SLIDE 1 (VIDEO STREAMABLE) -->
             <div class="slide active" id="slide-1">
-                <video id="hero-video" src="https://files.catbox.moe/vrbc7l.mp4" muted playsinline poster="https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg"></video>
+                <div class="iframe-wrapper">
+                    <iframe allow="fullscreen;autoplay" allowfullscreen src="https://streamable.com/e/7wiifz?autoplay=1&muted=1&loop=0" style="border:none; pointer-events: none;"></iframe>
+                </div>
             </div>
 
             <!-- SLIDE 2 & 3 (GAMBAR) -->
@@ -873,15 +880,15 @@
             });
 
             /* ==========================================
-               LOGIKA HERO SLIDER (VIDEO -> GAMBAR -> LOOP)
+               LOGIKA HERO SLIDER (IFRAME -> GAMBAR)
                ========================================== */
             const slides = document.querySelectorAll('.slide');
             const dotsContainer = document.getElementById('slider-dots');
             let currentSlide = 0;
             let slideInterval;
-            let videoModeActive = true; // Penanda apakah masih di mode video atau sudah gambar
+            let videoModeActive = true; 
+            let videoTimer; // Timer untuk mematikan iframe Streamable
 
-            // Buat titik-titik navigasi (dots)
             slides.forEach((_, index) => {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
@@ -904,48 +911,28 @@
                 slideInterval = setInterval(nextSlide, 3500); 
             }
 
-            // Fungsi saat video selesai atau dibatalkan
             function switchToImageMode(skipToNext = true) {
                 if (!videoModeActive) return;
                 videoModeActive = false;
                 
-                // Hapus elemen video agar tidak memakan kuota/memori
-                const video = document.getElementById('hero-video');
-                if (video) {
-                    video.pause();
-                    video.remove();
-                }
+                // Hapus iframe video
+                const iframeWrapper = document.querySelector('#slide-1 .iframe-wrapper');
+                if (iframeWrapper) iframeWrapper.remove();
                 
-                // Kembalikan gambar background untuk slide pertama
+                // Kembalikan gambar background untuk slide 1
                 document.getElementById('slide-1').style.backgroundImage = "url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg')";
                 
-                // Jika video selesai sendiri, lanjut ke slide berikutnya
                 if (skipToNext) {
                     nextSlide();
                     startSlide();
                 }
             }
 
-            // Deteksi koneksi internet
-            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            const isSlow = connection && (connection.saveData || ['slow-2g', '2g', '3g'].includes(connection.effectiveType));
-            const videoEl = document.getElementById('hero-video');
-
-            if (isSlow || !videoEl) {
-                // Jika internet lelet atau tidak ada video: Langsung pakai gambar
-                switchToImageMode(false); 
-                startSlide();
-            } else {
-                // Jika internet cepat: Putar video
-                videoEl.play().catch(() => {
-                    // Jika autoplay diblokir browser (misal karena kebijakan), langsung pindah ke gambar
-                    switchToImageMode(false);
-                    startSlide();
-                });
-                
-                // Saat video selesai, panggil fungsi untuk pindah ke gambar
-                videoEl.addEventListener('ended', () => switchToImageMode(true));
-            }
+            // Mulai timer untuk video Streamable (Contoh: 15 detik = 15000 ms)
+            // Silakan ubah angka 15000 sesuai durasi asli video Anda!
+            videoTimer = setTimeout(() => {
+                switchToImageMode(true);
+            }, 15000);
 
             // Logika Swipe (Geser) manual
             let touchStartX = 0, touchEndX = 0;
@@ -953,7 +940,7 @@
             
             sliderElement.addEventListener('touchstart', e => { 
                 touchStartX = e.changedTouches[0].screenX; 
-                if(!videoModeActive) clearInterval(slideInterval); // Pause timer jika sudah mode gambar
+                if(!videoModeActive) clearInterval(slideInterval);
             }, {passive: true});
             
             sliderElement.addEventListener('touchend', e => {
@@ -961,7 +948,8 @@
                 
                 if (touchStartX - touchEndX > 50) { // Swipe kiri
                     if (videoModeActive) {
-                        switchToImageMode(false); // Matikan video jika di-swipe
+                        clearTimeout(videoTimer); // Batalkan timer video
+                        switchToImageMode(false); 
                         nextSlide();
                         startSlide();
                     } else {
@@ -971,7 +959,8 @@
                 }
                 if (touchEndX - touchStartX > 50) { // Swipe kanan
                     if (videoModeActive) {
-                        switchToImageMode(false); // Matikan video jika di-swipe
+                        clearTimeout(videoTimer);
+                        switchToImageMode(false); 
                         goToSlide(currentSlide - 1);
                         startSlide();
                     } else {
@@ -980,7 +969,6 @@
                     }
                 }
                 
-                // Jika hanya tap (tidak geser) dan dalam mode gambar, lanjutkan timer
                 if (!videoModeActive && Math.abs(touchStartX - touchEndX) <= 50) {
                     startSlide();
                 }
