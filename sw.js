@@ -1,27 +1,43 @@
-const CACHE_NAME = "website-cache-v1";
+const CACHE_NAME = 'kebab-pwa-v2'; // UBAH DARI V1 JADI V2 AGAR MEMORI LAMA HAPUS
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json'
+];
 
-self.addEventListener("install", (event) => {
+self.addEventListener('install', event => {
   self.skipWaiting();
-});
-
-self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    ).then(() => self.clients.claim())
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
 
+self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).catch(() =>
-      caches.match(event.request)
-    )
+    caches.match(event.request)
+      .then(response => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      })
   );
 });
