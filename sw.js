@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kebab-pwa-v2'; // UBAH DARI V1 JADI V2 AGAR MEMORI LAMA HAPUS
+const CACHE_NAME = 'kebab-pwa-v3'; // UBAH DARI V1 JADI V2 AGAR MEMORI LAMA HAPUS
 const urlsToCache = [
   './',
   './index.html',
