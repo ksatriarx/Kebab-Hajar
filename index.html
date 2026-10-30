@@ -382,7 +382,7 @@
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--primary); }
 
-        /* ===== MODAL KERANJANG & KONFIRMASI ===== */
+        /* ===== MODAL KERANJANG & KONFIRMASI & VARIAN ===== */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
         .modal-overlay.show { display: flex; }
         
@@ -658,6 +658,19 @@
         </a>
     </div>
 
+    <!-- ===== MODAL VARIAN (DINGIN/PANAS) ===== -->
+    <div class="modal-overlay" id="variant-modal" onclick="if(event.target===this) closeVariantModal()">
+        <div class="modal-box" style="max-height: 50vh; text-align: center; padding: 20px;">
+            <div class="modal-handle"></div>
+            <h3 class="modal-title" id="variant-title" style="margin-bottom: 20px;">Pilih Varian</h3>
+            <div id="variant-options" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Buttons injected here -->
+            </div>
+            <button onclick="closeVariantModal()" style="margin-top: 20px; width:100%; background:transparent; border:none; color:var(--text-muted); padding:12px; font-size:11px; font-weight:700; cursor:pointer;">Batal</button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL KERANJANG ===== -->
     <div class="modal-overlay" id="cart-modal" onclick="if(event.target===this) closeCartModal()">
         <div class="modal-box">
             <div class="modal-handle"></div>
@@ -677,6 +690,7 @@
         </div>
     </div>
 
+    <!-- ===== MODAL KONFIRMASI PESANAN ===== -->
     <div class="modal-overlay" id="confirm-modal" onclick="if(event.target===this) closeConfirmModal()">
         <div class="modal-box">
             <div class="modal-handle"></div>
@@ -984,27 +998,32 @@
             const DEFAULT_DRINK_IMAGE = "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop"; 
 
             const menuData = [
+                /* MAKANAN BARU (8000) */
                 { id: 19, category: "makanan", type: "Kebab", name: "Kebab Sayur", price: 8000, image: "https://i.ibb.co.com/KpJZwKQy/file-000000001ecc82119383cae59bea6a5f.png", badge: "" },
                 { id: 20, category: "makanan", type: "Kebab", name: "Kebab Telur", price: 8000, image: "https://i.ibb.co.com/rCMZ8Cc/file-0000000000548211b52d0bfad661f748.png", badge: "" },
                 { id: 21, category: "makanan", type: "Kebab", name: "Kebab Sosis", price: 8000, image: "https://i.ibb.co.com/jXSzzLN/file-00000000e40c8211b085d5cc5c6f79be.png", badge: "" },
+                
+                /* MAKANAN LAMA */
                 { id: 1, category: "makanan", type: "Kebab", name: "Telur Sosis", price: 10000, image: "https://i.ibb.co.com/hPwgw0f/file-000000003c388207a89749c0fe820b2b.png", badge: "" },
                 { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://i.ibb.co.com/35htZS9w/file-000000002c0082119ad5543f388247df.png", badge: "" },
                 { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://i.ibb.co.com/j90LH4YS/file-0000000040c882118a04f2e0ce8c402a.png", badge: "" },
                 { id: 4, category: "makanan", type: "Kebab", name: "Daging Telur", price: 13000, image: "https://i.ibb.co.com/xqcmDfHs/file-000000003e2c82119ce5e518f35696c6.png", badge: "" },
                 { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, image: "https://i.ibb.co.com/kgvMLdP8/file-00000000d1988211b11c4d18bd5327b4.png", badge: "BEST" },
                 { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://i.ibb.co.com/dsRW0mfZ/file-000000009c3482118de7254c91fc3d87.png", badge: "" },
-                { id: 7, category: "minuman", type: "Minuman", name: "Sanger Dingin/Panas", price: 10000, image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 8, category: "minuman", type: "Minuman", name: "Americano Dingin/Panas", price: 10000, image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 9, category: "minuman", type: "Minuman", name: "Americano Gula Aren", price: 12000, image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 10, category: "minuman", type: "Minuman", name: "Teh Hijau Dingin", price: 8000, image: "https://images.unsplash.com/photo-1556881286-fc6915169721?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 11, category: "minuman", type: "Minuman", name: "Teh Hijau Panas", price: 5000, image: "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 12, category: "minuman", type: "Minuman", name: "Kopi Caramel", price: 15000, image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 13, category: "minuman", type: "Minuman", name: "Kopi Latte", price: 15000, image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 14, category: "minuman", type: "Minuman", name: "Sirup Kurnia Dingin", price: 8000, image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 15, category: "minuman", type: "Minuman", name: "Capucino", price: 15000, image: "https://images.unsplash.com/photo-1534778101976-62847782c213?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 16, category: "minuman", type: "Minuman", name: "Long Black", price: 10000, image: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 17, category: "minuman", type: "Minuman", name: "Sanger Double Shoot", price: 18000, image: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=400&auto=format&fit=crop", badge: "" },
-                { id: 18, category: "minuman", type: "Minuman", name: "Kopi Milo Dingin", price: 15000, image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=400&auto=format&fit=crop", badge: "" }
+                
+                /* MINUMAN (UPDATE GAMBAR & VARIAN) */
+                { id: 7, category: "minuman", type: "Minuman", name: "Sanger", price: 10000, image: "https://i.ibb.co.com/PGj2LpX9/file-0000000031cc8211a6dcc107c336df45.png", badge: "", variants: ["Dingin", "Panas"] },
+                { id: 8, category: "minuman", type: "Minuman", name: "Americano", price: 10000, image: "https://i.ibb.co.com/9HM8M6XD/file-00000000e168821193186ccd0e44f53d.png", badge: "", variants: ["Dingin", "Panas"] },
+                { id: 9, category: "minuman", type: "Minuman", name: "Americano Gula Aren", price: 12000, image: "https://i.ibb.co.com/N2B6vQnP/file-00000000b264820796a3bac4a080e4b3.png", badge: "" },
+                { id: 10, category: "minuman", type: "Minuman", name: "Teh Hijau", price: 8000, image: "https://i.ibb.co.com/CdQ1wqj/file-000000000f908211b837ae54563dd966.png", badge: "", variants: ["Dingin", "Panas"] },
+                { id: 11, category: "minuman", type: "Minuman", name: "Teh Hijau Susu", price: 10000, image: "https://i.ibb.co.com/Rp0nhMck/file-00000000e7b482078de4e531ff710564.png", badge: "" },
+                { id: 12, category: "minuman", type: "Minuman", name: "Kopi Caramel", price: 15000, image: "https://i.ibb.co.com/WWt5KWpJ/file-00000000f7948211a0b0b5664ce94ef2.png", badge: "" },
+                { id: 13, category: "minuman", type: "Minuman", name: "Kopi Latte", price: 15000, image: "https://i.ibb.co.com/nMmKpxP1/file-00000000685c82119555630672974adf.png", badge: "" },
+                { id: 14, category: "minuman", type: "Minuman", name: "Sirup Kurnia Dingin", price: 8000, image: "https://i.ibb.co.com/TxxPGfJR/file-000000000fbc8211bfae4fd9fb3c28e1.png", badge: "" },
+                { id: 15, category: "minuman", type: "Minuman", name: "Capucino", price: 15000, image: "https://i.ibb.co.com/hx3s3SZH/file-000000009b188211bcbfeb424e4d3b4b.png", badge: "" },
+                { id: 16, category: "minuman", type: "Minuman", name: "Long Black", price: 10000, image: "https://i.ibb.co.com/LznJ62Vw/file-00000000941c8211b103e39f78f5a3f4.png", badge: "" },
+                { id: 17, category: "minuman", type: "Minuman", name: "Sanger Double Shoot", price: 18000, image: "https://i.ibb.co.com/TD38ST6w/file-00000000ea1c8207aec4784f0d414597.png", badge: "" },
+                { id: 18, category: "minuman", type: "Minuman", name: "Kopi Milo Dingin", price: 15000, image: "https://i.ibb.co.com/JwnTHR1v/file-00000000a8f48211a6ce1bf12c34801c.png", badge: "" }
             ];
 
             function getItemImage(item) {
@@ -1129,13 +1148,38 @@
                     ? menuData.filter(item => `${item.type} ${item.name} ${item.category}`.toLowerCase().includes(searchQuery))
                     : menuData.filter(item => item.category === currentCategory);
                 titleEl.innerText = searchQuery ? 'Hasil Pencarian' : (currentCategory === 'makanan' ? 'Menu Kebab' : 'Menu Minuman');
+                
                 if (items.length === 0) {
                     container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Menu tidak ditemukan.</div>`;
                     return;
                 }
+
                 container.innerHTML = items.map(item => {
-                    const qty = cart[item.id] || 0;
+                    const hasVariants = item.variants && item.variants.length > 0;
+                    
+                    // Hitung total qty untuk item ini (termasuk semua varian)
+                    let totalQty = 0;
+                    Object.keys(cart).forEach(key => {
+                        if (key.startsWith(item.id + '-') || key === item.id.toString()) {
+                            totalQty += cart[key];
+                        }
+                    });
+
                     const imgUrl = getItemImage(item);
+                    
+                    let actionButton = '';
+                    if (hasVariants) {
+                        actionButton = `<button class="btn-add" onclick="openVariantModal(${item.id})"><i class="fa-solid fa-plus"></i></button>`;
+                    } else {
+                        actionButton = totalQty === 0 
+                            ? `<button class="btn-add" onclick="updateQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>`
+                            : `<div class="qty-wrap">
+                                <button class="qty-btn" onclick="updateQty('${item.id}', -1)"><i class="fa-solid fa-minus"></i></button>
+                                <span class="qty-num">${totalQty}</span>
+                                <button class="qty-btn" onclick="updateQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>
+                               </div>`;
+                    }
+
                     return `
                         <div class="menu-card">
                             ${item.badge ? `<span class="menu-badge">${item.badge}</span>` : ''}
@@ -1144,24 +1188,60 @@
                             <div class="menu-type">${item.type}</div>
                             <div class="menu-bottom">
                                 <span class="menu-price">Rp${(item.price/1000)}k</span>
-                                ${qty === 0 
-                                    ? `<button class="btn-add" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>`
-                                    : `<div class="qty-wrap">
-                                        <button class="qty-btn" onclick="updateQty(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
-                                        <span class="qty-num">${qty}</span>
-                                        <button class="qty-btn" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
-                                       </div>`
-                                }
+                                ${actionButton}
                             </div>
                         </div>
                     `;
                 }).join('');
             }
 
-            window.updateQty = (id, change) => {
-                if (!cart[id]) cart[id] = 0;
-                cart[id] += change;
-                if (cart[id] < 0) cart[id] = 0;
+            /* ===== LOGIKA VARIAN (DINGIN/PANAS) ===== */
+            let currentVariantItemId = null;
+
+            window.openVariantModal = (id) => {
+                const item = menuData.find(i => i.id === id);
+                if (!item || !item.variants) return;
+                
+                currentVariantItemId = id;
+                document.getElementById('variant-title').innerText = item.name;
+                
+                const optionsContainer = document.getElementById('variant-options');
+                optionsContainer.innerHTML = item.variants.map(v => `
+                    <button onclick="selectVariant('${v}')" style="background:var(--bg-input); border:1px solid var(--border); padding:12px; border-radius:var(--radius-sm); color:var(--text-main); font-weight:700; font-size:14px; cursor:pointer;">
+                        ${v}
+                    </button>
+                `).join('');
+                
+                document.getElementById('variant-modal').classList.add('show');
+            }
+
+            window.closeVariantModal = () => {
+                document.getElementById('variant-modal').classList.remove('show');
+                currentVariantItemId = null;
+            }
+
+            window.selectVariant = (variant) => {
+                if (!currentVariantItemId) return;
+                const cartKey = `${currentVariantItemId}-${variant}`;
+                
+                if (!cart[cartKey]) cart[cartKey] = 0;
+                cart[cartKey] += 1;
+                
+                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                renderMenu();
+                calculateTotal();
+                renderCartModal(); 
+                closeVariantModal();
+                document.getElementById('reorder-banner').classList.remove('show');
+            }
+
+            /* ===== LOGIKA KERANJANG LAINNYA ===== */
+            window.updateQty = (cartKey, change) => {
+                if (!cart[cartKey]) cart[cartKey] = 0;
+                cart[cartKey] += change;
+                if (cart[cartKey] <= 0) {
+                    delete cart[cartKey]; // Hapus jika qty 0
+                }
                 localStorage.setItem('kebabCart', JSON.stringify(cart));
                 renderMenu(); 
                 calculateTotal();
@@ -1187,38 +1267,47 @@
                 const container = document.getElementById('cart-list-content');
                 let html = '';
                 let hasItems = false;
-                menuData.forEach(item => {
-                    const qty = cart[item.id] || 0;
+                
+                Object.keys(cart).forEach(cartKey => {
+                    const qty = cart[cartKey];
                     if (qty > 0) {
                         hasItems = true;
-                        const imgUrl = getItemImage(item);
-                        html += `
-                            <div class="cart-item">
-                                <img src="${imgUrl}" alt="${item.name}">
-                                <div class="cart-item-info">
-                                    <div class="cart-item-name">${item.name}</div>
-                                    <div class="cart-item-price">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
+                        const parts = cartKey.split('-');
+                        const itemId = parseInt(parts[0]);
+                        const variant = parts[1] ? ` (${parts[1]})` : '';
+                        const item = menuData.find(i => i.id === itemId);
+                        
+                        if (item) {
+                            const imgUrl = getItemImage(item);
+                            html += `
+                                <div class="cart-item">
+                                    <img src="${imgUrl}" alt="${item.name}">
+                                    <div class="cart-item-info">
+                                        <div class="cart-item-name">${item.name}${variant}</div>
+                                        <div class="cart-item-price">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
+                                    </div>
+                                    <div class="qty-wrap" style="background:var(--bg-main); border:1px solid var(--border);">
+                                        <button class="qty-btn" onclick="updateQty('${cartKey}', -1)"><i class="fa-solid fa-minus"></i></button>
+                                        <span class="qty-num">${qty}</span>
+                                        <button class="qty-btn" onclick="updateQty('${cartKey}', 1)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                    <button onclick="hapusItem('${cartKey}')" style="background:rgba(229,57,53,0.1); border:none; color:var(--primary); width:28px; height:28px; border-radius:6px; cursor:pointer; margin-left:6px;">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
                                 </div>
-                                <div class="qty-wrap" style="background:var(--bg-main); border:1px solid var(--border);">
-                                    <button class="qty-btn" onclick="updateQty(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
-                                    <span class="qty-num">${qty}</span>
-                                    <button class="qty-btn" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                                <button onclick="hapusItem(${item.id})" style="background:rgba(229,57,53,0.1); border:none; color:var(--primary); width:28px; height:28px; border-radius:6px; cursor:pointer; margin-left:6px;">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </div>
-                        `;
+                            `;
+                        }
                     }
                 });
+                
                 if (!hasItems) {
                     html = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Keranjang kosong.</div>`;
                 }
                 container.innerHTML = html;
             }
 
-            window.hapusItem = (id) => {
-                cart[id] = 0;
+            window.hapusItem = (cartKey) => {
+                delete cart[cartKey];
                 localStorage.setItem('kebabCart', JSON.stringify(cart));
                 renderMenu();
                 calculateTotal();
@@ -1265,11 +1354,19 @@
 
             function calculateTotal() {
                 let subtotal = 0, itemCount = 0;
-                menuData.forEach(item => {
-                    const qty = cart[item.id] || 0;
-                    subtotal += qty * item.price;
-                    itemCount += qty;
+                
+                Object.keys(cart).forEach(cartKey => {
+                    const qty = cart[cartKey];
+                    const parts = cartKey.split('-');
+                    const itemId = parseInt(parts[0]);
+                    const item = menuData.find(i => i.id === itemId);
+                    
+                    if (item) {
+                        subtotal += qty * item.price;
+                        itemCount += qty;
+                    }
                 });
+
                 if (deliveryMethod === 'delivery' && userCoords) {
                     const R = 6371;
                     const dLat = (userCoords.lat - STORE_LAT) * Math.PI / 180;
@@ -1308,10 +1405,20 @@
                 if (deliveryMethod === 'delivery' && shippingFee === -1) { alert("Lokasi terlalu jauh!"); return; }
 
                 let html = `<div class="summary-row"><span>Nama</span><span>${name}</span></div>`;
-                menuData.forEach(item => {
-                    const qty = cart[item.id] || 0;
-                    if (qty > 0) html += `<div class="summary-row"><span>${item.name} (${qty}x)</span><span>Rp ${(item.price*qty).toLocaleString('id-ID')}</span></div>`;
+                
+                Object.keys(cart).forEach(cartKey => {
+                    const qty = cart[cartKey];
+                    if (qty > 0) {
+                        const parts = cartKey.split('-');
+                        const itemId = parseInt(parts[0]);
+                        const variant = parts[1] ? ` (${parts[1]})` : '';
+                        const item = menuData.find(i => i.id === itemId);
+                        if (item) {
+                            html += `<div class="summary-row"><span>${item.name}${variant} (${qty}x)</span><span>Rp ${(item.price*qty).toLocaleString('id-ID')}</span></div>`;
+                        }
+                    }
                 });
+
                 html += `<div class="summary-row" style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px;"><span>Subtotal</span><span>Rp ${totals.subtotal.toLocaleString('id-ID')}</span></div>`;
                 if(deliveryMethod === 'delivery'){
                     html += `<div class="summary-row"><span>Ongkir (${distanceKm.toFixed(1)} km)</span><span>Rp ${shippingFee.toLocaleString('id-ID')}</span></div>`;
@@ -1337,10 +1444,20 @@
 
                 let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
                 txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n--------------------------------\n`;
-                menuData.forEach(item => {
-                    const qty = cart[item.id] || 0;
-                    if (qty > 0) txt += `▪ ${item.name} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
+                
+                Object.keys(cart).forEach(cartKey => {
+                    const qty = cart[cartKey];
+                    if (qty > 0) {
+                        const parts = cartKey.split('-');
+                        const itemId = parseInt(parts[0]);
+                        const variant = parts[1] ? ` (${parts[1]})` : '';
+                        const item = menuData.find(i => i.id === itemId);
+                        if (item) {
+                            txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
+                        }
+                    }
                 });
+
                 txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`;
                 if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`;
                 else txt += `Ongkir: GRATIS\n`;
