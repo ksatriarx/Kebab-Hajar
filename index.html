@@ -776,6 +776,7 @@
         
         let manualStoreStatus = "auto";
         let currentUid = 'guest';
+        let currentUid = 'guest';
 
         const loadingOverlay = document.getElementById('loading');
         const showLoading = () => loadingOverlay.classList.add('show');
@@ -850,7 +851,7 @@
                 bukaAplikasi(namaUser, emailUser, fotoUser, "Akun Google", user.uid);
             } else {
                 if (localStorage.getItem('kebabGuest') === 'true') {
-                    bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
+                    bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu", 'guest');
                 } else {
                     authScreen.style.display = 'flex';
                     appScreen.style.display = 'none';
@@ -1612,6 +1613,7 @@ window.openConfirmModal = () => {
                 if (platform === 'wa') window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
             }
 
+            loadCartByUser();
             loadCartByUser();
             if (buyerNameSaved && !buyerNameInput.value) buyerNameInput.value = buyerNameSaved;
             switchMethod(deliveryMethod);
