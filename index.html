@@ -637,6 +637,10 @@
                     <div style="color:var(--accent); font-weight:800; font-size:11px; margin-bottom:2px;">Ambil di Toko</div>
                     <div style="font-size:10px; color:var(--text-muted); line-height:1.3;">Kebab Turki Hajar<br>Idi Rayeuk, Aceh Timur</div>
                 </div>
+
+                <button class="btn-wa" onclick="openConfirmModal()" style="margin-top: 12px;">
+                    <i class="fa-solid fa-cart-shopping" style="font-size:16px;"></i> Pesan Sekarang
+                </button>
             </div>
             
             <div style="text-align:center; padding:10px 0; color:var(--text-muted); font-size:9px;">
@@ -753,7 +757,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -784,7 +788,12 @@
         window.loginGoogle = async () => {
             showLoading();
             try {
-                await signInWithPopup(auth, provider);
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isMobile) {
+                    await signInWithRedirect(auth, provider);
+                } else {
+                    await signInWithPopup(auth, provider);
+                }
             } catch (error) {
                 alert("Gagal masuk dengan Google: " + error.message);
             } finally {
@@ -792,24 +801,32 @@
             }
         };
 
+        getRedirectResult(auth).catch(err => console.error("Redirect error:", err));
+
         window.masukTamu = () => {
             localStorage.setItem('kebabGuest', 'true');
             bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
         };
 
-        window.prosesLogout = () => {
+        window.prosesLogout = async () => {
             if (confirm("Yakin ingin keluar?")) {
-                localStorage.removeItem('kebabGuest');
-                signOut(auth);
-                if(typeof tutupProfil === 'function') tutupProfil();
-                
-                authScreen.style.display = 'flex';
-                appScreen.classList.remove('show');
+                try {
+                    localStorage.removeItem('kebabGuest');
+                    await signOut(auth);
+                    if (typeof tutupProfil === 'function') tutupProfil();
+                    authScreen.style.display = 'flex';
+                    appScreen.style.display = 'none';
+                    appScreen.classList.remove('show');
+                    window.appInitialized = false;
+                } catch (e) {
+                    alert("Gagal logout: " + e.message);
+                }
             }
         };
 
         function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
             authScreen.style.display = 'none';
+            appScreen.style.display = 'block';
             appScreen.classList.add('show');
             buyerNameInput.value = namaUser;
             btnLogout.style.display = 'flex';
@@ -833,7 +850,9 @@
                     bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
                 } else {
                     authScreen.style.display = 'flex';
+                    appScreen.style.display = 'none';
                     appScreen.classList.remove('show');
+                    window.appInitialized = false;
                 }
             }
         });
@@ -1035,7 +1054,8 @@
                 } 
                 else if (menuName === 'menu') {
                     document.getElementById('nav-menu').classList.add('active');
-                    window.scrollTo({top: document.getElementById('menu-container').offsetTop - 130, behavior: 'smooth'});
+                    const menuTop = document.getElementById('menu-container').getBoundingClientRect().top + window.scrollY - 130;
+                    window.scrollTo({top: menuTop, behavior: 'smooth'});
                 } 
                 else if (menuName === 'cart') {
                     document.getElementById('nav-cart').classList.add('active');
@@ -1184,10 +1204,14 @@
                 );
             };
 
+            let searchDebounceTimer = null;
             window.handleSearch = (value) => {
-                searchQuery = value.trim().toLowerCase();
-                document.getElementById('clear-search').style.display = searchQuery.length > 0 ? 'block' : 'none';
-                renderMenu();
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(() => {
+                    searchQuery = value.trim().toLowerCase();
+                    document.getElementById('clear-search').style.display = searchQuery.length > 0 ? 'block' : 'none';
+                    renderMenu();
+                }, 200);
             };
             
             window.clearSearch = () => {
@@ -1421,9 +1445,7 @@
             window.openConfirmModalFromCart = () => {
                 closeCartModal();
                 document.querySelector('.form-card').scrollIntoView({behavior:'smooth', block:'center'});
-                setTimeout(() => {
-                    openConfirmModal();
-                }, 400);
+                // Tidak auto-open modal; user klik tombol "Pesan Sekarang" setelah isi form
             }
 
             window.switchMethod = (method) => {
@@ -1484,7 +1506,13 @@
                 return { subtotal, total, itemCount };
             }
 
-            window.openConfirmModal = () => {
+            function escapeHtml(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+window.openConfirmModal = () => {
                 if (!cekStatusToko()) { alert("Mohon maaf, toko sedang TUTUP atau di luar jam operasional."); return; }
                 const name = document.getElementById('buyer-name').value.trim();
                 if (!name) { alert("Masukkan nama Anda di form pengiriman!"); document.getElementById('buyer-name').focus(); return; }
@@ -1494,7 +1522,7 @@
                 if (deliveryMethod === 'delivery' && !userLocation) { alert("Lokasi GPS belum terdeteksi. Pastikan izin lokasi aktif."); return; }
                 if (deliveryMethod === 'delivery' && shippingFee === -1) { alert("Lokasi terlalu jauh!"); return; }
 
-                let html = `<div class="summary-row"><span>Nama</span><span>${name}</span></div>`;
+                let html = `<div class="summary-row"><span>Nama</span><span>${escapeHtml(name)}</span></div>`;
                 
                 Object.keys(cart).forEach(cartKey => {
                     const qty = cart[cartKey];
@@ -1504,7 +1532,7 @@
                         const variant = parts[1] ? ` (${parts[1]})` : '';
                         const item = menuData.find(i => i.id === itemId);
                         if (item) {
-                            html += `<div class="summary-row"><span>${item.name}${variant} (${qty}x)</span><span>Rp ${(item.price*qty).toLocaleString('id-ID')}</span></div>`;
+                            html += `<div class="summary-row"><span>${escapeHtml(item.name)}${escapeHtml(variant)} (${qty}x)</span><span>Rp ${(item.price*qty).toLocaleString('id-ID')}</span></div>`;
                         }
                     }
                 });
@@ -1548,7 +1576,7 @@
                         const variant = parts[1] ? ` (${parts[1]})` : '';
                         const item = menuData.find(i => i.id === itemId);
                         if (item) {
-                            txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
+                            txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;  // WA plain text - aman
                         }
                     }
                 });
