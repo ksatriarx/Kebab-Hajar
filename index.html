@@ -480,9 +480,44 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+        /* ===== TOAST NOTIFICATION ===== */
+        #toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 10000; display: flex; flex-direction: column; gap: 10px;
+            width: 90%; max-width: 400px; pointer-events: none;
+        }
+        .toast {
+            background: rgba(26, 26, 26, 0.95); backdrop-filter: blur(8px);
+            border-left: 4px solid var(--primary); border-radius: var(--radius-sm);
+            padding: 12px 16px; color: var(--text-main); font-size: 12px; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 10px;
+            animation: slideDownToast 0.3s ease forwards;
+        }
+        .toast.success { border-left-color: #4caf50; }
+        .toast.info { border-left-color: var(--accent); }
+        .toast i { font-size: 16px; }
+        .toast.success i { color: #4caf50; }
+        .toast.info i { color: var(--accent); }
+        .toast.error i { color: var(--primary); }
+        
+        @keyframes slideDownToast {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toast.hide {
+            animation: fadeOutToast 0.3s ease forwards;
+        }
+        @keyframes fadeOutToast {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
     </style>
 </head>
 <body>
+    <div id="toast-container"></div>
 
     <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
@@ -778,6 +813,26 @@
         let currentUid = 'guest';
         let currentUid = 'guest';
 
+        
+        window.showToast = (message, type = 'error') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'fa-circle-exclamation';
+            if (type === 'success') icon = 'fa-circle-check';
+            if (type === 'info') icon = 'fa-circle-info';
+            
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            // Hapus setelah 3.5 detik
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        };
+
         const loadingOverlay = document.getElementById('loading');
         const showLoading = () => loadingOverlay.classList.add('show');
         const hideLoading = () => loadingOverlay.classList.remove('show');
@@ -797,7 +852,7 @@
                     await signInWithPopup(auth, provider);
                 }
             } catch (error) {
-                alert("Gagal masuk dengan Google: " + error.message);
+                showToast("Gagal masuk dengan Google: " + error.message, 'error')
             } finally {
                 hideLoading();
             }
@@ -821,7 +876,7 @@
                     appScreen.classList.remove('show');
                     window.appInitialized = false;
                 } catch (e) {
-                    alert("Gagal logout: " + e.message);
+                    showToast("Gagal logout: " + e.message, 'error')
                 }
             }
         };
@@ -1163,7 +1218,7 @@
                 document.getElementById('reorder-banner').classList.remove('show');
                 renderMenu();
                 calculateTotal();
-                alert("Pesanan kemarin berhasil dimasukkan ke keranjang!");
+                showToast("Pesanan kemarin berhasil dimasukkan ke keranjang!", 'success')
             }
 
             window.autoDetectGPS = () => {
@@ -1209,7 +1264,7 @@
                         btn.style.display = 'none';
                     },
                     (err) => {
-                        alert("Gagal melacak. Pastikan GPS aktif dan izin browser diberikan.");
+                        showToast("Gagal melacak. Pastikan GPS aktif dan izin browser diberikan.", 'error')
                         btn.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i> Coba Lagi`;
                     }, { enableHighAccuracy: true }
                 );
@@ -1374,7 +1429,7 @@
             window.openCartModal = () => {
                 const totals = calculateTotal();
                 if (totals.itemCount === 0) {
-                    alert("Keranjang masih kosong. Silakan pilih menu dulu.");
+                    showToast("Keranjang masih kosong. Silakan pilih menu dulu.", 'error')
                     return;
                 }
                 renderCartModal();
@@ -1524,14 +1579,14 @@
 }
 
 window.openConfirmModal = () => {
-                if (!cekStatusToko()) { alert("Mohon maaf, toko sedang TUTUP atau di luar jam operasional."); return; }
+                if (!cekStatusToko()) { showToast("Mohon maaf, toko sedang TUTUP atau di luar jam operasional.", 'error') return; }
                 const name = document.getElementById('buyer-name').value.trim();
-                if (!name) { alert("Masukkan nama Anda di form pengiriman!"); document.getElementById('buyer-name').focus(); return; }
+                if (!name) { showToast("Masukkan nama Anda di form pengiriman!", 'error') document.getElementById('buyer-name').focus(); return; }
                 localStorage.setItem('kebabName', name);
                 const totals = calculateTotal();
-                if (totals.itemCount === 0) { alert("Pilih minimal 1 menu!"); return; }
-                if (deliveryMethod === 'delivery' && !userLocation) { alert("Lokasi GPS belum terdeteksi. Pastikan izin lokasi aktif."); return; }
-                if (deliveryMethod === 'delivery' && shippingFee === -1) { alert("Lokasi terlalu jauh!"); return; }
+                if (totals.itemCount === 0) { showToast("Pilih minimal 1 menu!", 'info') return; }
+                if (deliveryMethod === 'delivery' && !userLocation) { showToast("Lokasi GPS belum terdeteksi. Pastikan izin lokasi aktif.", 'info') return; }
+                if (deliveryMethod === 'delivery' && shippingFee === -1) { showToast("Lokasi terlalu jauh!", 'error') return; }
 
                 let html = `<div class="summary-row"><span>Nama</span><span>${escapeHtml(name)}</span></div>`;
                 
@@ -1565,7 +1620,7 @@ window.openConfirmModal = () => {
 
             /* ===== FUNGSI TOMBOL PEMBAYARAN ONLINE BARU ===== */
             window.prosesPembayaranOnline = () => {
-                alert("Mohon maaf, sistem pembayaran online (QRIS/E-Wallet/Bank) saat ini sedang dalam proses verifikasi oleh pihak ketiga (Midtrans).\n\nSementara ini, silakan gunakan opsi 'Kirim via WA' untuk menyelesaikan pesanan Anda.");
+                showToast("Mohon maaf, sistem pembayaran online (QRIS/E-Wallet/Bank) saat ini sedang dalam proses verifikasi oleh pihak ketiga (Midtrans).\n\nSementara ini, silakan gunakan opsi 'Kirim via WA' untuk menyelesaikan pesanan Anda.", 'error')
             }
 
             window.confirmAndSend = () => {
@@ -1604,7 +1659,7 @@ window.openConfirmModal = () => {
                 localStorage.removeItem(`kebabCart_${currentUid}`); 
                 renderMenu(); 
                 calculateTotal(); 
-                alert("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.");
+                showToast("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.", 'success')
             }
 
             window.shareWeb = (platform) => {
@@ -1641,7 +1696,7 @@ window.openConfirmModal = () => {
                         deferredPrompt = null;
                     });
                 } else {
-                    alert("Untuk Install Aplikasi:\n\n1. Klik titik tiga (⋮) di pojok kanan atas Chrome.\n2. Pilih 'Install App' atau 'Tambahkan ke Layar Utama'.\n\nJika menu tersebut tidak ada, pastikan Anda membuka web ini menggunakan Chrome.");
+                    showToast("Untuk Install Aplikasi:\n\n1. Klik titik tiga (⋮) di pojok kanan atas Chrome.\n2. Pilih 'Install App' atau 'Tambahkan ke Layar Utama'.\n\nJika menu tersebut tidak ada, pastikan Anda membuka web ini menggunakan Chrome.", 'info')
                 }
             }
 
