@@ -775,6 +775,7 @@
         const provider = new GoogleAuthProvider();
         
         let manualStoreStatus = "auto";
+        let currentUid = 'guest';
 
         const loadingOverlay = document.getElementById('loading');
         const showLoading = () => loadingOverlay.classList.add('show');
@@ -805,7 +806,7 @@
 
         window.masukTamu = () => {
             localStorage.setItem('kebabGuest', 'true');
-            bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
+            bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu", 'guest');
         };
 
         window.prosesLogout = async () => {
@@ -824,7 +825,9 @@
             }
         };
 
-        function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
+        function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu", uid = 'guest') {
+            currentUid = uid;
+            if (window.appInitialized) loadCartByUser();
             authScreen.style.display = 'none';
             appScreen.style.display = 'block';
             appScreen.classList.add('show');
@@ -844,7 +847,7 @@
                 const namaUser = user.displayName || "Pelanggan";
                 const emailUser = user.email || "";
                 const fotoUser = user.photoURL || "";
-                bukaAplikasi(namaUser, emailUser, fotoUser, "Akun Google");
+                bukaAplikasi(namaUser, emailUser, fotoUser, "Akun Google", user.uid);
             } else {
                 if (localStorage.getItem('kebabGuest') === 'true') {
                     bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
@@ -1115,7 +1118,14 @@
                 return item.category === "makanan" ? DEFAULT_FOOD_IMAGE : DEFAULT_DRINK_IMAGE;
             }
 
-            let cart = JSON.parse(localStorage.getItem('kebabCart') || '{}');
+            let cart = {}; // Akan di-load oleh loadCartByUser()
+
+        function loadCartByUser() {
+            cart = JSON.parse(localStorage.getItem(`kebabCart_${currentUid}`) || '{}');
+        }
+        function saveCartByUser() {
+            localStorage.setItem(`kebabCart_${currentUid}`, JSON.stringify(cart));
+        }
             let buyerNameSaved = localStorage.getItem('kebabName') || '';
             let deliveryMethod = localStorage.getItem('kebabMethod') || 'delivery';
             let lastOrderData = JSON.parse(localStorage.getItem('kebabLastOrder') || 'null'); 
@@ -1145,7 +1155,7 @@
             window.prosesPesanLagi = () => {
                 if (!lastOrderData || !lastOrderData.cart) return;
                 cart = JSON.parse(JSON.stringify(lastOrderData.cart)); 
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 if (lastOrderData.nama) document.getElementById('buyer-name').value = lastOrderData.nama;
                 if (lastOrderData.notes) document.getElementById('order-notes').value = lastOrderData.notes;
                 if (lastOrderData.metode) switchMethod(lastOrderData.metode);
@@ -1322,7 +1332,7 @@
                 if (!cart[cartKey]) cart[cartKey] = 0;
                 cart[cartKey] += 1;
                 
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 renderMenu();
                 calculateTotal();
                 renderCartModal(); 
@@ -1338,7 +1348,7 @@
                     cart[key] -= 1;
                     if (cart[key] <= 0) delete cart[key];
                     
-                    localStorage.setItem('kebabCart', JSON.stringify(cart));
+                    saveCartByUser();
                     renderMenu();
                     calculateTotal();
                     renderCartModal();
@@ -1353,7 +1363,7 @@
                 if (cart[cartKey] <= 0) {
                     delete cart[cartKey]; 
                 }
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 renderMenu(); 
                 calculateTotal();
                 renderCartModal(); 
@@ -1422,7 +1432,7 @@
 
             window.hapusItem = (cartKey) => {
                 delete cart[cartKey];
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 renderMenu();
                 calculateTotal();
                 renderCartModal();
@@ -1435,7 +1445,7 @@
             window.resetCart = () => {
                 if (confirm("Yakin ingin mengosongkan keranjang?")) {
                     cart = {};
-                    localStorage.setItem('kebabCart', JSON.stringify(cart));
+                    saveCartByUser();
                     renderMenu();
                     calculateTotal();
                     closeCartModal();
@@ -1590,7 +1600,7 @@ window.openConfirmModal = () => {
                 window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
                 
                 cart = {}; 
-                localStorage.removeItem('kebabCart'); 
+                localStorage.removeItem(`kebabCart_${currentUid}`); 
                 renderMenu(); 
                 calculateTotal(); 
                 alert("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.");
@@ -1602,6 +1612,7 @@ window.openConfirmModal = () => {
                 if (platform === 'wa') window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
             }
 
+            loadCartByUser();
             if (buyerNameSaved && !buyerNameInput.value) buyerNameInput.value = buyerNameSaved;
             switchMethod(deliveryMethod);
             updateStatusUI();
