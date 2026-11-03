@@ -330,7 +330,6 @@
 
         .qty-num { font-size: 10px; font-weight: 700; min-width: 10px; text-align: center; }
 
-        /* ===== UPDATE: FORM CARD DIBUAT LEBIH MINIMALIS ===== */
         .form-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 12px; margin-bottom: 20px; }
 
         .form-group { margin-bottom: 8px; }
@@ -480,9 +479,35 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        #toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 10000; display: flex; flex-direction: column; gap: 10px;
+            width: 90%; max-width: 400px; pointer-events: none;
+        }
+        .toast {
+            background: rgba(26, 26, 26, 0.95); backdrop-filter: blur(8px);
+            border-left: 4px solid var(--primary); border-radius: var(--radius-sm);
+            padding: 12px 16px; color: var(--text-main); font-size: 12px; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 10px;
+            animation: slideDownToast 0.3s ease forwards;
+        }
+        .toast.success { border-left-color: #4caf50; }
+        .toast.info { border-left-color: var(--accent); }
+        .toast i { font-size: 16px; }
+        .toast.success i { color: #4caf50; }
+        .toast.info i { color: var(--accent); }
+        .toast.error i { color: var(--primary); }
+        @keyframes slideDownToast { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .toast.hide { animation: fadeOutToast 0.3s ease forwards; }
+        @keyframes fadeOutToast { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
     </style>
 </head>
 <body>
+
+    <div id="toast-container"></div>
 
     <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
@@ -506,7 +531,7 @@
         </div>
     </div>
 
-    <div class="app" id="app-screen">
+    <div class="app" id="app-screen" style="display: none;">
         
         <div class="main-header" id="main-header">
             <div class="header-top">
@@ -532,14 +557,12 @@
 
         <!-- HERO SLIDER -->
         <div class="hero-slider" id="hero-slider">
-            <!-- SLIDE 1 (VIDEO STREAMABLE + WALLPAPER) -->
             <div class="slide active" id="slide-1" style="background-image: url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg');">
                 <div class="iframe-wrapper">
                     <iframe allow="fullscreen;autoplay" allowfullscreen src="https://streamable.com/e/7wiifz?autoplay=1&muted=1&loop=0" style="border:none; pointer-events: none;"></iframe>
                 </div>
             </div>
 
-            <!-- SLIDE 2 & 3 (GAMBAR) -->
             <div class="slide" style="background-image: url('https://i.ibb.co.com/SZCStwz/Gemini-Generated-Image-kqtryfkqtryfkqtr.jpg');"></div>
             <div class="slide" style="background-image: url('https://i.ibb.co.com/wNKsnJxq/file-000000004a2c82118f1b6e2a3d065d2b-2.jpg');"></div>
 
@@ -637,6 +660,10 @@
                     <div style="color:var(--accent); font-weight:800; font-size:11px; margin-bottom:2px;">Ambil di Toko</div>
                     <div style="font-size:10px; color:var(--text-muted); line-height:1.3;">Kebab Turki Hajar<br>Idi Rayeuk, Aceh Timur</div>
                 </div>
+
+                <button class="btn-wa" onclick="openConfirmModal()" style="margin-top: 12px;">
+                    <i class="fa-solid fa-cart-shopping" style="font-size:16px;"></i> Pesan Sekarang
+                </button>
             </div>
             
             <div style="text-align:center; padding:10px 0; color:var(--text-muted); font-size:9px;">
@@ -653,7 +680,6 @@
         <button class="cart-btn">Lihat Keranjang</button>
     </div>
 
-    <!-- BOTTOM NAV DENGAN ID UNTUK MEMUDAHKAN JS -->
     <div class="bottom-nav">
         <a href="#" class="nav-item active" id="nav-home" onclick="handleNavClick('home'); return false;">
             <i class="fa-solid fa-house"></i><span>Home</span>
@@ -669,7 +695,6 @@
         </a>
     </div>
 
-    <!-- ===== MODAL VARIAN (DINGIN/PANAS) ===== -->
     <div class="modal-overlay" id="variant-modal" onclick="if(event.target===this) closeVariantModal()">
         <div class="modal-box" style="max-height: 50vh; text-align: center; padding: 20px;">
             <div class="modal-handle"></div>
@@ -680,7 +705,6 @@
         </div>
     </div>
 
-    <!-- ===== MODAL KERANJANG ===== -->
     <div class="modal-overlay" id="cart-modal" onclick="if(event.target===this) closeCartModal()">
         <div class="modal-box">
             <div class="modal-handle"></div>
@@ -700,7 +724,6 @@
         </div>
     </div>
 
-    <!-- ===== MODAL KONFIRMASI PESANAN ===== -->
     <div class="modal-overlay" id="confirm-modal" onclick="if(event.target===this) closeConfirmModal()">
         <div class="modal-box">
             <div class="modal-handle"></div>
@@ -708,12 +731,10 @@
             
             <div class="summary-box" id="confirm-summary"></div>
             
-            <!-- TOMBOL PEMBAYARAN ONLINE (BARU) -->
             <button class="btn-online" onclick="prosesPembayaranOnline()">
                 <i class="fa-solid fa-credit-card" style="font-size:16px;"></i> Bayar Online (QRIS / E-Wallet / Bank)
             </button>
             
-            <!-- TOMBOL WA (TETAP ADA) -->
             <button class="btn-wa" onclick="confirmAndSend()">
                 <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Kirim via WA
             </button>
@@ -753,7 +774,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -771,6 +792,28 @@
         const provider = new GoogleAuthProvider();
         
         let manualStoreStatus = "auto";
+        let currentUid = 'guest';
+
+        window.showToast = (message, type = 'error') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = 'fa-circle-exclamation';
+            if (type === 'success') icon = 'fa-circle-check';
+            if (type === 'info') icon = 'fa-circle-info';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        };
+
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
 
         const loadingOverlay = document.getElementById('loading');
         const showLoading = () => loadingOverlay.classList.add('show');
@@ -784,32 +827,46 @@
         window.loginGoogle = async () => {
             showLoading();
             try {
-                await signInWithPopup(auth, provider);
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isMobile) {
+                    await signInWithRedirect(auth, provider);
+                } else {
+                    await signInWithPopup(auth, provider);
+                }
             } catch (error) {
-                alert("Gagal masuk dengan Google: " + error.message);
+                showToast("Gagal masuk dengan Google: " + error.message, 'error');
             } finally {
                 hideLoading();
             }
         };
 
+        getRedirectResult(auth).catch(err => console.error("Redirect error:", err));
+
         window.masukTamu = () => {
             localStorage.setItem('kebabGuest', 'true');
-            bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
+            bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu", 'guest');
         };
 
-        window.prosesLogout = () => {
+        window.prosesLogout = async () => {
             if (confirm("Yakin ingin keluar?")) {
-                localStorage.removeItem('kebabGuest');
-                signOut(auth);
-                if(typeof tutupProfil === 'function') tutupProfil();
-                
-                authScreen.style.display = 'flex';
-                appScreen.classList.remove('show');
+                try {
+                    localStorage.removeItem('kebabGuest');
+                    await signOut(auth);
+                    if (typeof tutupProfil === 'function') tutupProfil();
+                    authScreen.style.display = 'flex';
+                    appScreen.style.display = 'none';
+                    appScreen.classList.remove('show');
+                    window.appInitialized = false;
+                } catch (e) {
+                    showToast("Gagal logout: " + e.message, 'error');
+                }
             }
         };
 
-        function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
+        function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu", uid = 'guest') {
+            currentUid = uid;
             authScreen.style.display = 'none';
+            appScreen.style.display = 'block';
             appScreen.classList.add('show');
             buyerNameInput.value = namaUser;
             btnLogout.style.display = 'flex';
@@ -819,7 +876,13 @@
                 document.getElementById('prof-type').innerText = tipeUser;
             }
 
-            initApp();
+            if (window.appInitialized) {
+                loadCartByUser();
+                if (typeof window.renderMenu === 'function') window.renderMenu();
+                if (typeof window.calculateTotal === 'function') window.calculateTotal();
+            } else {
+                initApp();
+            }
         }
 
         onAuthStateChanged(auth, (user) => {
@@ -827,13 +890,15 @@
                 const namaUser = user.displayName || "Pelanggan";
                 const emailUser = user.email || "";
                 const fotoUser = user.photoURL || "";
-                bukaAplikasi(namaUser, emailUser, fotoUser, "Akun Google");
+                bukaAplikasi(namaUser, emailUser, fotoUser, "Akun Google", user.uid);
             } else {
                 if (localStorage.getItem('kebabGuest') === 'true') {
-                    bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
+                    bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu", 'guest');
                 } else {
                     authScreen.style.display = 'flex';
+                    appScreen.style.display = 'none';
                     appScreen.classList.remove('show');
+                    window.appInitialized = false;
                 }
             }
         });
@@ -841,10 +906,6 @@
         function initApp() {
             if (window.appInitialized) return;
             window.appInitialized = true;
-            
-            // Expose to global scope for bukaAplikasi
-            window.renderMenu = renderMenu;
-            window.calculateTotal = calculateTotal;
 
             const JAM_BUKA = 10;
             const JAM_TUTUP_DELIVERY = 23;
@@ -913,9 +974,6 @@
                 updateStatusUI();
             });
 
-            /* ==========================================
-               LOGIKA HERO SLIDER (IFRAME -> GAMBAR)
-               ========================================== */
             const slides = document.querySelectorAll('.slide');
             const dotsContainer = document.getElementById('slider-dots');
             let currentSlide = 0;
@@ -958,12 +1016,10 @@
                 }
             }
 
-            // Timer 39 Detik (39000 ms) sebelum pindah ke gambar
             videoTimer = setTimeout(() => {
                 switchToImageMode(true);
             }, 39000);
 
-            // Logika Swipe (Geser) manual
             let touchStartX = 0, touchEndX = 0;
             const sliderElement = document.getElementById('hero-slider');
             
@@ -975,7 +1031,7 @@
             sliderElement.addEventListener('touchend', e => {
                 touchEndX = e.changedTouches[0].screenX;
                 
-                if (touchStartX - touchEndX > 50) { // Swipe kiri
+                if (touchStartX - touchEndX > 50) { 
                     if (videoModeActive) {
                         clearTimeout(videoTimer); 
                         switchToImageMode(false); 
@@ -986,7 +1042,7 @@
                         startSlide();
                     }
                 }
-                if (touchEndX - touchStartX > 50) { // Swipe kanan
+                if (touchEndX - touchStartX > 50) { 
                     if (videoModeActive) {
                         clearTimeout(videoTimer);
                         switchToImageMode(false); 
@@ -1004,33 +1060,23 @@
             }, {passive: true});
 
 
-            /* ==========================================
-               UPDATE: STICKY HEADER & NAVIGASI DINAMIS
-               ========================================== */
             window.addEventListener('scroll', function() {
-                // Logika Header
                 document.getElementById('main-header').classList.toggle('scrolled', window.scrollY > 30);
                 
-                // Logika Warna Merah Navigasi Pindah Otomatis Saat Scroll
-                // Jangan jalankan jika modal keranjang sedang terbuka
                 if(!document.getElementById('cart-modal').classList.contains('show')) {
                     const menuTop = document.getElementById('menu-container').offsetTop - 200;
                     
                     if (window.scrollY >= menuTop) {
-                        // Jika sudah scroll ke bawah, pindah ke "Menu"
                         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                         document.getElementById('nav-menu').classList.add('active');
                     } else {
-                        // Jika scroll kembali ke atas, pindah ke "Home"
                         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                         document.getElementById('nav-home').classList.add('active');
                     }
                 }
             });
 
-            // Fungsi Klik Navigasi Bawah
             window.handleNavClick = (menuName) => {
-                // Hilangkan warna merah dari semua menu
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
                 if (menuName === 'home') {
@@ -1039,7 +1085,8 @@
                 } 
                 else if (menuName === 'menu') {
                     document.getElementById('nav-menu').classList.add('active');
-                    window.scrollTo({top: document.getElementById('menu-container').offsetTop - 130, behavior: 'smooth'});
+                    const menuTop = document.getElementById('menu-container').getBoundingClientRect().top + window.scrollY - 130;
+                    window.scrollTo({top: menuTop, behavior: 'smooth'});
                 } 
                 else if (menuName === 'cart') {
                     document.getElementById('nav-cart').classList.add('active');
@@ -1048,7 +1095,6 @@
                 else if (menuName === 'chat') {
                     document.getElementById('nav-chat').classList.add('active');
                     chatLangsung();
-                    // Kembalikan merah ke home setelah buka WA (karena WA pindah tab)
                     setTimeout(() => {
                         document.getElementById('nav-home').classList.add('active');
                         document.getElementById('nav-chat').classList.remove('active');
@@ -1056,7 +1102,6 @@
                 }
             };
 
-            /* KONFIGURASI MENU */
             const WHATSAPP_NUMBER = "6287881318261";
             const STORE_LAT = 4.9509491;
             const STORE_LON = 97.7697946;
@@ -1066,20 +1111,15 @@
             const DEFAULT_DRINK_IMAGE = "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop"; 
 
             const menuData = [
-                /* MAKANAN BARU (8000) */
                 { id: 19, category: "makanan", type: "Kebab", name: "Kebab Sayur", price: 8000, image: "https://i.ibb.co.com/KpJZwKQy/file-000000001ecc82119383cae59bea6a5f.png", badge: "" },
                 { id: 20, category: "makanan", type: "Kebab", name: "Kebab Telur", price: 8000, image: "https://i.ibb.co.com/rCMZ8Cc/file-0000000000548211b52d0bfad661f748.png", badge: "" },
                 { id: 21, category: "makanan", type: "Kebab", name: "Kebab Sosis", price: 8000, image: "https://i.ibb.co.com/jXSzzLN/file-00000000e40c8211b085d5cc5c6f79be.png", badge: "" },
-                
-                /* MAKANAN LAMA */
                 { id: 1, category: "makanan", type: "Kebab", name: "Telur Sosis", price: 10000, image: "https://i.ibb.co.com/hPwgw0f/file-000000003c388207a89749c0fe820b2b.png", badge: "" },
                 { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://i.ibb.co.com/35htZS9w/file-000000002c0082119ad5543f388247df.png", badge: "" },
                 { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://i.ibb.co.com/j90LH4YS/file-0000000040c882118a04f2e0ce8c402a.png", badge: "" },
                 { id: 4, category: "makanan", type: "Kebab", name: "Daging Telur", price: 13000, image: "https://i.ibb.co.com/xqcmDfHs/file-000000003e2c82119ce5e518f35696c6.png", badge: "" },
                 { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, image: "https://i.ibb.co.com/kgvMLdP8/file-00000000d1988211b11c4d18bd5327b4.png", badge: "BEST" },
                 { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://i.ibb.co.com/dsRW0mfZ/file-000000009c3482118de7254c91fc3d87.png", badge: "" },
-                
-                /* MINUMAN */
                 { id: 7, category: "minuman", type: "Minuman", name: "Sanger", price: 10000, image: "https://i.ibb.co.com/PGj2LpX9/file-0000000031cc8211a6dcc107c336df45.png", badge: "", variants: ["Dingin", "Panas"] },
                 { id: 8, category: "minuman", type: "Minuman", name: "Americano", price: 10000, image: "https://i.ibb.co.com/9HM8M6XD/file-00000000e168821193186ccd0e44f53d.png", badge: "", variants: ["Dingin", "Panas"] },
                 { id: 9, category: "minuman", type: "Minuman", name: "Americano Gula Aren", price: 12000, image: "https://i.ibb.co.com/N2B6vQnP/file-00000000b264820796a3bac4a080e4b3.png", badge: "" },
@@ -1099,7 +1139,14 @@
                 return item.category === "makanan" ? DEFAULT_FOOD_IMAGE : DEFAULT_DRINK_IMAGE;
             }
 
-            let cart = JSON.parse(localStorage.getItem('kebabCart') || '{}');
+            let cart = {};
+            function loadCartByUser() {
+                cart = JSON.parse(localStorage.getItem(`kebabCart_${currentUid}`) || '{}');
+            }
+            function saveCartByUser() {
+                localStorage.setItem(`kebabCart_${currentUid}`, JSON.stringify(cart));
+            }
+
             let buyerNameSaved = localStorage.getItem('kebabName') || '';
             let deliveryMethod = localStorage.getItem('kebabMethod') || 'delivery';
             let lastOrderData = JSON.parse(localStorage.getItem('kebabLastOrder') || 'null'); 
@@ -1129,14 +1176,14 @@
             window.prosesPesanLagi = () => {
                 if (!lastOrderData || !lastOrderData.cart) return;
                 cart = JSON.parse(JSON.stringify(lastOrderData.cart)); 
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 if (lastOrderData.nama) document.getElementById('buyer-name').value = lastOrderData.nama;
                 if (lastOrderData.notes) document.getElementById('order-notes').value = lastOrderData.notes;
                 if (lastOrderData.metode) switchMethod(lastOrderData.metode);
                 document.getElementById('reorder-banner').classList.remove('show');
                 renderMenu();
                 calculateTotal();
-                alert("Pesanan kemarin berhasil dimasukkan ke keranjang!");
+                showToast("Pesanan kemarin berhasil dimasukkan ke keranjang!", "success");
             }
 
             window.autoDetectGPS = () => {
@@ -1182,16 +1229,20 @@
                         btn.style.display = 'none';
                     },
                     (err) => {
-                        alert("Gagal melacak. Pastikan GPS aktif dan izin browser diberikan.");
+                        showToast("Gagal melacak. Pastikan GPS aktif dan izin browser diberikan.", "error");
                         btn.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i> Coba Lagi`;
                     }, { enableHighAccuracy: true }
                 );
             };
 
+            let searchDebounceTimer = null;
             window.handleSearch = (value) => {
-                searchQuery = value.trim().toLowerCase();
-                document.getElementById('clear-search').style.display = searchQuery.length > 0 ? 'block' : 'none';
-                renderMenu();
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(() => {
+                    searchQuery = value.trim().toLowerCase();
+                    document.getElementById('clear-search').style.display = searchQuery.length > 0 ? 'block' : 'none';
+                    renderMenu();
+                }, 200);
             };
             
             window.clearSearch = () => {
@@ -1269,8 +1320,9 @@
                     `;
                 }).join('');
             }
+            
+            window.renderMenu = renderMenu;
 
-            /* ===== LOGIKA VARIAN (DINGIN/PANAS) ===== */
             let currentVariantItemId = null;
 
             window.openVariantModal = (id) => {
@@ -1302,7 +1354,7 @@
                 if (!cart[cartKey]) cart[cartKey] = 0;
                 cart[cartKey] += 1;
                 
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 renderMenu();
                 calculateTotal();
                 renderCartModal(); 
@@ -1318,7 +1370,7 @@
                     cart[key] -= 1;
                     if (cart[key] <= 0) delete cart[key];
                     
-                    localStorage.setItem('kebabCart', JSON.stringify(cart));
+                    saveCartByUser();
                     renderMenu();
                     calculateTotal();
                     renderCartModal();
@@ -1326,14 +1378,13 @@
                 }
             }
 
-            /* ===== LOGIKA KERANJANG LAINNYA ===== */
             window.updateQty = (cartKey, change) => {
                 if (!cart[cartKey]) cart[cartKey] = 0;
                 cart[cartKey] += change;
                 if (cart[cartKey] <= 0) {
                     delete cart[cartKey]; 
                 }
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 renderMenu(); 
                 calculateTotal();
                 renderCartModal(); 
@@ -1343,7 +1394,7 @@
             window.openCartModal = () => {
                 const totals = calculateTotal();
                 if (totals.itemCount === 0) {
-                    alert("Keranjang masih kosong. Silakan pilih menu dulu.");
+                    showToast("Keranjang masih kosong. Silakan pilih menu dulu.", "info");
                     return;
                 }
                 renderCartModal();
@@ -1352,7 +1403,6 @@
 
             window.closeCartModal = () => {
                 document.getElementById('cart-modal').classList.remove('show');
-                // Kembalikan merah ke Home jika keranjang ditutup
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 document.getElementById('nav-home').classList.add('active');
             }
@@ -1402,7 +1452,7 @@
 
             window.hapusItem = (cartKey) => {
                 delete cart[cartKey];
-                localStorage.setItem('kebabCart', JSON.stringify(cart));
+                saveCartByUser();
                 renderMenu();
                 calculateTotal();
                 renderCartModal();
@@ -1415,7 +1465,7 @@
             window.resetCart = () => {
                 if (confirm("Yakin ingin mengosongkan keranjang?")) {
                     cart = {};
-                    localStorage.setItem('kebabCart', JSON.stringify(cart));
+                    saveCartByUser();
                     renderMenu();
                     calculateTotal();
                     closeCartModal();
@@ -1425,9 +1475,6 @@
             window.openConfirmModalFromCart = () => {
                 closeCartModal();
                 document.querySelector('.form-card').scrollIntoView({behavior:'smooth', block:'center'});
-                setTimeout(() => {
-                    openConfirmModal();
-                }, 400);
             }
 
             window.switchMethod = (method) => {
@@ -1487,18 +1534,20 @@
                 }
                 return { subtotal, total, itemCount };
             }
+            
+            window.calculateTotal = calculateTotal;
 
             window.openConfirmModal = () => {
-                if (!cekStatusToko()) { alert("Mohon maaf, toko sedang TUTUP atau di luar jam operasional."); return; }
+                if (!cekStatusToko()) { showToast("Mohon maaf, toko sedang TUTUP atau di luar jam operasional.", "error"); return; }
                 const name = document.getElementById('buyer-name').value.trim();
-                if (!name) { alert("Masukkan nama Anda di form pengiriman!"); document.getElementById('buyer-name').focus(); return; }
+                if (!name) { showToast("Masukkan nama Anda di form pengiriman!", "error"); document.getElementById('buyer-name').focus(); return; }
                 localStorage.setItem('kebabName', name);
                 const totals = calculateTotal();
-                if (totals.itemCount === 0) { alert("Pilih minimal 1 menu!"); return; }
-                if (deliveryMethod === 'delivery' && !userLocation) { alert("Lokasi GPS belum terdeteksi. Pastikan izin lokasi aktif."); return; }
-                if (deliveryMethod === 'delivery' && shippingFee === -1) { alert("Lokasi terlalu jauh!"); return; }
+                if (totals.itemCount === 0) { showToast("Pilih minimal 1 menu!", "error"); return; }
+                if (deliveryMethod === 'delivery' && !userLocation) { showToast("Lokasi GPS belum terdeteksi. Pastikan izin lokasi aktif.", "error"); return; }
+                if (deliveryMethod === 'delivery' && shippingFee === -1) { showToast("Lokasi terlalu jauh dari jangkauan pengantaran.", "error"); return; }
 
-                let html = `<div class="summary-row"><span>Nama</span><span>${name}</span></div>`;
+                let html = `<div class="summary-row"><span>Nama</span><span>${escapeHtml(name)}</span></div>`;
                 
                 Object.keys(cart).forEach(cartKey => {
                     const qty = cart[cartKey];
@@ -1508,7 +1557,7 @@
                         const variant = parts[1] ? ` (${parts[1]})` : '';
                         const item = menuData.find(i => i.id === itemId);
                         if (item) {
-                            html += `<div class="summary-row"><span>${item.name}${variant} (${qty}x)</span><span>Rp ${(item.price*qty).toLocaleString('id-ID')}</span></div>`;
+                            html += `<div class="summary-row"><span>${escapeHtml(item.name)}${escapeHtml(variant)} (${qty}x)</span><span>Rp ${(item.price*qty).toLocaleString('id-ID')}</span></div>`;
                         }
                     }
                 });
@@ -1528,9 +1577,8 @@
                 document.getElementById('confirm-modal').classList.remove('show');
             }
 
-            /* ===== FUNGSI TOMBOL PEMBAYARAN ONLINE BARU ===== */
             window.prosesPembayaranOnline = () => {
-                alert("Mohon maaf, sistem pembayaran online (QRIS/E-Wallet/Bank) saat ini sedang dalam proses verifikasi oleh pihak ketiga (Midtrans).\n\nSementara ini, silakan gunakan opsi 'Kirim via WA' untuk menyelesaikan pesanan Anda.");
+                showToast("Sistem pembayaran online sedang dalam proses verifikasi. Gunakan opsi Kirim via WA.", "info");
             }
 
             window.confirmAndSend = () => {
@@ -1566,10 +1614,10 @@
                 window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
                 
                 cart = {}; 
-                localStorage.removeItem('kebabCart'); 
+                localStorage.removeItem(`kebabCart_${currentUid}`); 
                 renderMenu(); 
                 calculateTotal(); 
-                alert("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.");
+                showToast("✅ Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.", "success");
             }
 
             window.shareWeb = (platform) => {
@@ -1578,6 +1626,7 @@
                 if (platform === 'wa') window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
             }
 
+            loadCartByUser();
             if (buyerNameSaved && !buyerNameInput.value) buyerNameInput.value = buyerNameSaved;
             switchMethod(deliveryMethod);
             updateStatusUI();
@@ -1604,7 +1653,7 @@
                         deferredPrompt = null;
                     });
                 } else {
-                    alert("Untuk Install Aplikasi:\n\n1. Klik titik tiga (⋮) di pojok kanan atas Chrome.\n2. Pilih 'Install App' atau 'Tambahkan ke Layar Utama'.\n\nJika menu tersebut tidak ada, pastikan Anda membuka web ini menggunakan Chrome.");
+                    showToast("Gunakan menu browser (titik tiga) > 'Install App' atau 'Tambahkan ke Layar Utama'.", "info");
                 }
             }
 
