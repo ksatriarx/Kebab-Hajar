@@ -841,6 +841,10 @@
         function initApp() {
             if (window.appInitialized) return;
             window.appInitialized = true;
+            
+            // Expose to global scope for bukaAplikasi
+            window.renderMenu = renderMenu;
+            window.calculateTotal = calculateTotal;
 
             const JAM_BUKA = 10;
             const JAM_TUTUP_DELIVERY = 23;
