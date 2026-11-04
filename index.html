@@ -1068,6 +1068,40 @@
             let shippingFee = 0;
             let distanceKm = 0;
 
+            // ==========================================
+            // DETEKTIF URL (Membaca jika kembali dari Midtrans)
+            // ==========================================
+            function cekRedirectMidtrans() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const orderId = urlParams.get('order_id');
+                const trxStatus = urlParams.get('transaction_status');
+
+                if (orderId && (trxStatus === 'settlement' || trxStatus === 'capture')) {
+                    // Ambil data pesanan yang disimpan sementara saat bayar
+                    const pendingOrder = localStorage.getItem('kebabPendingOrder');
+                    if (pendingOrder) {
+                        const dataPesanan = JSON.parse(pendingOrder);
+                        
+                        alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp. Silakan tekan tombol KIRIM di WhatsApp untuk menyelesaikan pesanan.");
+                        
+                        // Alihkan ke WA
+                        window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(dataPesanan.waText)}`;
+                        
+                        // Bersihkan memori
+                        localStorage.removeItem('kebabPendingOrder');
+                        localStorage.removeItem('kebabCart');
+                        
+                        // Bersihkan URL dari parameter Midtrans
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        
+                        // Reload agar keranjang bersih
+                        setTimeout(() => window.location.reload(), 2000);
+                    }
+                }
+            }
+            cekRedirectMidtrans();
+
+
             window.chatLangsung = () => {
                 const pesan = "Halo Kebab Turki Hajar, saya mau tanya-tanya dulu sebelum pesan 😊";
                 window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(pesan)}`, '_blank');
@@ -1500,6 +1534,40 @@
                 const orderId = 'KEBAB-' + Date.now();
                 const email = auth.currentUser ? auth.currentUser.email : 'guest@kebabidi.com';
 
+                // ==========================================
+                // SIAPKAN TEKS WA UNTUK DISIMPAN SEMENTARA
+                // ==========================================
+                const notes = document.getElementById('order-notes').value.trim();
+                const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) };
+                localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
+
+                let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
+                txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n--------------------------------\n`;
+                
+                Object.keys(cart).forEach(cartKey => {
+                    const qty = cart[cartKey];
+                    if (qty > 0) {
+                        const parts = cartKey.split('-');
+                        const itemId = parseInt(parts[0]);
+                        const variant = parts[1] ? ` (${parts[1]})` : '';
+                        const item = menuData.find(i => i.id === itemId);
+                        if (item) {
+                            txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
+                        }
+                    }
+                });
+
+                txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`;
+                if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`;
+                else txt += `Ongkir: GRATIS\n`;
+                txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
+                if (notes) txt += `📝 Catatan: ${notes}\n\n`;
+                txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
+                
+                // Simpan teks WA ke memori HP sementara
+                localStorage.setItem('kebabPendingOrder', JSON.stringify({ waText: txt }));
+                // ==========================================
+
                 showLoading();
 
                 try {
@@ -1520,49 +1588,16 @@
                     if (data.token) {
                         window.snap.pay(data.token, {
                             onSuccess: function(result){
-                                // ==========================================
-                                // OTOMATIS KIRIM KE WA SETELAH BAYAR SUKSES
-                                // ==========================================
-                                const notes = document.getElementById('order-notes').value.trim();
-                                const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) };
-                                localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
-
-                                let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
-                                txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n--------------------------------\n`;
+                                alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp. Silakan tekan tombol KIRIM di WhatsApp untuk menyelesaikan pesanan.");
+                                window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
                                 
-                                Object.keys(cart).forEach(cartKey => {
-                                    const qty = cart[cartKey];
-                                    if (qty > 0) {
-                                        const parts = cartKey.split('-');
-                                        const itemId = parseInt(parts[0]);
-                                        const variant = parts[1] ? ` (${parts[1]})` : '';
-                                        const item = menuData.find(i => i.id === itemId);
-                                        if (item) {
-                                            txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
-                                        }
-                                    }
-                                });
-
-                                txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`;
-                                if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`;
-                                else txt += `Ongkir: GRATIS\n`;
-                                txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
-                                if (notes) txt += `📝 Catatan: ${notes}\n\n`;
-                                txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
-                                
-                                // Bersihkan Keranjang
                                 cart = {}; 
                                 localStorage.removeItem('kebabCart'); 
+                                localStorage.removeItem('kebabPendingOrder');
                                 renderMenu(); 
                                 calculateTotal(); 
                                 closeConfirmModal();
                                 closeCartModal();
-                                
-                                // Tampilkan Alert bahwa akan diarahkan ke WA
-                                alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp. Silakan tekan tombol KIRIM di WhatsApp untuk menyelesaikan pesanan.");
-                                
-                                // Alihkan ke WA
-                                window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
                             },
                             onPending: function(result){
                                 alert("⏳ Menunggu pembayaran. Silakan selesaikan sesuai instruksi.");
