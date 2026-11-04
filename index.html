@@ -163,17 +163,6 @@
             background-size: cover; background-position: center;
         }
 
-        .slide .iframe-wrapper {
-            position: absolute; inset: 0; overflow: hidden; pointer-events: none;
-        }
-        
-        .slide .iframe-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            transform: scale(1.8);
-        }
-
         .slide.active { opacity: 1; }
 
         .hero-gradient {
@@ -533,18 +522,19 @@
             </div>
         </div>
 
-        <!-- HERO SLIDER -->
+        <!-- HERO SLIDER 4 GAMBAR (TANPA VIDEO) -->
         <div class="hero-slider" id="hero-slider">
-            <!-- SLIDE 1 (VIDEO STREAMABLE + WALLPAPER) -->
-            <div class="slide active" id="slide-1" style="background-image: url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg');">
-                <div class="iframe-wrapper">
-                    <iframe allow="fullscreen;autoplay" allowfullscreen src="https://streamable.com/e/7wiifz?autoplay=1&muted=1&loop=0" style="border:none; pointer-events: none;"></iframe>
-                </div>
-            </div>
-
-            <!-- SLIDE 2 & 3 (GAMBAR) -->
+            <!-- SLIDE 1 (GAMBAR BARU DARI USER) -->
+            <div class="slide active" style="background-image: url('https://i.ibb.co.com/G30KNZDh/file-0000000052488211b3d436f566ec6b46.png');"></div>
+            
+            <!-- SLIDE 2 -->
             <div class="slide" style="background-image: url('https://i.ibb.co.com/SZCStwz/Gemini-Generated-Image-kqtryfkqtryfkqtr.jpg');"></div>
+            
+            <!-- SLIDE 3 -->
             <div class="slide" style="background-image: url('https://i.ibb.co.com/wNKsnJxq/file-000000004a2c82118f1b6e2a3d065d2b-2.jpg');"></div>
+
+            <!-- SLIDE 4 (GAMBAR BACKGROUND LAMA) -->
+            <div class="slide" style="background-image: url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg');"></div>
 
             <div class="hero-gradient"></div>
 
@@ -934,14 +924,12 @@
             });
 
             /* ==========================================
-               LOGIKA HERO SLIDER (IFRAME -> GAMBAR)
+               LOGIKA HERO SLIDER (4 GAMBAR FULL)
                ========================================== */
             const slides = document.querySelectorAll('.slide');
             const dotsContainer = document.getElementById('slider-dots');
             let currentSlide = 0;
             let slideInterval;
-            let videoModeActive = true; 
-            let videoTimer; 
 
             slides.forEach((_, index) => {
                 const dot = document.createElement('div');
@@ -965,23 +953,8 @@
                 slideInterval = setInterval(nextSlide, 3500); 
             }
 
-            function switchToImageMode(skipToNext = true) {
-                if (!videoModeActive) return;
-                videoModeActive = false;
-                
-                const iframeWrapper = document.querySelector('#slide-1 .iframe-wrapper');
-                if (iframeWrapper) iframeWrapper.remove();
-                
-                if (skipToNext) {
-                    nextSlide();
-                    startSlide();
-                }
-            }
-
-            // Timer 39 Detik (39000 ms) sebelum pindah ke gambar
-            videoTimer = setTimeout(() => {
-                switchToImageMode(true);
-            }, 39000);
+            // Langsung jalankan slider gambar
+            startSlide();
 
             // Logika Swipe (Geser) manual
             let touchStartX = 0, touchEndX = 0;
@@ -989,36 +962,22 @@
             
             sliderElement.addEventListener('touchstart', e => { 
                 touchStartX = e.changedTouches[0].screenX; 
-                if(!videoModeActive) clearInterval(slideInterval);
+                clearInterval(slideInterval);
             }, {passive: true});
             
             sliderElement.addEventListener('touchend', e => {
                 touchEndX = e.changedTouches[0].screenX;
                 
                 if (touchStartX - touchEndX > 50) { // Swipe kiri
-                    if (videoModeActive) {
-                        clearTimeout(videoTimer); 
-                        switchToImageMode(false); 
-                        nextSlide();
-                        startSlide();
-                    } else {
-                        nextSlide(); 
-                        startSlide();
-                    }
+                    nextSlide(); 
+                    startSlide();
                 }
                 if (touchEndX - touchStartX > 50) { // Swipe kanan
-                    if (videoModeActive) {
-                        clearTimeout(videoTimer);
-                        switchToImageMode(false); 
-                        goToSlide(currentSlide - 1);
-                        startSlide();
-                    } else {
-                        goToSlide(currentSlide - 1); 
-                        startSlide();
-                    }
+                    goToSlide(currentSlide - 1); 
+                    startSlide();
                 }
                 
-                if (!videoModeActive && Math.abs(touchStartX - touchEndX) <= 50) {
+                if (Math.abs(touchStartX - touchEndX) <= 50) {
                     startSlide();
                 }
             }, {passive: true});
