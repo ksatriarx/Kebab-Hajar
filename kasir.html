@@ -193,79 +193,111 @@
         let metodePembayaran = 'cash';
 
         // ============================================================
-// DATA MENU — SINKRON 100% DENGAN index.html
-// Sumber: array menuData di index.html (ID 1-21)
-// Item minuman dengan "variants" akan di-expand jadi 2 kartu
-// (Dingin & Panas) oleh renderMenu() di bawah.
-// ============================================================
-const menuData = [
-    /* MAKANAN BARU (8000) */
-    { id: 19, category: "makanan", type: "Kebab", name: "Kebab Sayur", price: 8000, image: "https://i.ibb.co.com/KpJZwKQy/file-000000001ecc82119383cae59bea6a5f.png", badge: "" },
-    { id: 20, category: "makanan", type: "Kebab", name: "Kebab Telur", price: 8000, image: "https://i.ibb.co.com/rCMZ8Cc/file-0000000000548211b52d0bfad661f748.png", badge: "" },
-    { id: 21, category: "makanan", type: "Kebab", name: "Kebab Sosis", price: 8000, image: "https://i.ibb.co.com/jXSzzLN/file-00000000e40c8211b085d5cc5c6f79be.png", badge: "" },
+        // DATA MENU — SINKRON 100% DENGAN index.html (ID 1-21)
+        // Item minuman dengan "variants" akan di-expand jadi 2 kartu
+        // (Dingin & Panas) oleh getExpandedMenu().
+        // ============================================================
+        const menuData = [
+            /* MAKANAN BARU (8000) */
+            { id: 19, category: "makanan", type: "Kebab", name: "Kebab Sayur", price: 8000, image: "https://i.ibb.co.com/KpJZwKQy/file-000000001ecc82119383cae59bea6a5f.png", badge: "" },
+            { id: 20, category: "makanan", type: "Kebab", name: "Kebab Telur", price: 8000, image: "https://i.ibb.co.com/rCMZ8Cc/file-0000000000548211b52d0bfad661f748.png", badge: "" },
+            { id: 21, category: "makanan", type: "Kebab", name: "Kebab Sosis", price: 8000, image: "https://i.ibb.co.com/jXSzzLN/file-00000000e40c8211b085d5cc5c6f79be.png", badge: "" },
 
-    /* MAKANAN LAMA */
-    { id: 1, category: "makanan", type: "Kebab", name: "Telur Sosis", price: 10000, image: "https://i.ibb.co.com/hPwgw0f/file-000000003c388207a89749c0fe820b2b.png", badge: "" },
-    { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://i.ibb.co.com/35htZS9w/file-000000002c0082119ad5543f388247df.png", badge: "" },
-    { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://i.ibb.co.com/j90LH4YS/file-0000000040c882118a04f2e0ce8c402a.png", badge: "" },
-    { id: 4, category: "makanan", type: "Kebab", name: "Daging Telur", price: 13000, image: "https://i.ibb.co.com/xqcmDfHs/file-000000003e2c82119ce5e518f35696c6.png", badge: "" },
-    { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, image: "https://i.ibb.co.com/kgvMLdP8/file-00000000d1988211b11c4d18bd5327b4.png", badge: "BEST" },
-    { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://i.ibb.co.com/dsRW0mfZ/file-000000009c3482118de7254c91fc3d87.png", badge: "" },
+            /* MAKANAN LAMA */
+            { id: 1, category: "makanan", type: "Kebab", name: "Telur Sosis", price: 10000, image: "https://i.ibb.co.com/hPwgw0f/file-000000003c388207a89749c0fe820b2b.png", badge: "" },
+            { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://i.ibb.co.com/35htZS9w/file-000000002c0082119ad5543f388247df.png", badge: "" },
+            { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://i.ibb.co.com/j90LH4YS/file-0000000040c882118a04f2e0ce8c402a.png", badge: "" },
+            { id: 4, category: "makanan", type: "Kebab", name: "Daging Telur", price: 13000, image: "https://i.ibb.co.com/xqcmDfHs/file-000000003e2c82119ce5e518f35696c6.png", badge: "" },
+            { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, image: "https://i.ibb.co.com/kgvMLdP8/file-00000000d1988211b11c4d18bd5327b4.png", badge: "BEST" },
+            { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://i.ibb.co.com/dsRW0mfZ/file-000000009c3482118de7254c91fc3d87.png", badge: "" },
 
-    /* MINUMAN (yang punya variants akan di-expand) */
-    { id: 7,  category: "minuman", type: "Minuman", name: "Sanger",                price: 10000, image: "https://i.ibb.co.com/PGj2LpX9/file-0000000031cc8211a6dcc107c336df45.png", badge: "", variants: ["Dingin", "Panas"] },
-    { id: 8,  category: "minuman", type: "Minuman", name: "Americano",             price: 10000, image: "https://i.ibb.co.com/9HM8M6XD/file-00000000e168821193186ccd0e44f53d.png", badge: "", variants: ["Dingin", "Panas"] },
-    { id: 9,  category: "minuman", type: "Minuman", name: "Americano Gula Aren",   price: 12000, image: "https://i.ibb.co.com/N2B6vQnP/file-00000000b264820796a3bac4a080e4b3.png", badge: "" },
-    { id: 10, category: "minuman", type: "Minuman", name: "Teh Hijau",             price: 8000,  image: "https://i.ibb.co.com/CdQ1wqj/file-000000000f908211b837ae54563dd966.png", badge: "", variants: ["Dingin", "Panas"] },
-    { id: 11, category: "minuman", type: "Minuman", name: "Teh Hijau Susu",        price: 10000, image: "https://i.ibb.co.com/Rp0nhMck/file-00000000e7b482078de4e531ff710564.png", badge: "" },
-    { id: 12, category: "minuman", type: "Minuman", name: "Kopi Caramel",          price: 15000, image: "https://i.ibb.co.com/WWt5KWpJ/file-00000000f7948211a0b0b5664ce94ef2.png", badge: "" },
-    { id: 13, category: "minuman", type: "Minuman", name: "Kopi Latte",            price: 15000, image: "https://i.ibb.co.com/nMmKpxP1/file-00000000685c82119555630672974adf.png", badge: "" },
-    { id: 14, category: "minuman", type: "Minuman", name: "Sirup Kurnia Dingin",   price: 8000,  image: "https://i.ibb.co.com/TxxPGfJR/file-000000000fbc8211bfae4fd9fb3c28e1.png", badge: "" },
-    { id: 15, category: "minuman", type: "Minuman", name: "Capucino",              price: 15000, image: "https://i.ibb.co.com/hx3s3SZH/file-000000009b188211bcbfeb424e4d3b4b.png", badge: "" },
-    { id: 16, category: "minuman", type: "Minuman", name: "Long Black",            price: 10000, image: "https://i.ibb.co.com/LznJ62Vw/file-00000000941c8211b103e39f78f5a3f4.png", badge: "" },
-    { id: 17, category: "minuman", type: "Minuman", name: "Sanger Double Shoot",   price: 18000, image: "https://i.ibb.co.com/TD38ST6w/file-00000000ea1c8207aec4784f0d414597.png", badge: "" },
-    { id: 18, category: "minuman", type: "Minuman", name: "Kopi Milo Dingin",      price: 15000, image: "https://i.ibb.co.com/JwnTHR1v/file-00000000a8f48211a6ce1bf12c34801c.png", badge: "" }
-];
+            /* MINUMAN (yang punya variants akan di-expand) */
+            { id: 7,  category: "minuman", type: "Minuman", name: "Sanger",                price: 10000, image: "https://i.ibb.co.com/PGj2LpX9/file-0000000031cc8211a6dcc107c336df45.png", badge: "", variants: ["Dingin", "Panas"] },
+            { id: 8,  category: "minuman", type: "Minuman", name: "Americano",             price: 10000, image: "https://i.ibb.co.com/9HM8M6XD/file-00000000e168821193186ccd0e44f53d.png", badge: "", variants: ["Dingin", "Panas"] },
+            { id: 9,  category: "minuman", type: "Minuman", name: "Americano Gula Aren",   price: 12000, image: "https://i.ibb.co.com/N2B6vQnP/file-00000000b264820796a3bac4a080e4b3.png", badge: "" },
+            { id: 10, category: "minuman", type: "Minuman", name: "Teh Hijau",             price: 8000,  image: "https://i.ibb.co.com/CdQ1wqj/file-000000000f908211b837ae54563dd966.png", badge: "", variants: ["Dingin", "Panas"] },
+            { id: 11, category: "minuman", type: "Minuman", name: "Teh Hijau Susu",        price: 10000, image: "https://i.ibb.co.com/Rp0nhMck/file-00000000e7b482078de4e531ff710564.png", badge: "" },
+            { id: 12, category: "minuman", type: "Minuman", name: "Kopi Caramel",          price: 15000, image: "https://i.ibb.co.com/WWt5KWpJ/file-00000000f7948211a0b0b5664ce94ef2.png", badge: "" },
+            { id: 13, category: "minuman", type: "Minuman", name: "Kopi Latte",            price: 15000, image: "https://i.ibb.co.com/nMmKpxP1/file-00000000685c82119555630672974adf.png", badge: "" },
+            { id: 14, category: "minuman", type: "Minuman", name: "Sirup Kurnia Dingin",   price: 8000,  image: "https://i.ibb.co.com/TxxPGfJR/file-000000000fbc8211bfae4fd9fb3c28e1.png", badge: "" },
+            { id: 15, category: "minuman", type: "Minuman", name: "Capucino",              price: 15000, image: "https://i.ibb.co.com/hx3s3SZH/file-000000009b188211bcbfeb424e4d3b4b.png", badge: "" },
+            { id: 16, category: "minuman", type: "Minuman", name: "Long Black",            price: 10000, image: "https://i.ibb.co.com/LznJ62Vw/file-00000000941c8211b103e39f78f5a3f4.png", badge: "" },
+            { id: 17, category: "minuman", type: "Minuman", name: "Sanger Double Shoot",   price: 18000, image: "https://i.ibb.co.com/TD38ST6w/file-00000000ea1c8207aec4784f0d414597.png", badge: "" },
+            { id: 18, category: "minuman", type: "Minuman", name: "Kopi Milo Dingin",      price: 15000, image: "https://i.ibb.co.com/JwnTHR1v/file-00000000a8f48211a6ce1bf12c34801c.png", badge: "" }
+        ];
 
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email === ALLOWED_EMAIL) {
-                document.getElementById('access-denied').style.display = 'none';
-                document.getElementById('pos-app').style.display = 'flex';
-                renderMenu();
-            } else {
-                document.getElementById('access-denied').style.display = 'flex';
-                document.getElementById('pos-app').style.display = 'none';
-            }
-        });
+        // ============================================================
+        // HELPER: Expand menu untuk tampilan (varian jadi kartu terpisah)
+        // key = "id" (tanpa varian) atau "id-Varian" (dengan varian)
+        // ============================================================
+        function getExpandedMenu(category) {
+            const result = [];
+            menuData.forEach(item => {
+                if (item.category !== category) return;
+                if (item.variants && item.variants.length > 0) {
+                    item.variants.forEach(v => {
+                        result.push({
+                            key: `${item.id}-${v}`,
+                            item: item,
+                            variant: v,
+                            name: `${item.name} ${v}`,
+                            price: item.price,
+                            image: item.image,
+                            badge: item.badge,
+                            type: item.type
+                        });
+                    });
+                } else {
+                    result.push({
+                        key: `${item.id}`,
+                        item: item,
+                        variant: null,
+                        name: item.name,
+                        price: item.price,
+                        image: item.image,
+                        badge: item.badge,
+                        type: item.type
+                    });
+                }
+            });
+            return result;
+        }
 
-        window.switchCategory = (category) => {
-            currentCategory = category;
-            document.getElementById('tab-makanan').classList.remove('active');
-            document.getElementById('tab-minuman').classList.remove('active');
-            document.getElementById(`tab-${category}`).classList.add('active');
-            renderMenu();
-        };
+        // ============================================================
+        // HELPER: Ambil item dari cartKey ("19" atau "7-Dingin")
+        // ============================================================
+        function getItemFromCartKey(cartKey) {
+            const parts = cartKey.split('-');
+            const itemId = parseInt(parts[0]);
+            const variant = parts[1] || null;
+            const item = menuData.find(i => i.id === itemId);
+            if (!item) return null;
+            return { item, variant };
+        }
 
+        // ============================================================
+        // RENDER MENU GRID
+        // ============================================================
         function renderMenu() {
             const container = document.getElementById('menu-grid');
-            const filteredMenu = menuData.filter(item => item.category === currentCategory);
+            const expanded = getExpandedMenu(currentCategory);
 
-            container.innerHTML = filteredMenu.map(item => {
-                const qty = cart[item.id] || 0;
+            container.innerHTML = expanded.map(entry => {
+                const qty = cart[entry.key] || 0;
                 return `
                     <div class="menu-card">
-                        ${item.badge ? `<span class="menu-badge">${item.badge}</span>` : ''}
-                        <img src="${item.image}" class="menu-img" loading="lazy" alt="${item.name}">
-                        <div class="menu-title">${item.name}</div>
-                        <div class="menu-type">${item.type}</div>
+                        ${entry.badge ? `<span class="menu-badge">${entry.badge}</span>` : ''}
+                        <img src="${entry.image}" class="menu-img" loading="lazy" alt="${entry.name}">
+                        <div class="menu-title">${entry.name}</div>
+                        <div class="menu-type">${entry.type}</div>
                         <div class="menu-bottom">
-                            <span class="menu-price">Rp${(item.price/1000)}k</span>
+                            <span class="menu-price">Rp${(entry.price/1000)}k</span>
                             ${qty === 0 
-                                ? `<button class="btn-add" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>`
+                                ? `<button class="btn-add" onclick="updateQty('${entry.key}', 1)"><i class="fa-solid fa-plus"></i></button>`
                                 : `<div class="qty-wrap">
-                                    <button class="qty-btn" onclick="updateQty(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
+                                    <button class="qty-btn" onclick="updateQty('${entry.key}', -1)"><i class="fa-solid fa-minus"></i></button>
                                     <span class="qty-num">${qty}</span>
-                                    <button class="qty-btn" onclick="updateQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
+                                    <button class="qty-btn" onclick="updateQty('${entry.key}', 1)"><i class="fa-solid fa-plus"></i></button>
                                    </div>`
                             }
                         </div>
@@ -274,40 +306,47 @@ const menuData = [
             }).join('');
         }
 
-        window.updateQty = (id, change) => {
-            if (!cart[id]) cart[id] = 0;
-            cart[id] += change;
-            if (cart[id] < 0) cart[id] = 0;
+        window.updateQty = (cartKey, change) => {
+            if (!cart[cartKey]) cart[cartKey] = 0;
+            cart[cartKey] += change;
+            if (cart[cartKey] < 0) cart[cartKey] = 0;
             renderMenu(); 
             renderKeranjang();
         };
 
+        // ============================================================
+        // RENDER KERANJANG
+        // ============================================================
         function renderKeranjang() {
             const list = document.getElementById('cart-list');
             let total = 0;
             let html = '';
 
-            if (Object.keys(cart).length === 0 || Object.values(cart).every(v => v === 0)) {
+            const keys = Object.keys(cart).filter(k => cart[k] > 0);
+
+            if (keys.length === 0) {
                 html = '<div style="text-align: center; color: var(--text-muted); margin-top: 20px;">Belum ada pesanan.</div>';
             } else {
-                menuData.forEach(item => {
-                    const qty = cart[item.id] || 0;
-                    if (qty > 0) {
-                        total += item.price * qty;
-                        html += `
-                            <div class="cart-item">
-                                <div class="cart-item-info">
-                                    <div class="cart-item-name">${item.name}</div>
-                                    <div class="cart-item-price">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
-                                </div>
-                                <div class="qty-wrap" style="background:#000;">
-                                    <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
-                                    <span class="qty-num">${qty}</span>
-                                    <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
-                                </div>
+                keys.forEach(cartKey => {
+                    const qty = cart[cartKey];
+                    const parsed = getItemFromCartKey(cartKey);
+                    if (!parsed) return;
+                    const { item, variant } = parsed;
+                    const displayName = variant ? `${item.name} ${variant}` : item.name;
+                    total += item.price * qty;
+                    html += `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${displayName}</div>
+                                <div class="cart-item-price">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
                             </div>
-                        `;
-                    }
+                            <div class="qty-wrap" style="background:#000;">
+                                <button class="qty-btn" onclick="updateQty('${cartKey}', -1)">-</button>
+                                <span class="qty-num">${qty}</span>
+                                <button class="qty-btn" onclick="updateQty('${cartKey}', 1)">+</button>
+                            </div>
+                        </div>
+                    `;
                 });
             }
 
@@ -317,9 +356,25 @@ const menuData = [
             hitungKembalian();
         }
 
-        window.bukaPembayaran = () => {
+        // ============================================================
+        // HITUNG TOTAL DARI CART (dipakai bukaPembayaran & selesaikanPesanan)
+        // ============================================================
+        function hitungTotalCart() {
             let total = 0;
-            menuData.forEach(item => { total += (cart[item.id] || 0) * item.price; });
+            Object.keys(cart).forEach(cartKey => {
+                const qty = cart[cartKey];
+                if (qty <= 0) return;
+                const parsed = getItemFromCartKey(cartKey);
+                if (parsed) total += parsed.item.price * qty;
+            });
+            return total;
+        }
+
+        // ============================================================
+        // PEMBAYARAN
+        // ============================================================
+        window.bukaPembayaran = () => {
+            const total = hitungTotalCart();
             if (total === 0) { alert("Pilih menu terlebih dahulu!"); return; }
             document.getElementById('payment-modal').style.display = 'flex';
             document.getElementById('uang-diterima').value = '';
@@ -346,8 +401,7 @@ const menuData = [
         };
 
         window.hitungKembalian = () => {
-            let total = 0;
-            menuData.forEach(item => { total += (cart[item.id] || 0) * item.price; });
+            const total = hitungTotalCart();
             const diterima = parseInt(document.getElementById('uang-diterima').value) || 0;
             const kembalian = diterima - total;
             document.getElementById('modal-kembalian').innerText = kembalian > 0 ? `Rp ${kembalian.toLocaleString('id-ID')}` : 'Rp 0';
@@ -356,12 +410,20 @@ const menuData = [
         window.selesaikanPesanan = async () => {
             let total = 0;
             let rincian = [];
-            menuData.forEach(item => {
-                const qty = cart[item.id] || 0;
-                if (qty > 0) {
-                    total += item.price * qty;
-                    rincian.push({ nama: item.name, qty: qty, harga: item.price });
-                }
+
+            Object.keys(cart).forEach(cartKey => {
+                const qty = cart[cartKey];
+                if (qty <= 0) return;
+                const parsed = getItemFromCartKey(cartKey);
+                if (!parsed) return;
+                const { item, variant } = parsed;
+                const displayName = variant ? `${item.name} ${variant}` : item.name;
+                total += item.price * qty;
+                rincian.push({
+                    nama: displayName,
+                    qty: qty,
+                    harga: item.price
+                });
             });
 
             const diterima = parseInt(document.getElementById('uang-diterima').value) || 0;
@@ -388,6 +450,28 @@ const menuData = [
             } catch (error) {
                 alert("❌ Gagal menyimpan transaksi: " + error.message);
             }
+        };
+
+        // ============================================================
+        // AUTH STATE
+        // ============================================================
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ALLOWED_EMAIL) {
+                document.getElementById('access-denied').style.display = 'none';
+                document.getElementById('pos-app').style.display = 'flex';
+                renderMenu();
+            } else {
+                document.getElementById('access-denied').style.display = 'flex';
+                document.getElementById('pos-app').style.display = 'none';
+            }
+        });
+
+        window.switchCategory = (category) => {
+            currentCategory = category;
+            document.getElementById('tab-makanan').classList.remove('active');
+            document.getElementById('tab-minuman').classList.remove('active');
+            document.getElementById(`tab-${category}`).classList.add('active');
+            renderMenu();
         };
 
         window.prosesLogout = () => {
