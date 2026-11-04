@@ -522,18 +522,11 @@
             </div>
         </div>
 
-        <!-- HERO SLIDER 4 GAMBAR (TANPA VIDEO) -->
+        <!-- HERO SLIDER 4 GAMBAR -->
         <div class="hero-slider" id="hero-slider">
-            <!-- SLIDE 1 (GAMBAR BARU DARI USER) -->
             <div class="slide active" style="background-image: url('https://i.ibb.co.com/G30KNZDh/file-0000000052488211b3d436f566ec6b46.png');"></div>
-            
-            <!-- SLIDE 2 -->
             <div class="slide" style="background-image: url('https://i.ibb.co.com/SZCStwz/Gemini-Generated-Image-kqtryfkqtryfkqtr.jpg');"></div>
-            
-            <!-- SLIDE 3 -->
             <div class="slide" style="background-image: url('https://i.ibb.co.com/wNKsnJxq/file-000000004a2c82118f1b6e2a3d065d2b-2.jpg');"></div>
-
-            <!-- SLIDE 4 (GAMBAR BACKGROUND LAMA) -->
             <div class="slide" style="background-image: url('https://i.ibb.co.com/dTnR6xq/file-0000000099fc8211846625e958f6f044-1.jpg');"></div>
 
             <div class="hero-gradient"></div>
@@ -924,7 +917,7 @@
             });
 
             /* ==========================================
-               LOGIKA HERO SLIDER (4 GAMBAR FULL)
+               LOGIKA HERO SLIDER
                ========================================== */
             const slides = document.querySelectorAll('.slide');
             const dotsContainer = document.getElementById('slider-dots');
@@ -953,10 +946,8 @@
                 slideInterval = setInterval(nextSlide, 3500); 
             }
 
-            // Langsung jalankan slider gambar
             startSlide();
 
-            // Logika Swipe (Geser) manual
             let touchStartX = 0, touchEndX = 0;
             const sliderElement = document.getElementById('hero-slider');
             
@@ -968,11 +959,11 @@
             sliderElement.addEventListener('touchend', e => {
                 touchEndX = e.changedTouches[0].screenX;
                 
-                if (touchStartX - touchEndX > 50) { // Swipe kiri
+                if (touchStartX - touchEndX > 50) { 
                     nextSlide(); 
                     startSlide();
                 }
-                if (touchEndX - touchStartX > 50) { // Swipe kanan
+                if (touchEndX - touchStartX > 50) { 
                     goToSlide(currentSlide - 1); 
                     startSlide();
                 }
@@ -987,29 +978,22 @@
                UPDATE: STICKY HEADER & NAVIGASI DINAMIS
                ========================================== */
             window.addEventListener('scroll', function() {
-                // Logika Header
                 document.getElementById('main-header').classList.toggle('scrolled', window.scrollY > 30);
                 
-                // Logika Warna Merah Navigasi Pindah Otomatis Saat Scroll
-                // Jangan jalankan jika modal keranjang sedang terbuka
                 if(!document.getElementById('cart-modal').classList.contains('show')) {
                     const menuTop = document.getElementById('menu-container').offsetTop - 200;
                     
                     if (window.scrollY >= menuTop) {
-                        // Jika sudah scroll ke bawah, pindah ke "Menu"
                         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                         document.getElementById('nav-menu').classList.add('active');
                     } else {
-                        // Jika scroll kembali ke atas, pindah ke "Home"
                         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                         document.getElementById('nav-home').classList.add('active');
                     }
                 }
             });
 
-            // Fungsi Klik Navigasi Bawah
             window.handleNavClick = (menuName) => {
-                // Hilangkan warna merah dari semua menu
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
                 if (menuName === 'home') {
@@ -1027,7 +1011,6 @@
                 else if (menuName === 'chat') {
                     document.getElementById('nav-chat').classList.add('active');
                     chatLangsung();
-                    // Kembalikan merah ke home setelah buka WA (karena WA pindah tab)
                     setTimeout(() => {
                         document.getElementById('nav-home').classList.add('active');
                         document.getElementById('nav-chat').classList.remove('active');
@@ -1045,20 +1028,15 @@
             const DEFAULT_DRINK_IMAGE = "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=400&auto=format&fit=crop"; 
 
             const menuData = [
-                /* MAKANAN BARU (8000) */
                 { id: 19, category: "makanan", type: "Kebab", name: "Kebab Sayur", price: 8000, image: "https://i.ibb.co.com/KpJZwKQy/file-000000001ecc82119383cae59bea6a5f.png", badge: "" },
                 { id: 20, category: "makanan", type: "Kebab", name: "Kebab Telur", price: 8000, image: "https://i.ibb.co.com/rCMZ8Cc/file-0000000000548211b52d0bfad661f748.png", badge: "" },
                 { id: 21, category: "makanan", type: "Kebab", name: "Kebab Sosis", price: 8000, image: "https://i.ibb.co.com/jXSzzLN/file-00000000e40c8211b085d5cc5c6f79be.png", badge: "" },
-                
-                /* MAKANAN LAMA */
                 { id: 1, category: "makanan", type: "Kebab", name: "Telur Sosis", price: 10000, image: "https://i.ibb.co.com/hPwgw0f/file-000000003c388207a89749c0fe820b2b.png", badge: "" },
                 { id: 2, category: "makanan", type: "Kebab", name: "Daging", price: 10000, image: "https://i.ibb.co.com/35htZS9w/file-000000002c0082119ad5543f388247df.png", badge: "" },
                 { id: 3, category: "makanan", type: "Kebab", name: "Daging Sosis", price: 13000, image: "https://i.ibb.co.com/j90LH4YS/file-0000000040c882118a04f2e0ce8c402a.png", badge: "" },
                 { id: 4, category: "makanan", type: "Kebab", name: "Daging Telur", price: 13000, image: "https://i.ibb.co.com/xqcmDfHs/file-000000003e2c82119ce5e518f35696c6.png", badge: "" },
                 { id: 5, category: "makanan", type: "KEBAB", name: "Daging Telur Sosis", price: 15000, image: "https://i.ibb.co.com/kgvMLdP8/file-00000000d1988211b11c4d18bd5327b4.png", badge: "BEST" },
                 { id: 6, category: "makanan", type: "Kebab", name: "Daging Telur Sosis Keju", price: 18000, image: "https://i.ibb.co.com/dsRW0mfZ/file-000000009c3482118de7254c91fc3d87.png", badge: "" },
-                
-                /* MINUMAN */
                 { id: 7, category: "minuman", type: "Minuman", name: "Sanger", price: 10000, image: "https://i.ibb.co.com/PGj2LpX9/file-0000000031cc8211a6dcc107c336df45.png", badge: "", variants: ["Dingin", "Panas"] },
                 { id: 8, category: "minuman", type: "Minuman", name: "Americano", price: 10000, image: "https://i.ibb.co.com/9HM8M6XD/file-00000000e168821193186ccd0e44f53d.png", badge: "", variants: ["Dingin", "Panas"] },
                 { id: 9, category: "minuman", type: "Minuman", name: "Americano Gula Aren", price: 12000, image: "https://i.ibb.co.com/N2B6vQnP/file-00000000b264820796a3bac4a080e4b3.png", badge: "" },
@@ -1331,7 +1309,6 @@
 
             window.closeCartModal = () => {
                 document.getElementById('cart-modal').classList.remove('show');
-                // Kembalikan merah ke Home jika keranjang ditutup
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 document.getElementById('nav-home').classList.add('active');
             }
@@ -1543,9 +1520,37 @@
                     if (data.token) {
                         window.snap.pay(data.token, {
                             onSuccess: function(result){
-                                const orderHistory = { nama: name, notes: document.getElementById('order-notes').value.trim(), metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) };
+                                // ==========================================
+                                // OTOMATIS KIRIM KE WA SETELAH BAYAR SUKSES
+                                // ==========================================
+                                const notes = document.getElementById('order-notes').value.trim();
+                                const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) };
                                 localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
+
+                                let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
+                                txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n--------------------------------\n`;
                                 
+                                Object.keys(cart).forEach(cartKey => {
+                                    const qty = cart[cartKey];
+                                    if (qty > 0) {
+                                        const parts = cartKey.split('-');
+                                        const itemId = parseInt(parts[0]);
+                                        const variant = parts[1] ? ` (${parts[1]})` : '';
+                                        const item = menuData.find(i => i.id === itemId);
+                                        if (item) {
+                                            txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
+                                        }
+                                    }
+                                });
+
+                                txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`;
+                                if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`;
+                                else txt += `Ongkir: GRATIS\n`;
+                                txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
+                                if (notes) txt += `📝 Catatan: ${notes}\n\n`;
+                                txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
+                                
+                                // Bersihkan Keranjang
                                 cart = {}; 
                                 localStorage.removeItem('kebabCart'); 
                                 renderMenu(); 
@@ -1553,8 +1558,11 @@
                                 closeConfirmModal();
                                 closeCartModal();
                                 
-                                alert("✅ Pembayaran Berhasil! Pesanan Anda sedang diproses.");
-                                window.location.reload();
+                                // Tampilkan Alert bahwa akan diarahkan ke WA
+                                alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp. Silakan tekan tombol KIRIM di WhatsApp untuk menyelesaikan pesanan.");
+                                
+                                // Alihkan ke WA
+                                window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
                             },
                             onPending: function(result){
                                 alert("⏳ Menunggu pembayaran. Silakan selesaikan sesuai instruksi.");
