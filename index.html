@@ -472,6 +472,14 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Gaya untuk Riwayat Pesanan */
+        .history-item {
+            background: var(--bg-input); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 10px; border: 1px solid var(--border);
+        }
+        .history-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; color: var(--text-muted); }
+        .history-status { font-weight: 800; color: var(--accent); }
+        .history-detail { font-size: 11px; line-height: 1.4; color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -694,17 +702,29 @@
             
             <div class="summary-box" id="confirm-summary"></div>
             
-            <!-- TOMBOL PEMBAYARAN ONLINE (BARU) -->
+            <!-- TOMBOL PEMBAYARAN ONLINE -->
             <button class="btn-online" onclick="prosesPembayaranOnline()">
                 <i class="fa-solid fa-credit-card" style="font-size:16px;"></i> Bayar Online (QRIS / E-Wallet / Bank)
             </button>
             
-            <!-- TOMBOL WA (TETAP ADA) -->
+            <!-- TOMBOL WA -->
             <button class="btn-wa" onclick="confirmAndSend()">
                 <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Kirim via WA
             </button>
             
             <button onclick="closeConfirmModal()" style="width:100%; background:transparent; border:none; color:var(--text-muted); padding:12px; font-size:11px; font-weight:700; cursor:pointer;">Batal</button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL RIWAYAT PESANAN ===== -->
+    <div class="modal-overlay" id="history-modal" onclick="if(event.target===this) closeHistoryModal()">
+        <div class="modal-box">
+            <div class="modal-handle"></div>
+            <h3 class="modal-title">Riwayat Pesanan</h3>
+            <div class="cart-list" id="history-list-content" style="min-height: 100px;">
+                <!-- Diisi oleh JS -->
+            </div>
+            <button onclick="closeHistoryModal()" style="width:100%; background:transparent; border:none; color:var(--text-muted); padding:12px; font-size:11px; font-weight:700; cursor:pointer;">Tutup</button>
         </div>
     </div>
 
@@ -746,6 +766,11 @@
                 <label>Status Akun</label>
                 <div class="value" id="prof-type">-</div>
             </div>
+
+            <!-- TOMBOL RIWAYAT PESANAN -->
+            <button onclick="openHistoryModal()" style="margin-top: 15px; width: 100%; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Pesanan
+            </button>
         </div>
 
         <button class="btn-logout-sidebar" id="btn-logout-sidebar">
@@ -1082,7 +1107,10 @@
                     if (pendingOrder) {
                         const dataPesanan = JSON.parse(pendingOrder);
                         
-                        alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp. Silakan tekan tombol KIRIM di WhatsApp untuk menyelesaikan pesanan.");
+                        // SIMPAN KE RIWAYAT
+                        simpanRiwayatPesanan(orderId, dataPesanan.totalAmount, dataPesanan.waText);
+
+                        alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp untuk mengirim pesanan. Silakan tekan tombol KIRIM di WhatsApp.");
                         
                         // Alihkan ke WA
                         window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(dataPesanan.waText)}`;
@@ -1090,16 +1118,60 @@
                         // Bersihkan memori
                         localStorage.removeItem('kebabPendingOrder');
                         localStorage.removeItem('kebabCart');
+                        cart = {};
                         
                         // Bersihkan URL dari parameter Midtrans
                         window.history.replaceState({}, document.title, window.location.pathname);
                         
-                        // Reload agar keranjang bersih
-                        setTimeout(() => window.location.reload(), 2000);
+                        renderMenu(); 
+                        calculateTotal();
                     }
                 }
             }
             cekRedirectMidtrans();
+
+            // ==========================================
+            // FUNGSI RIWAYAT PESANAN
+            // ==========================================
+            function simpanRiwayatPesanan(orderId, total, waText) {
+                let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
+                history.unshift({
+                    orderId: orderId || 'KEBAB-MANUAL',
+                    tanggal: new Date().toLocaleString('id-ID'),
+                    total: total,
+                    status: "Diproses (Menunggu Konfirmasi Toko)",
+                    waText: waText
+                });
+                localStorage.setItem('kebabOrderHistory', JSON.stringify(history));
+            }
+
+            window.openHistoryModal = () => {
+                tutupProfil();
+                const container = document.getElementById('history-list-content');
+                let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
+                
+                if (history.length === 0) {
+                    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Belum ada riwayat pesanan.</div>`;
+                } else {
+                    container.innerHTML = history.map(item => `
+                        <div class="history-item">
+                            <div class="history-header">
+                                <span>${item.tanggal}</span>
+                                <span class="history-status">${item.status}</span>
+                            </div>
+                            <div class="history-detail">
+                                <b>ID: ${item.orderId}</b><br>
+                                Total: Rp ${item.total.toLocaleString('id-ID')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('history-modal').classList.add('show');
+            }
+
+            window.closeHistoryModal = () => {
+                document.getElementById('history-modal').classList.remove('show');
+            }
 
 
             window.chatLangsung = () => {
@@ -1565,7 +1637,7 @@
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                 
                 // Simpan teks WA ke memori HP sementara
-                localStorage.setItem('kebabPendingOrder', JSON.stringify({ waText: txt }));
+                localStorage.setItem('kebabPendingOrder', JSON.stringify({ waText: txt, totalAmount: totals.total }));
                 // ==========================================
 
                 showLoading();
@@ -1650,6 +1722,9 @@
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                 window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
                 
+                // Simpan ke Riwayat Pesanan
+                simpanRiwayatPesanan('KEBAB-MANUAL', totals.total, txt);
+
                 cart = {}; 
                 localStorage.removeItem('kebabCart'); 
                 renderMenu(); 
