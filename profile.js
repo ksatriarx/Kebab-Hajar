@@ -18,6 +18,18 @@ function tutupProfil() {
 function isiDataProfil(nama, email, fotoUrl, tipeUser) {
     document.getElementById('prof-name').innerText = nama;
     document.getElementById('prof-email').innerText = email;
+
+    // ==========================================
+    // LOGIKA RAHASIA: TOMBOL KASIR KHUSUS OWNER
+    // ==========================================
+    const ownerMenu = document.getElementById('owner-menu');
+    if (ownerMenu) {
+        if (email === "rxstore101@gmail.com") {
+            ownerMenu.style.display = 'inline-block';
+        } else {
+            ownerMenu.style.display = 'none';
+        }
+    }
     
     // Sembunyikan atau tampilkan kotak saldo
     const walletCard = document.querySelector('.wallet-card');
