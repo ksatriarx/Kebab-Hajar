@@ -86,8 +86,13 @@
         .order-header {
             display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; color: var(--text-muted);
         }
-        .order-name { font-weight: 800; color: var(--accent); font-size: 14px; }
-        .order-detail { font-size: 12px; line-height: 1.5; margin-top: 5px; }
+        .order-name { font-weight: 800; color: var(--accent); font-size: 14px; margin-bottom: 4px; }
+        .order-email { font-size: 11px; color: #3b82f6; margin-bottom: 6px; }
+        .order-detail { font-size: 12px; line-height: 1.5; margin-top: 5px; color: #ccc; white-space: pre-wrap; margin-bottom: 10px; }
+        
+        .status-select {
+            width: 100%; padding: 8px; background: var(--bg-card); border: 1px solid var(--accent); color: var(--accent); font-weight: bold; border-radius: 6px; outline: none;
+        }
     </style>
 </head>
 <body>
@@ -182,7 +187,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
@@ -352,20 +357,40 @@
             let html = '';
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                // Format tanggal
-                const tgl = new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                const docId = doc.id; // <-- Ambil ID dokumen untuk update status
+                
+                // Format tanggal dengan aman
+                let tgl = "Waktu tidak valid";
+                if(data.waktu) {
+                    tgl = new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                }
+
+                // Cek Fallback jika data lama (dari webhook midtrans)
+                const namaPembeli = data.nama ? data.nama : 'Pelanggan Midtrans';
+                const emailPembeli = data.email ? data.email : '-';
+                const detailPesanan = data.detail_pesanan ? data.detail_pesanan : 'Detail tidak tersedia (data lama)';
+                const total = data.total_bayar ? data.total_bayar : 0;
+                const metode = data.metode ? data.metode : '-';
+                const statusSaatIni = data.status ? data.status : 'Menunggu Konfirmasi Toko';
                 
                 html += `
                     <div class="order-item">
                         <div class="order-header">
                             <span>${tgl}</span>
-                            <span style="color: var(--success); font-weight: bold;">${data.metode}</span>
+                            <span style="color: var(--success); font-weight: bold;">${metode}</span>
                         </div>
-                        <div class="order-name">${data.nama} - Rp ${data.total_bayar.toLocaleString('id-ID')}</div>
-                        <div class="order-detail">
-                            <b>ID: ${data.order_id}</b><br>
-                            <span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px; white-space: pre-wrap;">${data.detail_pesanan}</span>
-                        </div>
+                        <div class="order-name">${namaPembeli} - Rp ${total.toLocaleString('id-ID')}</div>
+                        <div class="order-email"><i class="fa-solid fa-envelope"></i> ${emailPembeli}</div>
+                        <div class="order-detail">${detailPesanan}</div>
+                        
+                        <!-- DROPDOWN UNTUK MENGUBAH STATUS -->
+                        <select class="status-select" onchange="updateStatusPesanan('${docId}', this.value)">
+                            <option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option>
+                            <option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option>
+                            <option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option>
+                            <option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                            <option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option>
+                        </select>
                     </div>
                 `;
             });
@@ -373,6 +398,19 @@
         }, (error) => {
             list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat pesanan: ${error.message}</p>`;
         });
+    }
+
+    // FUNGSI UNTUK MENGUBAH STATUS DARI ADMIN
+    window.updateStatusPesanan = async (docId, newStatus) => {
+        try {
+            const orderRef = doc(db, "transaksi_online", docId);
+            await updateDoc(orderRef, {
+                status: newStatus
+            });
+            // Tidak perlu alert, karena dropdown langsung berubah
+        } catch (error) {
+            alert("Gagal mengubah status: " + error.message);
+        }
     }
 </script>
 </body>
