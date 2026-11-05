@@ -22,11 +22,26 @@
         
         .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
         
+        /* ==========================================
+           CSS UNTUK TAB UTAMA
+           ========================================== */
+        .main-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;}
+        .main-tab-btn {
+            flex: 1; min-width: 100px; padding: 10px; border-radius: var(--radius); border: none; background: var(--bg-card); color: white; font-weight: bold; font-size: 12px; cursor: pointer; border: 1px solid var(--border); position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; white-space: nowrap;
+        }
+        .main-tab-btn.active { background: var(--primary); border-color: var(--primary); }
+        
+        /* Badge Notifikasi (Angka) */
+        .notif-badge {
+            background: var(--accent); color: #000; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; display: none;
+        }
+        .notif-badge.show { display: inline-block; }
+
+        /* ===== STYLE FORM & LIST ===== */
         .status-display { text-align: center; padding: 20px; margin-bottom: 20px; border-radius: var(--radius); border: 2px solid var(--border); }
         .status-display.buka { border-color: var(--success); background: rgba(16, 185, 129, 0.1); }
         .status-display.tutup { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
         .status-display.auto { border-color: var(--accent); background: rgba(255, 179, 0, 0.1); }
-        
         .status-icon { font-size: 50px; margin-bottom: 10px; }
         .status-text { font-size: 24px; font-weight: 800; }
         .status-display.buka .status-text { color: var(--success); }
@@ -35,94 +50,47 @@
         .status-info { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
 
         .option-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
-        
-        .option-btn { 
-            width: 100%; display: flex; align-items: center; gap: 15px; 
-            padding: 18px; margin-bottom: 10px; cursor: pointer; 
-            border-radius: var(--radius); border: 2px solid var(--border); 
-            background: var(--bg-main); color: var(--text-main); 
-            text-align: left; transition: all 0.2s;
-        }
-        .option-btn:hover { border-color: var(--text-muted); }
+        .option-btn { width: 100%; display: flex; align-items: center; gap: 15px; padding: 15px; margin-bottom: 10px; cursor: pointer; border-radius: var(--radius); border: 2px solid var(--border); background: var(--bg-main); color: var(--text-main); text-align: left; transition: all 0.2s; }
         .option-btn.active { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
+        .option-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
         .option-btn.active .option-icon { background: var(--primary); }
+        .option-text h4 { font-size: 14px; margin-bottom: 2px; }
+        .option-text p { font-size: 11px; color: var(--text-muted); }
         
-        .option-icon { 
-            width: 45px; height: 45px; border-radius: 50%; 
-            background: var(--border); display: flex; align-items: center; 
-            justify-content: center; font-size: 20px; flex-shrink: 0;
-        }
-        .option-text h4 { font-size: 15px; margin-bottom: 2px; }
-        .option-text p { font-size: 12px; color: var(--text-muted); }
-
-        /* Dropdown Alasan */
-        .select-alasan {
-            width: 100%; padding: 14px; background: var(--bg-main);
-            border: 1px solid var(--border); border-radius: var(--radius);
-            color: var(--text-main); font-size: 14px; outline: none;
-            margin-top: 5px; appearance: none; -webkit-appearance: none;
-        }
-        .select-alasan:focus { border-color: var(--primary); }
-        
-        .btn-save { 
-            width: 100%; background: var(--success); color: white; 
-            border: none; padding: 15px; border-radius: var(--radius); 
-            font-size: 15px; font-weight: 800; cursor: pointer; 
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
+        .select-alasan { width: 100%; padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-main); font-size: 13px; outline: none; margin-top: 5px; }
+        .btn-save { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: var(--radius); font-size: 14px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-save:disabled { background: #555; cursor: not-allowed; }
-        
+
         .access-denied { display: none; text-align: center; padding: 50px 20px; }
         .access-denied h2 { color: var(--primary); margin: 15px 0; }
 
         /* ==========================================
            CSS UNTUK DAFTAR PESANAN & FILTER
            ========================================== */
-        .main-tabs {
-            display: flex; gap: 10px; margin-bottom: 20px;
-        }
-        .main-tab-btn {
-            flex:1; padding: 12px; border-radius: var(--radius); border: none; background: var(--bg-card); color: white; font-weight: bold; cursor: pointer; border: 1px solid var(--border); position: relative; display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
-        .main-tab-btn.active { background: var(--primary); border-color: var(--primary); }
-        
-        /* Badge Notifikasi (Angka) */
-        .notif-badge {
-            background: var(--accent); color: #000; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; display: none;
-            animation: pulse 2s infinite;
-        }
-        .notif-badge.show { display: inline-block; }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(255, 179, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 179, 0, 0); }
-        }
-
-        /* Filter Sub-Tab di dalam Pesanan */
         .filter-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-        .filter-btn { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-main); color: var(--text-muted); font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .filter-btn { flex: 1; padding: 8px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-main); color: var(--text-muted); font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s; }
         .filter-btn.active { background: var(--bg-card-hover); color: var(--accent); border-color: var(--accent); }
 
-        .order-item {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-        .order-header {
-            display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; color: var(--text-muted);
-        }
-        .order-name { font-weight: 800; color: var(--accent); font-size: 14px; margin-bottom: 4px; }
-        .order-email { font-size: 11px; color: #3b82f6; margin-bottom: 6px; }
-        .order-detail { font-size: 12px; line-height: 1.5; margin-top: 5px; color: #ccc; white-space: pre-wrap; margin-bottom: 10px; }
-        
-        .status-select {
-            width: 100%; padding: 8px; background: var(--bg-card); border: 1px solid var(--accent); color: var(--accent); font-weight: bold; border-radius: 6px; outline: none;
-        }
-        /* Warna khusus untuk status Selesai */
+        .order-item { background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; color: var(--text-muted); }
+        .order-name { font-weight: 800; color: var(--accent); font-size: 13px; margin-bottom: 4px; }
+        .order-email { font-size: 10px; color: #3b82f6; margin-bottom: 6px; }
+        .order-detail { font-size: 11px; line-height: 1.5; margin-top: 5px; color: #ccc; white-space: pre-wrap; margin-bottom: 10px; }
+        .status-select { width: 100%; padding: 8px; background: var(--bg-card); border: 1px solid var(--accent); color: var(--accent); font-weight: bold; border-radius: 6px; outline: none; font-size: 12px; }
         .status-select.selesai { border-color: var(--success); color: var(--success); }
+
+        /* ==========================================
+           CSS UNTUK KELOLA MENU (BARU)
+           ========================================== */
+        .form-input { width: 100%; padding: 10px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; }
+        .form-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;}
+        
+        .menu-item-admin { display: flex; align-items: center; gap: 10px; background: var(--bg-main); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; }
+        .menu-item-admin img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+        .menu-item-admin-info { flex-grow: 1; }
+        .menu-item-admin-title { font-size: 12px; font-weight: 700; }
+        .menu-item-admin-price { font-size: 11px; color: var(--accent); }
+        .btn-delete-menu { background: rgba(229, 57, 53, 0.2); color: var(--primary); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
@@ -130,16 +98,17 @@
 <div class="app" id="app-content" style="display: none;">
     <div class="header">
         <h1>⚙️ Dashboard Owner</h1>
-        <p>Atur status & pantau pesanan Kebab IDI</p>
+        <p>Atur status, pesanan, & menu Kebab IDI</p>
     </div>
 
     <!-- TAB UTAMA -->
     <div class="main-tabs">
-        <button id="tab-status" onclick="switchTab('status')" class="main-tab-btn">Status Toko</button>
+        <button id="tab-status" onclick="switchTab('status')" class="main-tab-btn">Status</button>
         <button id="tab-pesanan" onclick="switchTab('pesanan')" class="main-tab-btn">
-            Pesanan Masuk
+            Pesanan
             <span id="badge-notif" class="notif-badge">0</span>
         </button>
+        <button id="tab-menu" onclick="switchTab('menu')" class="main-tab-btn">Kelola Menu</button>
     </div>
 
     <!-- BAGIAN STATUS TOKO -->
@@ -152,46 +121,33 @@
 
         <div class="card">
             <div class="option-title">1. Pilih Status Toko</div>
-            
             <button class="option-btn" id="opt-auto" onclick="pilihStatus('auto')">
                 <div class="option-icon"><i class="fa-solid fa-clock"></i></div>
-                <div class="option-text">
-                    <h4>Otomatis (Jadwal)</h4>
-                    <p>Ikuti jam operasional (10:00 - 23:00)</p>
-                </div>
+                <div class="option-text"><h4>Otomatis</h4><p>Ikuti jam operasional</p></div>
             </button>
-            
             <button class="option-btn" id="opt-buka" onclick="pilihStatus('buka')">
                 <div class="option-icon"><i class="fa-solid fa-circle-check"></i></div>
-                <div class="option-text">
-                    <h4>Paksa Buka</h4>
-                    <p>Buka terus, walau di luar jam jadwal</p>
-                </div>
+                <div class="option-text"><h4>Paksa Buka</h4><p>Buka di luar jam jadwal</p></div>
             </button>
-            
             <button class="option-btn" id="opt-tutup" onclick="pilihStatus('tutup')">
                 <div class="option-icon"><i class="fa-solid fa-circle-xmark"></i></div>
-                <div class="option-text">
-                    <h4>Paksa Tutup</h4>
-                    <p>Tutup toko (libur, habis, dll)</p>
-                </div>
+                <div class="option-text"><h4>Paksa Tutup</h4><p>Tutup toko sementara</p></div>
             </button>
         </div>
 
         <div class="card">
-            <div class="option-title">2. Pengumuman (Muncul di Web)</div>
+            <div class="option-title">2. Pengumuman</div>
             <select class="select-alasan" id="pilih-alasan">
                 <option value="">-- Tidak ada pengumuman --</option>
                 <option value="Libur Nasional (Tanggal Merah) 🇮🇩">Libur Nasional (Tanggal Merah) 🇮🇩</option>
                 <option value="Tutup sebentar, owner lagi 'meeting' sama Allah di masjid 🤝">Tutup sebentar, owner lagi 'meeting' sama Allah di masjid 🤝</option>
                 <option value="Owner lagi lowbat 🤒, tunggu sampai nyawa 100% 🔋😂">Owner lagi lowbat 🤒, tunggu sampai nyawa 100% 🔋😂</option>
                 <option value="Habis solat Magrib dulu ya 🕌">Habis solat Magrib dulu ya 🕌</option>
-                <option value="Stok daging habis, besok lagi ya 🥩">Stok daging habis, besok lagi ya 🥩</option>
             </select>
         </div>
 
         <button class="btn-save" id="btn-save" onclick="simpanPengaturan()" disabled>
-            <i class="fa-solid fa-floppy-disk"></i> <span id="btn-save-text">Simpan Pengaturan</span>
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan
         </button>
     </div>
 
@@ -202,14 +158,44 @@
                 Daftar Pesanan
                 <i class="fa-solid fa-rotate-right" onclick="loadPesanan()" style="cursor: pointer; color: var(--accent);"></i>
             </div>
-
-            <!-- SUB-TAB FILTER (PROSES VS SELESAI) -->
             <div class="filter-tabs">
                 <button id="btn-filter-aktif" class="filter-btn active" onclick="switchFilter('aktif')">Sedang Proses <span id="badge-aktif" style="color: var(--accent);"></span></button>
                 <button id="btn-filter-selesai" class="filter-btn" onclick="switchFilter('selesai')">Selesai / Batal</button>
             </div>
-
             <div id="list-pesanan">
+                <p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BAGIAN KELOLA MENU (BARU) -->
+    <div id="area-menu" style="display: none;">
+        <div class="card" style="margin-bottom: 15px;">
+            <div class="option-title">Tambah Menu Baru</div>
+            
+            <label class="form-label">Nama Menu</label>
+            <input type="text" id="menu-name" class="form-input" placeholder="Contoh: Kebab Daging Spesial">
+
+            <label class="form-label">Kategori</label>
+            <select id="menu-category" class="form-input">
+                <option value="makanan">Makanan</option>
+                <option value="minuman">Minuman</option>
+            </select>
+
+            <label class="form-label">Harga (Angka saja)</label>
+            <input type="number" id="menu-price" class="form-input" placeholder="Contoh: 15000">
+
+            <label class="form-label">Link Gambar (URL)</label>
+            <input type="text" id="menu-image" class="form-input" placeholder="https://...">
+
+            <button class="btn-save" style="background: #3b82f6; margin-top: 10px;" onclick="tambahMenu()">
+                <i class="fa-solid fa-plus"></i> Tambah Menu
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="option-title">Daftar Menu Saat Ini</div>
+            <div id="list-menu-admin">
                 <p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>
             </div>
         </div>
@@ -227,7 +213,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
@@ -248,16 +234,18 @@
     let statusSaatIni = "auto";
     let alasanSaatIni = "";
     let unsubPesanan = null;
+    let unsubMenu = null;
     
-    let allOrders = []; // Menyimpan semua pesanan
-    let currentFilter = 'aktif'; // Filter default
+    let allOrders = []; 
+    let currentFilter = 'aktif'; 
 
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === ALLOWED_EMAIL) {
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('access-denied').style.display = 'none';
             loadStatus();
-            loadPesanan(); // Otomatis load pesanan
+            loadPesanan();
+            loadMenuAdmin(); // Panggil fungsi muat menu
         } else {
             document.getElementById('app-content').style.display = 'none';
             document.getElementById('access-denied').style.display = 'block';
@@ -266,23 +254,23 @@
 
     // ===== LOGIKA PINDAH TAB UTAMA =====
     window.switchTab = (tab) => {
-        if (tab === 'status') {
+        document.getElementById('area-status').style.display = 'none';
+        document.getElementById('area-pesanan').style.display = 'none';
+        document.getElementById('area-menu').style.display = 'none';
+        
+        document.getElementById('tab-status').classList.remove('active');
+        document.getElementById('tab-pesanan').classList.remove('active');
+        document.getElementById('tab-menu').classList.remove('active');
+
+        if(tab === 'status') {
             document.getElementById('area-status').style.display = 'block';
-            document.getElementById('area-pesanan').style.display = 'none';
             document.getElementById('tab-status').classList.add('active');
-            document.getElementById('tab-pesanan').classList.remove('active');
-            document.getElementById('tab-pesanan').style.background = 'var(--bg-card)';
-            document.getElementById('tab-pesanan').style.border = '1px solid var(--border)';
-        } else {
-            document.getElementById('area-status').style.display = 'none';
+        } else if (tab === 'pesanan') {
             document.getElementById('area-pesanan').style.display = 'block';
-            document.getElementById('tab-status').classList.remove('active');
-            document.getElementById('tab-status').style.background = 'var(--bg-card)';
             document.getElementById('tab-pesanan').classList.add('active');
-            // Reset styling inline agar class active bekerja
-            document.getElementById('tab-pesanan').style.background = '';
-            document.getElementById('tab-pesanan').style.border = '';
-            document.getElementById('tab-status').style.border = '1px solid var(--border)';
+        } else if (tab === 'menu') {
+            document.getElementById('area-menu').style.display = 'block';
+            document.getElementById('tab-menu').classList.add('active');
         }
     }
 
@@ -315,17 +303,11 @@
         display.className = 'status-display ' + status;
 
         if (status === 'buka') {
-            icon.innerText = '🟢';
-            text.innerText = 'TOKO BUKA';
-            info.innerText = 'Pelanggan bisa memesan sekarang';
+            icon.innerText = '🟢'; text.innerText = 'TOKO BUKA'; info.innerText = 'Pelanggan bisa memesan';
         } else if (status === 'tutup') {
-            icon.innerText = '🔴';
-            text.innerText = 'TOKO TUTUP';
-            info.innerText = 'Pelanggan tidak bisa memesan';
+            icon.innerText = '🔴'; text.innerText = 'TOKO TUTUP'; info.innerText = 'Pelanggan tidak bisa memesan';
         } else {
-            icon.innerText = '⏰';
-            text.innerText = 'OTOMATIS';
-            info.innerText = 'Mengikuti jadwal (10:00 - 23:00)';
+            icon.innerText = '⏰'; text.innerText = 'OTOMATIS'; info.innerText = 'Mengikuti jadwal (10:00 - 23:00)';
         }
     }
 
@@ -349,22 +331,16 @@
 
     function updateTombolSimpan() {
         const btn = document.getElementById('btn-save');
-        const btnText = document.getElementById('btn-save-text');
-        
         if (statusTerpilih === statusSaatIni && alasanTerpilih === alasanSaatIni) {
             btn.disabled = true;
         } else {
             btn.disabled = false;
-            btnText.innerText = 'Simpan Pengaturan';
         }
     }
 
     window.simpanPengaturan = async () => {
         const btn = document.getElementById('btn-save');
-        const btnText = document.getElementById('btn-save-text');
-        
         btn.disabled = true;
-        btnText.innerText = 'Menyimpan...';
 
         try {
             await setDoc(doc(db, "pengaturan", "toko"), {
@@ -373,50 +349,39 @@
                 updatedAt: new Date().toISOString(),
                 updatedBy: auth.currentUser.email
             });
-
             statusSaatIni = statusTerpilih;
             alasanSaatIni = alasanTerpilih;
-            alert("✅ Pengaturan & Pengumuman berhasil disimpan!");
-            btnText.innerText = 'Tersimpan';
+            alert("✅ Pengaturan berhasil disimpan!");
         } catch (error) {
             alert("❌ Gagal menyimpan: " + error.message);
-            btnText.innerText = 'Simpan Pengaturan';
             btn.disabled = false;
         }
     };
 
-    // ===== LOGIKA FILTER PESANAN =====
+    // ===== LOGIKA PESANAN MASUK =====
     window.switchFilter = (filter) => {
         currentFilter = filter;
         document.getElementById('btn-filter-aktif').classList.toggle('active', filter === 'aktif');
         document.getElementById('btn-filter-selesai').classList.toggle('active', filter === 'selesai');
-        renderOrders(); // Render ulang tampilan
+        renderOrders(); 
     }
 
-    // ===== LOGIKA PESANAN MASUK =====
     window.loadPesanan = () => {
         const list = document.getElementById('list-pesanan');
         list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>';
-        
-        // Hentikan listener lama jika ada
         if (unsubPesanan) unsubPesanan();
 
-        // Ambil data dari collection transaksi_online
         const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc"));
         
         unsubPesanan = onSnapshot(q, (snapshot) => {
-            allOrders = []; // Reset data
-            
+            allOrders = []; 
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                data.id = doc.id; // Simpan ID dokumen
+                data.id = doc.id; 
                 allOrders.push(data);
             });
 
-            // Hitung pesanan aktif (belum selesai / batal)
             const activeCount = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan').length;
-            
-            // Update Badge Angka
             const badgeMain = document.getElementById('badge-notif');
             const badgeTab = document.getElementById('badge-aktif');
             
@@ -429,49 +394,37 @@
                 badgeTab.innerText = '';
             }
 
-            renderOrders(); // Render ke layar sesuai filter
+            renderOrders(); 
         }, (error) => {
             list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat pesanan: ${error.message}</p>`;
         });
     }
 
-    // ===== RENDER PESANAN BERDASARKAN FILTER =====
     function renderOrders() {
         const list = document.getElementById('list-pesanan');
         let filtered = [];
 
         if (currentFilter === 'aktif') {
-            // Tampilkan yang belum selesai
             filtered = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan');
         } else {
-            // Tampilkan yang sudah selesai/batal
             filtered = allOrders.filter(o => o.status === 'Selesai' || o.status === 'Dibatalkan');
         }
 
         if (filtered.length === 0) {
-            list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Tidak ada pesanan ${currentFilter === 'aktif' ? 'yang sedang diproses' : 'yang selesai'}.</p>`;
+            list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Tidak ada pesanan ${currentFilter === 'aktif' ? 'proses' : 'selesai'}.</p>`;
             return;
         }
 
         let html = '';
         filtered.forEach((data) => {
             const docId = data.id;
-            
-            // Format tanggal dengan aman
-            let tgl = "Waktu tidak valid";
-            if(data.waktu) {
-                tgl = new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-            }
-
-            // Cek Fallback jika data lama (dari webhook midtrans)
-            const namaPembeli = data.nama ? data.nama : 'Pelanggan Midtrans';
-            const emailPembeli = data.email ? data.email : '-';
-            const detailPesanan = data.detail_pesanan ? data.detail_pesanan : 'Detail tidak tersedia (data lama)';
-            const total = data.total_bayar ? data.total_bayar : 0;
-            const metode = data.metode ? data.metode : '-';
-            const statusSaatIni = data.status ? data.status : 'Menunggu Konfirmasi Toko';
-
-            // Beri warna hijau jika status Selesai di dropdown
+            let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : "Waktu error";
+            const namaPembeli = data.nama || 'Pelanggan';
+            const emailPembeli = data.email || '-';
+            const detailPesanan = data.detail_pesanan || 'Detail tidak tersedia';
+            const total = data.total_bayar || 0;
+            const metode = data.metode || '-';
+            const statusSaatIni = data.status || 'Menunggu Konfirmasi Toko';
             const classSelesai = (statusSaatIni === 'Selesai') ? 'selesai' : '';
             
             html += `
@@ -483,12 +436,10 @@
                     <div class="order-name">${namaPembeli} - Rp ${total.toLocaleString('id-ID')}</div>
                     <div class="order-email"><i class="fa-solid fa-envelope"></i> ${emailPembeli}</div>
                     <div class="order-detail">${detailPesanan}</div>
-                    
-                    <!-- DROPDOWN UNTUK MENGUBAH STATUS -->
                     <select class="status-select ${classSelesai}" onchange="updateStatusPesanan('${docId}', this.value)">
                         <option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option>
                         <option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option>
-                        <option value="Siap Diambil" ${statusSaatIni === 'Siap Diambil' ? 'selected' : ''}>Siap Diambil (Untuk Pickup)</option>
+                        <option value="Siap Diambil" ${statusSaatIni === 'Siap Diambil' ? 'selected' : ''}>Siap Diambil (Pickup)</option>
                         <option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option>
                         <option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option>
                         <option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option>
@@ -499,16 +450,97 @@
         list.innerHTML = html;
     }
 
-    // FUNGSI UNTUK MENGUBAH STATUS DARI ADMIN
     window.updateStatusPesanan = async (docId, newStatus) => {
         try {
-            const orderRef = doc(db, "transaksi_online", docId);
-            await updateDoc(orderRef, {
-                status: newStatus
-            });
-            // onSnapshot akan otomatis me-render ulang jika status berubah ke Selesai
+            await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus });
         } catch (error) {
             alert("Gagal mengubah status: " + error.message);
+        }
+    }
+
+    // ===== LOGIKA KELOLA MENU (BARU) =====
+    window.loadMenuAdmin = () => {
+        const list = document.getElementById('list-menu-admin');
+        if (unsubMenu) unsubMenu();
+
+        // Urutkan berdasarkan ID agar rapi
+        const q = query(collection(db, "menu_kebab"), orderBy("id", "asc"));
+        
+        unsubMenu = onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada menu.</p>';
+                return;
+            }
+
+            let html = '';
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const docId = doc.id;
+                
+                html += `
+                    <div class="menu-item-admin">
+                        <img src="${data.image}" alt="${data.name}">
+                        <div class="menu-item-admin-info">
+                            <div class="menu-item-admin-title">${data.name} ${data.badge ? `<span style="font-size:8px; background:var(--primary); padding:2px 4px; border-radius:4px;">${data.badge}</span>` : ''}</div>
+                            <div class="menu-item-admin-price">Rp ${data.price.toLocaleString('id-ID')} (${data.category})</div>
+                        </div>
+                        <button class="btn-delete-menu" onclick="hapusMenu('${docId}', '${data.name}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }, (error) => {
+            list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat menu: ${error.message}</p>`;
+        });
+    }
+
+    window.tambahMenu = async () => {
+        const name = document.getElementById('menu-name').value.trim();
+        const category = document.getElementById('menu-category').value;
+        const price = parseInt(document.getElementById('menu-price').value);
+        const image = document.getElementById('menu-image').value.trim();
+
+        if (!name || !price || !image) {
+            alert("Mohon isi Nama, Harga, dan Link Gambar!");
+            return;
+        }
+
+        try {
+            // Gunakan timestamp sebagai ID unik sementara
+            const newId = Date.now();
+            
+            await setDoc(doc(db, "menu_kebab", newId.toString()), {
+                id: newId,
+                name: name,
+                category: category,
+                type: category === 'makanan' ? 'Kebab' : 'Minuman',
+                price: price,
+                image: image,
+                badge: ""
+            });
+
+            alert("✅ Menu berhasil ditambahkan!");
+            
+            // Kosongkan form
+            document.getElementById('menu-name').value = '';
+            document.getElementById('menu-price').value = '';
+            document.getElementById('menu-image').value = '';
+            
+        } catch (error) {
+            alert("❌ Gagal menambah menu: " + error.message);
+        }
+    }
+
+    window.hapusMenu = async (docId, namaMenu) => {
+        if (confirm(`Yakin ingin menghapus menu "${namaMenu}"?`)) {
+            try {
+                await deleteDoc(doc(db, "menu_kebab", docId));
+                alert("✅ Menu berhasil dihapus.");
+            } catch (error) {
+                alert("❌ Gagal menghapus: " + error.message);
+            }
         }
     }
 </script>
