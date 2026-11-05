@@ -24,9 +24,6 @@
     <!-- ===== FILE PROFIL TERPISAH ===== -->
     <link rel="stylesheet" href="profile.css?v=2">
 
-    <!-- ===== MIDTRANS SNAP (SANDBOX) - TETAP ADA TAPI TIDAK DIPAKAI DI PESANAN ===== -->
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-ccHdGHCTpj08BGVP"></script>
-
     <style>
         :root {
             --bg-main: #000000;
@@ -781,7 +778,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
@@ -1119,9 +1116,10 @@
             let distanceKm = 0;
 
             // ==========================================
-            // FUNGSI RIWAYAT PESANAN
+            // FUNGSI RIWAYAT PESANAN (DIUPDATE)
             // ==========================================
-            function simpanRiwayatPesanan(orderId, total, waText, statusText) {
+            async function simpanRiwayatPesanan(orderId, total, waText, statusText) {
+                // 1. Simpan ke HP pelanggan (Lokal)
                 let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
                 history.unshift({
                     orderId: orderId,
@@ -1131,36 +1129,91 @@
                     waText: waText
                 });
                 localStorage.setItem('kebabOrderHistory', JSON.stringify(history));
+
+                // 2. Kirim ke Firebase agar Owner bisa lihat
+                try {
+                    const namaPembeli = document.getElementById('buyer-name').value.trim() || "Pelanggan";
+                    const emailPembeli = isTamu ? "Tamu (Tanpa Email)" : auth.currentUser.email;
+                    
+                    await addDoc(collection(db, "transaksi_online"), {
+                        order_id: orderId,
+                        nama: namaPembeli,
+                        email: emailPembeli, // <-- EMAIL DITAMBAHKAN
+                        total_bayar: total,
+                        metode: statusText,
+                        status: "Menunggu Konfirmasi Toko", // <-- STATUS AWAL
+                        waktu: new Date().toISOString(),
+                        detail_pesanan: waText
+                    });
+                } catch (error) {
+                    console.error("Gagal kirim pesanan ke Firebase: ", error);
+                }
             }
 
-            window.openHistoryModal = () => {
+            window.openHistoryModal = async () => {
                 tutupProfil();
                 const container = document.getElementById('history-list-content');
-                let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
-                
-                if (history.length === 0) {
-                    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Belum ada riwayat pesanan.</div>`;
-                } else {
-                    container.innerHTML = history.map(item => `
-                        <div class="history-item">
-                            <div class="history-header">
-                                <span>${item.tanggal}</span>
-                                <span class="history-status">${item.status}</span>
-                            </div>
-                            <div class="history-detail">
-                                <b>ID: ${item.orderId}</b><br>
-                                Total: Rp ${item.total.toLocaleString('id-ID')}
-                            </div>
-                        </div>
-                    `).join('');
-                }
+                container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Memuat riwayat...</div>`;
                 document.getElementById('history-modal').classList.add('show');
+
+                if (isTamu) {
+                    // Tamu: Tampilkan dari LocalStorage saja (karena tidak punya email untuk dilacak)
+                    let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
+                    if (history.length === 0) {
+                        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Belum ada riwayat pesanan.</div>`;
+                    } else {
+                        container.innerHTML = history.map(item => `
+                            <div class="history-item">
+                                <div class="history-header">
+                                    <span>${item.tanggal}</span>
+                                    <span class="history-status">${item.status}</span>
+                                </div>
+                                <div class="history-detail">
+                                    <b>ID: ${item.orderId}</b><br>
+                                    Total: Rp ${item.total.toLocaleString('id-ID')}
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    // Login: Ambil dari Firebase agar bisa melihat update status dari Admin
+                    try {
+                        const q = query(collection(db, "transaksi_online"), where("email", "==", auth.currentUser.email));
+                        const querySnapshot = await getDocs(q);
+                        
+                        if (querySnapshot.empty) {
+                            container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Belum ada riwayat pesanan.</div>`;
+                        } else {
+                            let html = '';
+                            querySnapshot.forEach((doc) => {
+                                const data = doc.data();
+                                const tgl = new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                                const statusWarna = data.status === 'Selesai' ? '#4caf50' : (data.status === 'Dibatalkan' ? 'var(--primary)' : 'var(--accent)');
+                                
+                                html += `
+                                    <div class="history-item">
+                                        <div class="history-header">
+                                            <span>${tgl}</span>
+                                            <span class="history-status" style="color: ${statusWarna}">${data.status}</span>
+                                        </div>
+                                        <div class="history-detail">
+                                            <b>ID: ${data.order_id}</b><br>
+                                            Total: Rp ${data.total_bayar.toLocaleString('id-ID')}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            container.innerHTML = html;
+                        }
+                    } catch (error) {
+                        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--primary); font-size:12px;">Gagal memuat: ${error.message}</div>`;
+                    }
+                }
             }
 
             window.closeHistoryModal = () => {
                 document.getElementById('history-modal').classList.remove('show');
             }
-
 
             window.chatLangsung = () => {
                 const pesan = "Halo Kebab Turki Hajar, saya mau tanya-tanya dulu sebelum pesan 😊";
@@ -1737,10 +1790,13 @@
 
             if (buyerNameSaved && !buyerNameInput.value) buyerNameInput.value = buyerNameSaved;
             
-            // Paksa masuk ke mode Ambil Sendiri jika Tamu (Opsional, kalau mau default)
-            // switchMethod(deliveryMethod); // Biarkan default 'delivery' tapi tamu bebas ganti
+            // Paksa masuk ke mode Ambil Sendiri jika Tamu
+            if (isTamu) {
+                switchMethod('pickup');
+            } else {
+                switchMethod(deliveryMethod);
+            }
 
-            switchMethod(deliveryMethod);
             updateStatusUI();
             renderMenu();
             calculateTotal();
