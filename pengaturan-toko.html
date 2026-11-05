@@ -384,13 +384,14 @@
                         <div class="order-detail">${detailPesanan}</div>
                         
                         <!-- DROPDOWN UNTUK MENGUBAH STATUS -->
-                        <select class="status-select" onchange="updateStatusPesanan('${docId}', this.value)">
-                            <option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option>
-                            <option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option>
-                            <option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option>
-                            <option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option>
-                            <option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option>
-                        </select>
+<select class="status-select" onchange="updateStatusPesanan('${docId}', this.value)">
+    <option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option>
+    <option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option>
+    <option value="Siap Diambil" ${statusSaatIni === 'Siap Diambil' ? 'selected' : ''}>Siap Diambil (Untuk Pickup)</option>
+    <option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option>
+    <option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option>
+    <option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option>
+</select>
                     </div>
                 `;
             });
