@@ -69,7 +69,7 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* ==========================================
-           CSS UNTUK TOAST NOTIFICATION (PENGGANTI ALERT)
+           CSS UNTUK TOAST NOTIFICATION & CUSTOM CONFIRM
            ========================================== */
         #toast-container {
             position: fixed;
@@ -541,6 +541,19 @@
     <!-- CONTAINER UNTUK TOAST NOTIFIKASI -->
     <div id="toast-container"></div>
 
+    <!-- MODAL KONFIRMASI CUSTOM (PENGGANTI CONFIRM BAWAAN) -->
+    <div class="modal-overlay" id="custom-confirm-modal">
+        <div class="modal-box" style="max-height: fit-content; text-align: center; padding: 24px;">
+            <div class="modal-handle"></div>
+            <h3 class="modal-title" id="confirm-title" style="margin-bottom: 10px;">Konfirmasi</h3>
+            <p id="confirm-message" style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;">Apakah Anda yakin?</p>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="closeCustomConfirm()" style="flex: 1; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-main); font-weight: 700; cursor: pointer;">Batal</button>
+                <button onclick="executeCustomConfirm()" style="flex: 1; padding: 12px; border-radius: var(--radius-sm); border: none; background: var(--primary); color: white; font-weight: 700; cursor: pointer;">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
     <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
     </div>
@@ -743,7 +756,7 @@
                 <i class="fa-solid fa-arrow-right"></i> Lanjut ke Pengiriman
             </button>
             
-            <button class="btn-reset" onclick="resetCart()">
+            <button class="btn-reset" onclick="prosesResetCart()">
                 <i class="fa-solid fa-trash"></i> Kosongkan Keranjang
             </button>
             
@@ -906,6 +919,30 @@
             }, 3500);
         };
 
+        // ==========================================
+        // FUNGSI CUSTOM CONFIRM (PENGGANTI CONFIRM BAWAAN)
+        // ==========================================
+        let confirmCallback = null;
+
+        window.showCustomConfirm = (message, callback) => {
+            document.getElementById('confirm-message').innerText = message;
+            document.getElementById('custom-confirm-modal').classList.add('show');
+            confirmCallback = callback;
+        };
+
+        window.closeCustomConfirm = () => {
+            document.getElementById('custom-confirm-modal').classList.remove('show');
+            confirmCallback = null;
+        };
+
+        window.executeCustomConfirm = () => {
+            document.getElementById('custom-confirm-modal').classList.remove('show');
+            if (typeof confirmCallback === 'function') {
+                confirmCallback();
+            }
+            confirmCallback = null;
+        };
+
         window.loginGoogle = async () => {
             showLoading();
             try {
@@ -924,7 +961,7 @@
         };
 
         window.prosesLogout = () => {
-            if (confirm("Yakin ingin keluar?")) {
+            showCustomConfirm("Yakin ingin keluar dari akun Anda?", () => {
                 localStorage.removeItem('kebabGuest');
                 signOut(auth);
                 if(typeof tutupProfil === 'function') tutupProfil();
@@ -932,7 +969,7 @@
                 isTamu = true;
                 authScreen.style.display = 'flex';
                 appScreen.classList.remove('show');
-            }
+            });
         };
 
         function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
@@ -1339,7 +1376,6 @@
                 document.getElementById('reorder-banner').classList.remove('show');
                 renderMenu();
                 calculateTotal();
-                // Ganti alert dengan Toast
                 showToast("Pesanan kemarin berhasil dimasukkan ke keranjang!", "success");
             }
 
@@ -1615,14 +1651,16 @@
                 }
             }
 
-            window.resetCart = () => {
-                if (confirm("Yakin ingin mengosongkan keranjang?")) {
+            // Ganti fungsi resetCart agar menggunakan Custom Confirm
+            window.prosesResetCart = () => {
+                showCustomConfirm("Yakin ingin mengosongkan keranjang belanja Anda?", () => {
                     cart = {};
                     localStorage.setItem('kebabCart', JSON.stringify(cart));
                     renderMenu();
                     calculateTotal();
                     closeCartModal();
-                }
+                    showToast("Keranjang telah dikosongkan.", "success");
+                });
             }
 
             window.openConfirmModalFromCart = () => {
