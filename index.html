@@ -1703,8 +1703,15 @@
                     const saldoBaru = saldoSaatIni - saldoTerpotong;
                     await updateDoc(docRef, { saldo: saldoBaru });
                     
-                    // Buat Teks WA
+                    // ==========================================
+                    // SIMPAN DATA PESANAN TERAKHIR (FITUR PESAN LAGI)
+                    // ==========================================
                     const notes = document.getElementById('order-notes').value.trim();
+                    const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) };
+                    localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
+                    // ==========================================
+
+                    // Buat Teks WA
                     let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
                     txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n💳 Pembayaran: *${statusPembayaran}*\n--------------------------------\n`;
                     
