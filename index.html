@@ -87,7 +87,7 @@
         }
 
         /* Memastikan kotak konfirmasi selalu di paling atas */
-        #custom-confirm-modal {
+        #custom-confirm-modal, #wa-fallback-modal {
             z-index: 10005 !important;
         }
 
@@ -295,7 +295,7 @@
             background: linear-gradient(135deg, rgba(255, 179, 0, 0.15) 0%, rgba(229, 57, 53, 0.15) 100%);
             border: 1px dashed var(--accent); 
             border-radius: var(--radius-sm); 
-            padding: 6px 10px; /* Padding atas bawah dibuat tipis */
+            padding: 6px 10px; 
             margin-bottom: 12px; 
             align-items: center; 
             justify-content: space-between; 
@@ -304,12 +304,12 @@
         .reorder-banner.show { display: flex; }
         
         .reorder-text { 
-            font-size: 9px; /* Huruf lebih kecil */
+            font-size: 9px; 
             color: var(--text-main); 
             line-height: 1.2;
-            white-space: nowrap; /* Mencegah teks turun ke bawah */
+            white-space: nowrap; 
             overflow: hidden;
-            text-overflow: ellipsis; /* Beri titik-titik jika nama terlalu panjang */
+            text-overflow: ellipsis; 
             flex-grow: 1;
         }
         .reorder-text b { color: var(--accent); }
@@ -318,9 +318,9 @@
             background: var(--accent); 
             color: #000; 
             border: none; 
-            padding: 5px 8px; /* Tombol lebih kecil */
+            padding: 5px 8px; 
             border-radius: 4px; 
-            font-size: 8px; /* Huruf tombol kecil */
+            font-size: 8px; 
             font-weight: 800; 
             cursor: pointer; 
             white-space: nowrap; 
@@ -582,6 +582,28 @@
                 <button onclick="closeCustomConfirm()" style="flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-main); font-weight: 700; font-size: 11px; cursor: pointer;">Batal</button>
                 <button onclick="executeCustomConfirm()" style="flex: 1; padding: 10px; border-radius: var(--radius-sm); border: none; background: var(--primary); color: white; font-weight: 700; font-size: 11px; cursor: pointer;">Ya, Lanjutkan</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL FALLBACK WA (JIKA WA ERROR / GAGAL TERHUBUNG) -->
+    <div class="modal-overlay" id="wa-fallback-modal">
+        <div class="modal-box" style="max-height: fit-content; text-align: center; padding: 24px;">
+            <div class="modal-handle"></div>
+            <i class="fa-brands fa-whatsapp" style="font-size: 40px; color: var(--wa-color); margin-bottom: 10px;"></i>
+            <h3 class="modal-title">Pesanan Dibuat!</h3>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Jika WhatsApp gagal terbuka/error, silakan <b>Salin Pesanan</b> di bawah ini dan kirim manual ke Admin.</p>
+            
+            <textarea id="wa-text-area" class="form-input" style="height: 120px; font-family: monospace; font-size: 10px; margin-bottom: 15px;" readonly></textarea>
+            
+            <button onclick="copyWaText()" class="btn-saldo" style="background: #3b82f6; color: white; margin-bottom: 10px;">
+                <i class="fa-solid fa-copy"></i> Salin Pesanan (Copy)
+            </button>
+            
+            <a id="btn-buka-wa" href="#" target="_blank" class="btn-wa" style="text-decoration: none; margin-bottom: 10px;">
+                <i class="fa-brands fa-whatsapp"></i> Buka Aplikasi WhatsApp
+            </a>
+
+            <button onclick="closeWaFallback()" style="width:100%; background:transparent; border:none; color:var(--text-muted); padding:10px; font-size:10px; font-weight:700; cursor:pointer;">Tutup</button>
         </div>
     </div>
 
@@ -931,7 +953,6 @@
             if (type === 'success') icon = 'fa-circle-check';
             if (type === 'error') icon = 'fa-circle-exclamation';
 
-            // Ganti teks \n menjadi <br> agar rapi di HTML
             const formattedMessage = message.replace(/\n/g, '<br>');
 
             toast.innerHTML = `
@@ -940,11 +961,7 @@
             `;
             
             container.appendChild(toast);
-
-            // Animasi masuk
             setTimeout(() => toast.classList.add('show'), 10);
-
-            // Hapus otomatis setelah 3.5 detik
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300);
@@ -952,7 +969,7 @@
         };
 
         // ==========================================
-        // FUNGSI CUSTOM CONFIRM (PENGGANTI CONFIRM BAWAAN)
+        // FUNGSI CUSTOM CONFIRM & FALLBACK WA
         // ==========================================
         let confirmCallback = null;
 
@@ -974,6 +991,29 @@
             }
             confirmCallback = null;
         };
+
+        window.showWaFallback = (waText, waUrl) => {
+            document.getElementById('wa-text-area').value = waText;
+            document.getElementById('btn-buka-wa').href = waUrl;
+            document.getElementById('wa-fallback-modal').classList.add('show');
+        };
+
+        window.closeWaFallback = () => {
+            document.getElementById('wa-fallback-modal').classList.remove('show');
+        };
+
+        window.copyWaText = () => {
+            const textArea = document.getElementById('wa-text-area');
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); 
+            navigator.clipboard.writeText(textArea.value).then(() => {
+                showToast("Teks pesanan berhasil disalin! Silakan paste di WhatsApp.", "success");
+            }).catch(err => {
+                showToast("Gagal menyalin teks", "error");
+            });
+        };
+
+        // ==========================================
 
         window.loginGoogle = async () => {
             showLoading();
@@ -1393,7 +1433,6 @@
                     const hasItems = Object.values(cart).some(v => v > 0);
                     if (!hasItems) {
                         document.getElementById('reorder-banner').classList.add('show');
-                        // Mengambil nama dari data terakhir, jika tidak ada default ke 'Kak'
                         const namaTerakhir = lastOrderData.nama || 'Kak';
                         document.getElementById('reorder-name').innerText = namaTerakhir;
                     }
@@ -1685,9 +1724,8 @@
                 }
             }
 
-            // PERBAIKAN: Tutup keranjang dulu, lalu tampilkan konfirmasi
             window.prosesResetCart = () => {
-                closeCartModal(); // Tutup keranjang terlebih dahulu
+                closeCartModal();
                 setTimeout(() => {
                     showCustomConfirm("Yakin ingin mengosongkan keranjang belanja Anda?", () => {
                         cart = {};
@@ -1696,7 +1734,7 @@
                         calculateTotal();
                         showToast("Keranjang telah dikosongkan.", "success");
                     });
-                }, 300); // Beri jeda 0.3 detik agar animasi tutup selesai
+                }, 300);
             }
 
             window.openConfirmModalFromCart = () => {
@@ -1802,7 +1840,6 @@
                 html += `<div class="summary-row total"><span>TOTAL</span><span>Rp ${totals.total.toLocaleString('id-ID')}</span></div>`;
                 document.getElementById('confirm-summary').innerHTML = html;
                 
-                // Cek tombol saldo setiap kali modal konfirmasi dibuka
                 cekTombolSaldo();
                 
                 document.getElementById('confirm-modal').classList.add('show');
@@ -1813,7 +1850,7 @@
             }
 
             // ==========================================
-            // FUNGSI BAYAR PAKAI SALDO
+            // FUNGSI BAYAR PAKAI SALDO (DENGAN FALLBACK WA)
             // ==========================================
             window.bayarPakaiSaldo = async () => {
                 if (isTamu) { showToast("Silakan Login Google terlebih dahulu untuk menggunakan Saldo.", "info"); return; }
@@ -1845,13 +1882,11 @@
                     let statusRiwayat = "";
                     
                     if (saldoSaatIni >= totals.total) {
-                        // Saldo Cukup
                         saldoTerpotong = totals.total;
                         sisaTagihan = 0;
                         statusPembayaran = "✅ LUNAS VIA SALDO";
                         statusRiwayat = "Diproses (Lunas via Saldo)";
                     } else {
-                        // Saldo Kurang (Pilihan B)
                         saldoTerpotong = saldoSaatIni;
                         sisaTagihan = totals.total - saldoSaatIni;
                         statusPembayaran = `⚠️ SALDO TERPOTONG Rp ${saldoTerpotong.toLocaleString('id-ID')}.\nSISA TAGIHAN: Rp ${sisaTagihan.toLocaleString('id-ID')} (Bayar manual saat diterima)`;
@@ -1860,19 +1895,13 @@
                         showToast(`Saldo Anda hanya Rp ${saldoSaatIni.toLocaleString('id-ID')}. Sisa tagihan Rp ${sisaTagihan.toLocaleString('id-ID')} mohon disiapkan.`, "info");
                     }
                     
-                    // Potong Saldo di Firebase
                     const saldoBaru = saldoSaatIni - saldoTerpotong;
                     await updateDoc(docRef, { saldo: saldoBaru });
                     
-                    // ==========================================
-                    // SIMPAN DATA PESANAN TERAKHIR (FITUR PESAN LAGI)
-                    // ==========================================
                     const notes = document.getElementById('order-notes').value.trim();
                     const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) };
                     localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
-                    // ==========================================
 
-                    // Buat Teks WA
                     let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
                     txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n💳 Pembayaran: *${statusPembayaran}*\n--------------------------------\n`;
                     
@@ -1896,10 +1925,8 @@
                     if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                     txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                     
-                    // Simpan Riwayat (Tunggu sampai Firebase selesai menyimpan)
                     await simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat);
                     
-                    // Bersihkan Keranjang
                     cart = {}; 
                     localStorage.removeItem('kebabCart'); 
                     renderMenu(); 
@@ -1908,11 +1935,11 @@
                     closeCartModal();
                     
                     hideLoading();
-                    showToast("Pesanan Diproses! Anda akan diarahkan ke WhatsApp untuk konfirmasi.", "success");
                     
-                    setTimeout(() => {
-                        window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
-                    }, 1500); // Beri jeda 1.5 detik agar toast terbaca
+                    const waUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
+                    
+                    // TAMPILKAN FALLBACK MODAL
+                    showWaFallback(txt, waUrl);
                     
                 } catch (error) {
                     hideLoading();
@@ -1921,7 +1948,7 @@
             }
 
             // ==========================================
-            // FUNGSI KIRIM VIA WA (MANUAL / TRANSFER)
+            // FUNGSI KIRIM VIA WA (DENGAN FALLBACK WA)
             // ==========================================
             window.confirmAndSend = async () => {
                 closeConfirmModal();
@@ -1954,16 +1981,17 @@
                 if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                 
-                // Simpan ke Riwayat Pesanan (Tunggu sampai Firebase selesai menyimpan)
                 await simpanRiwayatPesanan('KEBAB-MANUAL-' + Date.now(), totals.total, txt, "Menunggu Pembayaran/Konfirmasi");
 
-                window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
-                
                 cart = {}; 
                 localStorage.removeItem('kebabCart'); 
                 renderMenu(); 
                 calculateTotal(); 
-                showToast("Pesanan berhasil dikirim ke WhatsApp! Keranjang telah dikosongkan.", "success");
+                
+                const waUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
+                
+                // TAMPILKAN FALLBACK MODAL
+                showWaFallback(txt, waUrl);
             }
 
             window.shareWeb = (platform) => {
