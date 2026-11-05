@@ -23,7 +23,7 @@
         .btn-back { background: var(--primary); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; margin-top: 15px; }
 
         /* KONTAINER UTAMA */
-        .pos-container { display: none; width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: var(--bg-main); flex-direction: column; position: relative; transition: max-width 0.3s ease; }
+        .pos-container { display: none; width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: var(--bg-main); flex-direction: column; position: relative; }
         
         /* HEADER */
         .pos-header { 
@@ -41,7 +41,6 @@
             background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--border);
             width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: 0.2s;
         }
-        .btn-icon:hover { background: var(--border); }
         .btn-icon-admin { display: none; }
         
         .btn-logout { background: rgba(229, 57, 53, 0.1); color: var(--primary); border: 1px solid var(--primary); padding: 0 12px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 10px; transition: 0.2s; }
@@ -103,7 +102,7 @@
         .cat-btn { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; cursor: pointer; transition: 0.3s; }
         .cat-btn.active { background: rgba(229, 57, 53, 0.1); border-color: var(--primary); color: var(--primary); }
         
-        /* Grid Menu Super Rapi */
+        /* Grid Menu SEJAJAR SEMPURNA */
         .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         
         .pos-card { 
@@ -113,21 +112,16 @@
             border: 1px solid var(--border); 
             display: flex; 
             flex-direction: column; 
-            height: 100%; /* Memaksa tinggi kartu sama */
+            height: 100%; 
         }
         
-        .pos-img { 
-            width: 100%; 
-            aspect-ratio: 1/1; 
-            border-radius: 6px; 
-            object-fit: cover; 
-            margin-bottom: 6px; 
-        }
+        .pos-img { width: 100%; aspect-ratio: 1/1; border-radius: 6px; object-fit: cover; margin-bottom: 4px; }
         
         .pos-info { 
-            flex-grow: 1; /* Mengisi sisa ruang agar tombol di bawah */
+            flex-grow: 1; 
             display: flex;
             flex-direction: column;
+            justify-content: space-between; /* Mendorong tombol ke bawah */
         }
         
         .pos-title { 
@@ -139,15 +133,33 @@
             -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical; 
             overflow: hidden; 
-            min-height: 22px; /* Tinggi minimal untuk 2 baris */
+            min-height: 22px; /* Kunci tinggi judul */
         }
         
         .pos-price { font-size: 9px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
         
-        .pos-bottom { margin-top: auto; } /* Kunci tombol selalu di bawah */
+        .pos-bottom { margin-top: auto; }
         
-        .pos-add { background: var(--primary); color: white; border: none; width: 100%; padding: 6px; border-radius: 4px; font-size: 9px; font-weight: 700; cursor: pointer; }
-        
+        .pos-add { 
+            background: var(--primary); color: white; border: none; width: 100%; 
+            height: 28px; /* Tinggi pasti */
+            border-radius: 4px; font-size: 9px; font-weight: 700; cursor: pointer; 
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Qty Control di dalam Menu */
+        .qty-control {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-main); border: 1px solid var(--border);
+            height: 28px; /* Samakan dengan tombol Tambah */
+            border-radius: 4px; padding: 0 2px;
+        }
+        .qty-control button {
+            background: transparent; border: none; color: white; font-size: 12px; font-weight: 800; cursor: pointer; width: 24px; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .qty-control span { font-size: 10px; font-weight: 800; }
+
         /* Cart Bottom Sheet */
         .cart-section { 
             background: var(--bg-card); border-top: 1px solid var(--border); 
@@ -168,76 +180,49 @@
         .btn-checkout { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4); }
 
         /* ==========================================
-           MODAL PEMBAYARAN & KEYPAD
+           MODAL PEMBAYARAN (COMPACT)
            ========================================== */
         .modal-overlay { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); 
-            display: none; align-items: flex-start; justify-content: center; z-index: 1000; 
-            padding: 20px; overflow-y: auto; 
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 10px; 
         }
         
         .modal-box { 
-            background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 400px; 
-            padding: 20px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            margin-top: 10vh; margin-bottom: 20px;
+            background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 380px; 
+            padding: 15px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            max-height: 98vh; display: flex; flex-direction: column;
         }
         
-        .modal-title { font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 15px; }
-        .pay-methods { display: flex; gap: 10px; margin-bottom: 15px; }
-        .pay-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: white; font-weight: 700; font-size: 11px; cursor: pointer; transition: 0.2s; }
+        .modal-title { font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 10px; }
+        .pay-methods { display: flex; gap: 8px; margin-bottom: 10px; }
+        .pay-btn { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: white; font-weight: 700; font-size: 10px; cursor: pointer; }
         .pay-btn.active { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); color: var(--primary); }
         
-        .form-group { margin-bottom: 10px; }
-        .form-label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
-        .form-input { width: 100%; padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 20px; font-weight: 800; text-align: right; letter-spacing: 1px; outline: none; }
+        .form-group { margin-bottom: 8px; }
+        .form-label { display: block; font-size: 9px; color: var(--text-muted); margin-bottom: 2px; }
+        .form-input { width: 100%; padding: 8px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 16px; font-weight: 800; text-align: right; outline: none; }
         
-        .custom-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        /* Keypad Diperkecil agar muat di layar */
+        .custom-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; flex-grow: 1; }
         .custom-keypad button {
-            padding: 15px; border-radius: 8px; border: 1px solid var(--border);
-            background: var(--bg-main); color: white; font-size: 18px; font-weight: 700; cursor: pointer;
-            transition: 0.1s; user-select: none;
+            padding: 10px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-main); color: white; font-size: 16px; font-weight: 700; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
         }
-        .custom-keypad button:active { background: var(--border); transform: scale(0.95); }
+        .custom-keypad button:active { background: var(--border); }
         .custom-keypad .btn-clear { color: var(--primary); }
         .custom-keypad .btn-del { color: var(--accent); }
 
-        .change-box { background: var(--bg-main); padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed var(--border); }
-        .change-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-muted); }
-        .change-val { color: var(--accent); font-size: 16px; font-weight: 800; }
-        .modal-actions { display: flex; gap: 10px; }
-        .btn-cancel { flex: 1; padding: 12px; border-radius: 8px; border: none; background: #333; color: white; font-weight: 700; font-size: 12px; cursor: pointer; }
-        .btn-confirm { flex: 2; padding: 12px; border-radius: 8px; border: none; background: var(--success); color: white; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .change-box { background: var(--bg-main); padding: 8px; border-radius: 8px; margin-bottom: 10px; border: 1px dashed var(--border); }
+        .change-row { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px; color: var(--text-muted); }
+        .change-val { color: var(--accent); font-size: 14px; font-weight: 800; }
+        .modal-actions { display: flex; gap: 8px; }
+        .btn-cancel { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #333; color: white; font-weight: 700; font-size: 11px; cursor: pointer; }
+        .btn-confirm { flex: 2; padding: 10px; border-radius: 8px; border: none; background: var(--success); color: white; font-weight: 700; font-size: 11px; cursor: pointer; }
 
         /* EMPTY STATE */
         .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 11px; }
         .empty-state i { font-size: 30px; opacity: 0.3; margin-bottom: 8px; display: block; }
-
-        /* ==========================================
-           MODE LANSKAP (SPLIT SCREEN RAPI)
-           ========================================== */
-        @media (orientation: landscape) {
-            .pos-container { max-width: 100%; }
-            .pos-layout { flex-direction: row; height: 100%; }
-            
-            /* Menu di Kiri */
-            .menu-section { flex: 1; height: 100%; border-right: 1px solid var(--border); padding: 15px; }
-            .menu-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
-            
-            /* Keranjang di Kanan */
-            .cart-section { 
-                width: 320px; height: 100%; max-height: none; border-radius: 0; 
-                border-top: none; border-left: 1px solid var(--border); 
-                padding: 20px; box-shadow: none;
-            }
-            .cart-list-pos { max-height: none; }
-            .btn-checkout { margin-top: auto; padding: 16px; }
-
-            /* Online List Grid di Lanskap */
-            .online-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-            
-            /* Sembunyikan header kecil agar lega */
-            .pos-header { display: none; }
-        }
     </style>
 </head>
 <body>
@@ -261,10 +246,6 @@
             <div style="text-align: right;">
                 <div class="header-info" id="header-email">-</div>
                 <div class="header-actions">
-                    <!-- Tombol Fullscreen Manual -->
-                    <button class="btn-icon" onclick="toggleFullscreen()" title="Fullscreen">
-                        <i class="fa-solid fa-expand"></i>
-                    </button>
                     <a href="pengaturan-toko.html" id="btn-settings-admin" class="btn-icon btn-icon-admin" title="Buka Pengaturan Toko">
                         <i class="fa-solid fa-gear"></i>
                     </a>
@@ -304,7 +285,7 @@
                     <div class="menu-grid" id="pos-menu-grid"></div>
                 </div>
 
-                <!-- Keranjang Bawah / Kanan -->
+                <!-- Keranjang Bawah -->
                 <div class="cart-section">
                     <div class="cart-header">
                         <span class="cart-title-text">Keranjang Kasir</span>
@@ -343,11 +324,10 @@
                 </div>
             </div>
 
-            <div id="area-qris" style="display: none; text-align: center; margin-bottom: 15px;">
-                <div style="background: white; padding: 10px; border-radius: 10px; display: inline-block;">
-                    <i class="fa-solid fa-qrcode" style="font-size: 70px; color: black;"></i>
+            <div id="area-qris" style="display: none; text-align: center; margin-bottom: 10px;">
+                <div style="background: white; padding: 8px; border-radius: 8px; display: inline-block;">
+                    <i class="fa-solid fa-qrcode" style="font-size: 60px; color: black;"></i>
                 </div>
-                <p style="font-size: 10px; color: var(--text-muted); margin-top: 8px;">Scan QRIS, pastikan uang masuk.</p>
             </div>
 
             <!-- KEYPAD CUSTOM -->
@@ -370,14 +350,14 @@
 
             <div class="change-box">
                 <div class="change-row"><span>Total Tagihan:</span><span id="modal-total">Rp 0</span></div>
-                <div class="change-row" style="margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px;">
+                <div class="change-row" style="margin-top: 4px; border-top: 1px solid var(--border); padding-top: 4px;">
                     <span>Kembalian:</span><span id="modal-kembalian" class="change-val">Rp 0</span>
                 </div>
             </div>
 
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="tutupPembayaran()">Batal</button>
-                <button class="btn-confirm" onclick="selesaikanPesanan()">✔ Simpan & Lunas</button>
+                <button class="btn-confirm" onclick="selesaikanPesanan()">✔ Simpan</button>
             </div>
         </div>
     </div>
@@ -413,23 +393,6 @@
         let isFirstLoad = true;
         let knownOrderIds = new Set();
         let audioCtx = null;
-
-        // --- LOGIKA FULLSCREEN MANUAL ---
-        window.toggleFullscreen = () => {
-            if (!document.fullscreenElement) {
-                // Jika belum fullscreen, minta fullscreen
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen().catch(err => {
-                        alert(`Gagal masuk fullscreen: ${err.message}`);
-                    });
-                }
-            } else {
-                // Jika sudah fullscreen, keluar
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        };
 
         // Audio Context untuk Bunyi Notifikasi
         document.body.addEventListener('click', function unlockAudio() {
@@ -620,10 +583,10 @@
                             <div class="pos-bottom">
                                 ${qty === 0 ? 
                                     `<button class="pos-add" onclick="addToCart(${item.id})">Tambah</button>` :
-                                    `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-main); padding:2px; border-radius:4px; border:1px solid var(--border);">
-                                        <button class="btn-qty" onclick="updateQty(${item.id}, -1)">-</button>
-                                        <span style="font-size:10px; font-weight:800;">${qty}</span>
-                                        <button class="btn-qty" onclick="updateQty(${item.id}, 1)">+</button>
+                                    `<div class="qty-control">
+                                        <button onclick="updateQty(${item.id}, -1)">-</button>
+                                        <span>${qty}</span>
+                                        <button onclick="updateQty(${item.id}, 1)">+</button>
                                     </div>`
                                 }
                             </div>
