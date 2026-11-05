@@ -24,7 +24,7 @@
     <!-- ===== FILE PROFIL TERPISAH ===== -->
     <link rel="stylesheet" href="profile.css?v=2">
 
-    <!-- ===== MIDTRANS SNAP (SANDBOX) ===== -->
+    <!-- ===== MIDTRANS SNAP (SANDBOX) - TETAP ADA TAPI TIDAK DIPAKAI DI PESANAN ===== -->
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-ccHdGHCTpj08BGVP"></script>
 
     <style>
@@ -400,14 +400,14 @@
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--text-muted); }
         .summary-row.total { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); color: var(--text-main); font-weight: 800; font-size: 14px; }
 
-        /* TOMBOL PEMBAYARAN ONLINE BARU */
-        .btn-online {
-            width: 100%; background: #3b82f6; color: #fff; border: none; padding: 14px;
+        /* TOMBOL PEMBAYARAN SALDO */
+        .btn-saldo {
+            width: 100%; background: var(--accent); color: #000; border: none; padding: 14px;
             border-radius: var(--radius-md); font-size: 13px; font-weight: 800; cursor: pointer;
             display: flex; justify-content: center; align-items: center; gap: 8px; flex-shrink: 0;
             margin-bottom: 10px;
         }
-        .btn-online:hover { background: #2563eb; }
+        .btn-saldo:hover { background: #ffca28; }
 
         .btn-wa {
             width: 100%; background: var(--wa-color); color: #fff; border: none; padding: 14px;
@@ -702,14 +702,14 @@
             
             <div class="summary-box" id="confirm-summary"></div>
             
-            <!-- TOMBOL PEMBAYARAN ONLINE -->
-            <button class="btn-online" onclick="prosesPembayaranOnline()">
-                <i class="fa-solid fa-credit-card" style="font-size:16px;"></i> Bayar Online (QRIS / E-Wallet / Bank)
+            <!-- TOMBOL BAYAR PAKAI SALDO -->
+            <button class="btn-saldo" id="btn-bayar-saldo" onclick="bayarPakaiSaldo()">
+                <i class="fa-solid fa-wallet" style="font-size:16px;"></i> Bayar pakai Saldo
             </button>
             
             <!-- TOMBOL WA -->
             <button class="btn-wa" onclick="confirmAndSend()">
-                <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Kirim via WA
+                <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Kirim Pesanan via WA
             </button>
             
             <button onclick="closeConfirmModal()" style="width:100%; background:transparent; border:none; color:var(--text-muted); padding:12px; font-size:11px; font-weight:700; cursor:pointer;">Batal</button>
@@ -781,7 +781,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
@@ -801,6 +801,8 @@
         window.firebaseDb = db;
         window.firestoreDoc = doc;
         window.firestoreOnSnapshot = onSnapshot;
+        window.firestoreGetDoc = getDoc;
+        window.firestoreUpdateDoc = updateDoc;
         
         let manualStoreStatus = "auto";
 
@@ -812,6 +814,8 @@
         const appScreen = document.getElementById('app-screen');
         const btnLogout = document.getElementById('btn-logout');
         const buyerNameInput = document.getElementById('buyer-name');
+        
+        let isTamu = true; // Flag untuk menandai apakah sedang mode tamu
 
         window.loginGoogle = async () => {
             showLoading();
@@ -826,6 +830,7 @@
 
         window.masukTamu = () => {
             localStorage.setItem('kebabGuest', 'true');
+            isTamu = true;
             bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu");
         };
 
@@ -835,6 +840,7 @@
                 signOut(auth);
                 if(typeof tutupProfil === 'function') tutupProfil();
                 
+                isTamu = true;
                 authScreen.style.display = 'flex';
                 appScreen.classList.remove('show');
             }
@@ -846,10 +852,19 @@
             buyerNameInput.value = namaUser;
             btnLogout.style.display = 'flex';
             
+            if (tipeUser === "Akun Google") {
+                isTamu = false;
+            } else {
+                isTamu = true;
+            }
+            
             if (typeof isiDataProfil === 'function') {
                 isiDataProfil(namaUser, emailUser || "Tidak ada email", fotoUser, tipeUser);
                 document.getElementById('prof-type').innerText = tipeUser;
             }
+
+            // Cek Tombol Saldo saat pertama buka
+            cekTombolSaldo();
 
             initApp();
         }
@@ -869,6 +884,16 @@
                 }
             }
         });
+
+        // Fungsi untuk memunculkan/menyembunyikan tombol saldo
+        function cekTombolSaldo() {
+            const btnSaldo = document.getElementById('btn-bayar-saldo');
+            if (isTamu) {
+                btnSaldo.style.display = 'none'; // Sembunyikan jika tamu
+            } else {
+                btnSaldo.style.display = 'flex'; // Tampilkan jika login
+            }
+        }
 
         function initApp() {
             if (window.appInitialized) return;
@@ -1094,52 +1119,15 @@
             let distanceKm = 0;
 
             // ==========================================
-            // DETEKTIF URL (Membaca jika kembali dari Midtrans)
-            // ==========================================
-            function cekRedirectMidtrans() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const orderId = urlParams.get('order_id');
-                const trxStatus = urlParams.get('transaction_status');
-
-                if (orderId && (trxStatus === 'settlement' || trxStatus === 'capture')) {
-                    // Ambil data pesanan yang disimpan sementara saat bayar
-                    const pendingOrder = localStorage.getItem('kebabPendingOrder');
-                    if (pendingOrder) {
-                        const dataPesanan = JSON.parse(pendingOrder);
-                        
-                        // SIMPAN KE RIWAYAT
-                        simpanRiwayatPesanan(orderId, dataPesanan.totalAmount, dataPesanan.waText);
-
-                        alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp untuk mengirim pesanan. Silakan tekan tombol KIRIM di WhatsApp.");
-                        
-                        // Alihkan ke WA
-                        window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(dataPesanan.waText)}`;
-                        
-                        // Bersihkan memori
-                        localStorage.removeItem('kebabPendingOrder');
-                        localStorage.removeItem('kebabCart');
-                        cart = {};
-                        
-                        // Bersihkan URL dari parameter Midtrans
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                        
-                        renderMenu(); 
-                        calculateTotal();
-                    }
-                }
-            }
-            cekRedirectMidtrans();
-
-            // ==========================================
             // FUNGSI RIWAYAT PESANAN
             // ==========================================
-            function simpanRiwayatPesanan(orderId, total, waText) {
+            function simpanRiwayatPesanan(orderId, total, waText, statusText) {
                 let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
                 history.unshift({
-                    orderId: orderId || 'KEBAB-MANUAL',
+                    orderId: orderId,
                     tanggal: new Date().toLocaleString('id-ID'),
                     total: total,
-                    status: "Diproses (Menunggu Konfirmasi Toko)",
+                    status: statusText,
                     waText: waText
                 });
                 localStorage.setItem('kebabOrderHistory', JSON.stringify(history));
@@ -1492,6 +1480,9 @@
                 }, 400);
             }
 
+            // ==========================================
+            // FUNGSI SWITCH METHOD (TAMU BEBAS PILIH)
+            // ==========================================
             window.switchMethod = (method) => {
                 deliveryMethod = method;
                 localStorage.setItem('kebabMethod', method);
@@ -1583,6 +1574,10 @@
                 }
                 html += `<div class="summary-row total"><span>TOTAL</span><span>Rp ${totals.total.toLocaleString('id-ID')}</span></div>`;
                 document.getElementById('confirm-summary').innerHTML = html;
+                
+                // Cek tombol saldo setiap kali modal konfirmasi dibuka
+                cekTombolSaldo();
+                
                 document.getElementById('confirm-modal').classList.add('show');
             }
 
@@ -1590,106 +1585,107 @@
                 document.getElementById('confirm-modal').classList.remove('show');
             }
 
-            /* ==========================================
-               FUNGSI TOMBOL PEMBAYARAN ONLINE (MIDTRANS)
-               ========================================== */
-            window.prosesPembayaranOnline = async () => {
-                if (!cekStatusToko()) { alert("Mohon maaf, toko sedang TUTUP atau di luar jam operasional."); return; }
+            // ==========================================
+            // FUNGSI BAYAR PAKAI SALDO
+            // ==========================================
+            window.bayarPakaiSaldo = async () => {
+                if (isTamu) { alert("Silakan Login Google terlebih dahulu untuk menggunakan Saldo."); return; }
+                
                 const name = document.getElementById('buyer-name').value.trim();
-                if (!name) { alert("Masukkan nama Anda di form pengiriman!"); document.getElementById('buyer-name').focus(); return; }
-                localStorage.setItem('kebabName', name);
                 const totals = calculateTotal();
-                if (totals.itemCount === 0) { alert("Pilih minimal 1 menu!"); return; }
-                if (deliveryMethod === 'delivery' && !userLocation) { alert("Lokasi GPS belum terdeteksi. Pastikan izin lokasi aktif."); return; }
-                if (deliveryMethod === 'delivery' && shippingFee === -1) { alert("Lokasi terlalu jauh!"); return; }
-
-                const orderId = 'KEBAB-' + Date.now();
-                const email = auth.currentUser ? auth.currentUser.email : 'guest@kebabidi.com';
-
-                // ==========================================
-                // SIAPKAN TEKS WA UNTUK DISIMPAN SEMENTARA
-                // ==========================================
-                const notes = document.getElementById('order-notes').value.trim();
-                const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) };
-                localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
-
-                let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
-                txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n--------------------------------\n`;
                 
-                Object.keys(cart).forEach(cartKey => {
-                    const qty = cart[cartKey];
-                    if (qty > 0) {
-                        const parts = cartKey.split('-');
-                        const itemId = parseInt(parts[0]);
-                        const variant = parts[1] ? ` (${parts[1]})` : '';
-                        const item = menuData.find(i => i.id === itemId);
-                        if (item) {
-                            txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
-                        }
-                    }
-                });
-
-                txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`;
-                if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`;
-                else txt += `Ongkir: GRATIS\n`;
-                txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
-                if (notes) txt += `📝 Catatan: ${notes}\n\n`;
-                txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
-                
-                // Simpan teks WA ke memori HP sementara
-                localStorage.setItem('kebabPendingOrder', JSON.stringify({ waText: txt, totalAmount: totals.total }));
-                // ==========================================
-
                 showLoading();
-
+                
                 try {
-                    const response = await fetch('https://kebab-backend.vercel.app/api/checkout', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            order_id: orderId,
-                            gross_amount: Math.round(totals.total),
-                            nama_pembeli: name,
-                            email_pembeli: email
-                        })
+                    const emailKey = auth.currentUser.email.replace(/[^a-zA-Z0-9]/g, "");
+                    const docRef = doc(db, "saldo_pelanggan", emailKey);
+                    const docSnap = await getDoc(docRef);
+                    
+                    let saldoSaatIni = 0;
+                    if (docSnap.exists()) {
+                        saldoSaatIni = docSnap.data().saldo || 0;
+                    }
+                    
+                    if (saldoSaatIni <= 0) {
+                        hideLoading();
+                        alert("Saldo Anda Rp 0. Silakan Top Up terlebih dahulu di menu Profil.");
+                        return;
+                    }
+                    
+                    let sisaTagihan = totals.total;
+                    let saldoTerpotong = 0;
+                    let statusPembayaran = "";
+                    let statusRiwayat = "";
+                    
+                    if (saldoSaatIni >= totals.total) {
+                        // Saldo Cukup
+                        saldoTerpotong = totals.total;
+                        sisaTagihan = 0;
+                        statusPembayaran = "✅ LUNAS VIA SALDO";
+                        statusRiwayat = "Diproses (Lunas via Saldo)";
+                    } else {
+                        // Saldo Kurang (Pilihan B)
+                        saldoTerpotong = saldoSaatIni;
+                        sisaTagihan = totals.total - saldoSaatIni;
+                        statusPembayaran = `⚠️ SALDO TERPOTONG Rp ${saldoTerpotong.toLocaleString('id-ID')}.\nSISA TAGIHAN: Rp ${sisaTagihan.toLocaleString('id-ID')} (Bayar manual saat diterima)`;
+                        statusRiwayat = "Diproses (Sebagian via Saldo)";
+                        
+                        alert(`Saldo Anda hanya Rp ${saldoSaatIni.toLocaleString('id-ID')}.\nSisa tagihan Rp ${sisaTagihan.toLocaleString('id-ID')} mohon disiapkan untuk dibayar manual.`);
+                    }
+                    
+                    // Potong Saldo di Firebase (Set jadi 0 atau sisanya)
+                    const saldoBaru = saldoSaatIni - saldoTerpotong;
+                    await updateDoc(docRef, { saldo: saldoBaru });
+                    
+                    // Buat Teks WA
+                    const notes = document.getElementById('order-notes').value.trim();
+                    let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
+                    txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n💳 Pembayaran: *${statusPembayaran}*\n--------------------------------\n`;
+                    
+                    Object.keys(cart).forEach(cartKey => {
+                        const qty = cart[cartKey];
+                        if (qty > 0) {
+                            const parts = cartKey.split('-');
+                            const itemId = parseInt(parts[0]);
+                            const variant = parts[1] ? ` (${parts[1]})` : '';
+                            const item = menuData.find(i => i.id === itemId);
+                            if (item) {
+                                txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`;
+                            }
+                        }
                     });
 
-                    const data = await response.json();
+                    txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`;
+                    if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`;
+                    else txt += `Ongkir: GRATIS\n`;
+                    txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
+                    if (notes) txt += `📝 Catatan: ${notes}\n\n`;
+                    txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
+                    
+                    // Simpan Riwayat
+                    simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat);
+                    
+                    // Bersihkan Keranjang
+                    cart = {}; 
+                    localStorage.removeItem('kebabCart'); 
+                    renderMenu(); 
+                    calculateTotal(); 
+                    closeConfirmModal();
+                    closeCartModal();
+                    
                     hideLoading();
-
-                    if (data.token) {
-                        window.snap.pay(data.token, {
-                            onSuccess: function(result){
-                                alert("✅ Pembayaran Berhasil!\n\nAnda akan diarahkan ke WhatsApp. Silakan tekan tombol KIRIM di WhatsApp untuk menyelesaikan pesanan.");
-                                window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
-                                
-                                cart = {}; 
-                                localStorage.removeItem('kebabCart'); 
-                                localStorage.removeItem('kebabPendingOrder');
-                                renderMenu(); 
-                                calculateTotal(); 
-                                closeConfirmModal();
-                                closeCartModal();
-                            },
-                            onPending: function(result){
-                                alert("⏳ Menunggu pembayaran. Silakan selesaikan sesuai instruksi.");
-                            },
-                            onError: function(result){
-                                alert("❌ Pembayaran gagal. Silakan coba lagi.");
-                            },
-                            onClose: function(){
-                                alert('Anda menutup pop-up sebelum menyelesaikan pembayaran.');
-                            }
-                        });
-                    } else {
-                        alert("Gagal mendapatkan token: " + (data.message || 'Error tidak diketahui'));
-                    }
+                    alert("Pesanan Diproses! Anda akan diarahkan ke WhatsApp untuk konfirmasi.");
+                    window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`;
+                    
                 } catch (error) {
                     hideLoading();
-                    alert("Terjadi kesalahan jaringan ke server pembayaran.");
+                    alert("Gagal memproses saldo: " + error.message);
                 }
             }
 
+            // ==========================================
+            // FUNGSI KIRIM VIA WA (MANUAL / TRANSFER)
+            // ==========================================
             window.confirmAndSend = () => {
                 closeConfirmModal();
                 const name = document.getElementById('buyer-name').value.trim();
@@ -1699,7 +1695,7 @@
                 localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
 
                 let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`;
-                txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n--------------------------------\n`;
+                txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n💳 Pembayaran: *Transfer Manual / Bayar di Tempat*\n--------------------------------\n`;
                 
                 Object.keys(cart).forEach(cartKey => {
                     const qty = cart[cartKey];
@@ -1720,11 +1716,12 @@
                 txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`;
                 if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
-                window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
                 
                 // Simpan ke Riwayat Pesanan
-                simpanRiwayatPesanan('KEBAB-MANUAL', totals.total, txt);
+                simpanRiwayatPesanan('KEBAB-MANUAL-' + Date.now(), totals.total, txt, "Menunggu Pembayaran/Konfirmasi");
 
+                window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
+                
                 cart = {}; 
                 localStorage.removeItem('kebabCart'); 
                 renderMenu(); 
@@ -1739,7 +1736,10 @@
             }
 
             if (buyerNameSaved && !buyerNameInput.value) buyerNameInput.value = buyerNameSaved;
-            switchMethod(deliveryMethod);
+            
+            // Paksa masuk ke mode Ambil Sendiri jika Tamu (Opsional, kalau mau default)
+            // switchMethod(deliveryMethod); // Biarkan default 'delivery' tapi tamu bebas ganti
+            
             updateStatusUI();
             renderMenu();
             calculateTotal();
