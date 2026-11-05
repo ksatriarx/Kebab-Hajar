@@ -24,13 +24,14 @@
         
         .main-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;}
         .main-tab-btn {
-            flex: 1; min-width: 100px; padding: 10px; border-radius: var(--radius); border: none; background: var(--bg-card); color: white; font-weight: bold; font-size: 12px; cursor: pointer; border: 1px solid var(--border); position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; white-space: nowrap;
+            flex: 1; min-width: 90px; padding: 10px; border-radius: var(--radius); border: none; background: var(--bg-card); color: white; font-weight: bold; font-size: 11px; cursor: pointer; border: 1px solid var(--border); position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; white-space: nowrap;
         }
         .main-tab-btn.active { background: var(--primary); border-color: var(--primary); }
         
         .notif-badge { background: var(--accent); color: #000; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; display: none; }
         .notif-badge.show { display: inline-block; }
 
+        /* STATUS TOKO */
         .status-display { text-align: center; padding: 20px; margin-bottom: 20px; border-radius: var(--radius); border: 2px solid var(--border); }
         .status-display.buka { border-color: var(--success); background: rgba(16, 185, 129, 0.1); }
         .status-display.tutup { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
@@ -54,13 +55,10 @@
         .btn-save { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: var(--radius); font-size: 14px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-save:disabled { background: #555; cursor: not-allowed; }
 
-        .access-denied { display: none; text-align: center; padding: 50px 20px; }
-        .access-denied h2 { color: var(--primary); margin: 15px 0; }
-
+        /* PESANAN */
         .filter-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
         .filter-btn { flex: 1; padding: 8px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-main); color: var(--text-muted); font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s; }
         .filter-btn.active { background: var(--bg-card-hover); color: var(--accent); border-color: var(--accent); }
-
         .order-item { background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; }
         .order-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; color: var(--text-muted); }
         .order-name { font-weight: 800; color: var(--accent); font-size: 13px; margin-bottom: 4px; }
@@ -69,21 +67,34 @@
         .status-select { width: 100%; padding: 8px; background: var(--bg-card); border: 1px solid var(--accent); color: var(--accent); font-weight: bold; border-radius: 6px; outline: none; font-size: 12px; }
         .status-select.selesai { border-color: var(--success); color: var(--success); }
 
+        /* MENU */
         .form-input { width: 100%; padding: 10px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; }
         .form-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;}
-        
         .menu-item-admin { display: flex; align-items: center; gap: 10px; background: var(--bg-main); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; }
         .menu-item-admin img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
         .menu-item-admin-info { flex-grow: 1; }
         .menu-item-admin-title { font-size: 12px; font-weight: 700; }
         .menu-item-admin-price { font-size: 11px; color: var(--accent); }
         .btn-delete-menu { background: rgba(229, 57, 53, 0.2); color: var(--primary); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-
-        /* Style untuk input file */
         .file-input-wrapper { position: relative; margin-bottom: 10px; }
         .file-input-wrapper input[type="file"] { display: none; }
         .btn-file { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; background: var(--bg-input); border: 1px dashed var(--accent); color: var(--accent); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
         .preview-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; display: none; }
+
+        /* LAPORAN (BARU) */
+        .report-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(0,0,0,0)); border: 1px solid var(--success); padding: 20px; border-radius: var(--radius); text-align: center; margin-bottom: 15px; }
+        .report-title { font-size: 12px; color: #fff; opacity: 0.8; margin-bottom: 5px; }
+        .report-value { font-size: 28px; font-weight: 800; color: var(--success); }
+        .report-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .report-box { background: var(--bg-main); border: 1px solid var(--border); padding: 15px; border-radius: var(--radius); text-align: center; }
+        .report-box-val { font-size: 18px; font-weight: 800; color: var(--accent); }
+        .report-box-label { font-size: 10px; color: var(--text-muted); }
+        .top-menu-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+        .top-menu-item:last-child { border-bottom: none; }
+
+        .access-denied { display: none; text-align: center; padding: 50px 20px; }
+        .access-denied h2 { color: var(--primary); margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -91,15 +102,17 @@
 <div class="app" id="app-content" style="display: none;">
     <div class="header">
         <h1>⚙️ Dashboard Owner</h1>
-        <p>Atur status, pesanan, & menu Kebab IDI</p>
+        <p>Atur status, pesanan, & laporan Kebab IDI</p>
     </div>
 
     <div class="main-tabs">
         <button id="tab-status" onclick="switchTab('status')" class="main-tab-btn">Status</button>
         <button id="tab-pesanan" onclick="switchTab('pesanan')" class="main-tab-btn">Pesanan <span id="badge-notif" class="notif-badge">0</span></button>
-        <button id="tab-menu" onclick="switchTab('menu')" class="main-tab-btn">Kelola Menu</button>
+        <button id="tab-menu" onclick="switchTab('menu')" class="main-tab-btn">Menu</button>
+        <button id="tab-laporan" onclick="switchTab('laporan')" class="main-tab-btn">Laporan</button>
     </div>
 
+    <!-- STATUS TOKO -->
     <div id="area-status">
         <div class="status-display auto" id="status-display">
             <div class="status-icon" id="status-icon">⏰</div>
@@ -124,6 +137,7 @@
         <button class="btn-save" id="btn-save" onclick="simpanPengaturan()" disabled><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
     </div>
 
+    <!-- PESANAN -->
     <div id="area-pesanan" style="display: none;">
         <div class="card">
             <div class="option-title" style="display: flex; justify-content: space-between;">Daftar Pesanan <i class="fa-solid fa-rotate-right" onclick="loadPesanan()" style="cursor: pointer; color: var(--accent);"></i></div>
@@ -135,6 +149,7 @@
         </div>
     </div>
 
+    <!-- MENU -->
     <div id="area-menu" style="display: none;">
         <div class="card" style="margin-bottom: 15px;">
             <div class="option-title">Tambah Menu Baru</div>
@@ -145,11 +160,10 @@
             <label class="form-label">Harga (Angka saja)</label>
             <input type="number" id="menu-price" class="form-input" placeholder="Contoh: 15000">
             
-            <!-- Opsi Upload Foto Baru -->
             <label class="form-label">Foto Menu (Pilih salah satu)</label>
             <div class="file-input-wrapper">
                 <input type="file" id="menu-file" accept="image/*" onchange="previewFile(this)">
-                <label for="menu-file" class="btn-file"><i class="fa-solid fa-camera"></i> Pilih Foto dari Galeri (Otomatis Kompres)</label>
+                <label for="menu-file" class="btn-file"><i class="fa-solid fa-camera"></i> Pilih Foto dari Galeri</label>
             </div>
             <img id="img-preview" class="preview-img" alt="Preview">
             
@@ -161,6 +175,38 @@
         <div class="card">
             <div class="option-title">Daftar Menu Saat Ini</div>
             <div id="list-menu-admin"><p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p></div>
+        </div>
+    </div>
+
+    <!-- LAPORAN (BARU) -->
+    <div id="area-laporan" style="display: none;">
+        <div class="card">
+            <div class="filter-tabs" style="margin-bottom: 20px;">
+                <button id="btn-lap-hari" class="filter-btn active" onclick="gantiFilterLaporan('hari')">Hari Ini</button>
+                <button id="btn-lap-bulan" class="filter-btn" onclick="gantiFilterLaporan('bulan')">Bulan Ini</button>
+                <button id="btn-lap-semua" class="filter-btn" onclick="gantiFilterLaporan('semua')">Semua</button>
+            </div>
+
+            <div class="report-card">
+                <div class="report-title">Total Pendapatan (Selesai & Saldo)</div>
+                <div class="report-value" id="lap-total-uang">Rp 0</div>
+            </div>
+
+            <div class="report-grid">
+                <div class="report-box">
+                    <div class="report-box-val" id="lap-total-pesanan">0</div>
+                    <div class="report-box-label">Pesanan Sukses</div>
+                </div>
+                <div class="report-box">
+                    <div class="report-box-val" id="lap-rata-rata">Rp 0</div>
+                    <div class="report-box-label">Rata-rata / Pesanan</div>
+                </div>
+            </div>
+
+            <div class="option-title" style="margin-top: 20px;">Menu Terlaris</div>
+            <div id="list-menu-terlaris">
+                <p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>
+            </div>
         </div>
     </div>
 </div>
@@ -195,6 +241,10 @@
     let unsubPesanan = null; let unsubMenu = null;
     let allOrders = []; let currentFilter = 'aktif';
     let compressedFile = null; 
+    
+    // Variabel Laporan
+    let filterLaporan = 'hari';
+    let allOrdersForReport = []; // Menyimpan semua data untuk dihitung
 
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === ALLOWED_EMAIL) {
@@ -211,12 +261,17 @@
         document.getElementById('area-status').style.display = 'none';
         document.getElementById('area-pesanan').style.display = 'none';
         document.getElementById('area-menu').style.display = 'none';
+        document.getElementById('area-laporan').style.display = 'none';
+        
         document.getElementById('tab-status').classList.remove('active');
         document.getElementById('tab-pesanan').classList.remove('active');
         document.getElementById('tab-menu').classList.remove('active');
+        document.getElementById('tab-laporan').classList.remove('active');
+        
         if(tab === 'status') { document.getElementById('area-status').style.display = 'block'; document.getElementById('tab-status').classList.add('active'); }
         else if (tab === 'pesanan') { document.getElementById('area-pesanan').style.display = 'block'; document.getElementById('tab-pesanan').classList.add('active'); }
         else if (tab === 'menu') { document.getElementById('area-menu').style.display = 'block'; document.getElementById('tab-menu').classList.add('active'); }
+        else if (tab === 'laporan') { document.getElementById('area-laporan').style.display = 'block'; document.getElementById('tab-laporan').classList.add('active'); hitungLaporan(); }
     }
 
     // STATUS TOKO
@@ -230,109 +285,99 @@
 
     // PESANAN
     window.switchFilter = (filter) => { currentFilter = filter; document.getElementById('btn-filter-aktif').classList.toggle('active', filter === 'aktif'); document.getElementById('btn-filter-selesai').classList.toggle('active', filter === 'selesai'); renderOrders(); }
-    window.loadPesanan = () => { const list = document.getElementById('list-pesanan'); list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>'; if (unsubPesanan) unsubPesanan(); const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc")); unsubPesanan = onSnapshot(q, (snapshot) => { allOrders = []; snapshot.forEach((doc) => { const data = doc.data(); data.id = doc.id; allOrders.push(data); }); const activeCount = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan').length; const badgeMain = document.getElementById('badge-notif'); const badgeTab = document.getElementById('badge-aktif'); if (activeCount > 0) { badgeMain.innerText = activeCount; badgeMain.classList.add('show'); badgeTab.innerText = `(${activeCount})`; } else { badgeMain.classList.remove('show'); badgeTab.innerText = ''; } renderOrders(); }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat pesanan: ${error.message}</p>`; }); }
+    window.loadPesanan = () => { const list = document.getElementById('list-pesanan'); list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>'; if (unsubPesanan) unsubPesanan(); const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc")); unsubPesanan = onSnapshot(q, (snapshot) => { allOrders = []; allOrdersForReport = []; snapshot.forEach((doc) => { const data = doc.data(); data.id = doc.id; allOrders.push(data); allOrdersForReport.push(data); }); const activeCount = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan').length; const badgeMain = document.getElementById('badge-notif'); const badgeTab = document.getElementById('badge-aktif'); if (activeCount > 0) { badgeMain.innerText = activeCount; badgeMain.classList.add('show'); badgeTab.innerText = `(${activeCount})`; } else { badgeMain.classList.remove('show'); badgeTab.innerText = ''; } renderOrders(); }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat pesanan: ${error.message}</p>`; }); }
     function renderOrders() { const list = document.getElementById('list-pesanan'); let filtered = []; if (currentFilter === 'aktif') { filtered = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan'); } else { filtered = allOrders.filter(o => o.status === 'Selesai' || o.status === 'Dibatalkan'); } if (filtered.length === 0) { list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Tidak ada pesanan ${currentFilter === 'aktif' ? 'proses' : 'selesai'}.</p>`; return; } let html = ''; filtered.forEach((data) => { const docId = data.id; let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : "Waktu error"; const namaPembeli = data.nama || 'Pelanggan'; const emailPembeli = data.email || '-'; const detailPesanan = data.detail_pesanan || 'Detail tidak tersedia'; const total = data.total_bayar || 0; const metode = data.metode || '-'; const statusSaatIni = data.status || 'Menunggu Konfirmasi Toko'; const classSelesai = (statusSaatIni === 'Selesai') ? 'selesai' : ''; html += `<div class="order-item"><div class="order-header"><span>${tgl}</span><span style="color: var(--success); font-weight: bold;">${metode}</span></div><div class="order-name">${namaPembeli} - Rp ${total.toLocaleString('id-ID')}</div><div class="order-email"><i class="fa-solid fa-envelope"></i> ${emailPembeli}</div><div class="order-detail">${detailPesanan}</div><select class="status-select ${classSelesai}" onchange="updateStatusPesanan('${docId}', this.value)"><option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option><option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option><option value="Siap Diambil" ${statusSaatIni === 'Siap Diambil' ? 'selected' : ''}>Siap Diambil (Pickup)</option><option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option><option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option><option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option></select></div>`; }); list.innerHTML = html; }
     window.updateStatusPesanan = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); } catch (error) { alert("Gagal mengubah status: " + error.message); } }
 
     // KELOLA MENU
     window.loadMenuAdmin = () => { const list = document.getElementById('list-menu-admin'); if (unsubMenu) unsubMenu(); const q = query(collection(db, "menu_kebab"), orderBy("id", "asc")); unsubMenu = onSnapshot(q, (snapshot) => { if (snapshot.empty) { list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada menu.</p>'; return; } let html = ''; snapshot.forEach((doc) => { const data = doc.data(); const docId = doc.id; html += `<div class="menu-item-admin"><img src="${data.image}" alt="${data.name}"><div class="menu-item-admin-info"><div class="menu-item-admin-title">${data.name} ${data.badge ? `<span style="font-size:8px; background:var(--primary); padding:2px 4px; border-radius:4px;">${data.badge}</span>` : ''}</div><div class="menu-item-admin-price">Rp ${data.price.toLocaleString('id-ID')} (${data.category})</div></div><button class="btn-delete-menu" onclick="hapusMenu('${docId}', '${data.name}')"><i class="fa-solid fa-trash"></i></button></div>`; }); list.innerHTML = html; }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat menu: ${error.message}</p>`; }); }
 
-    // FUNGSI PREVIEW & KOMPRESI GAMBAR
-    window.previewFile = (input) => {
-        const file = input.files[0];
-        if (!file) return;
+    window.previewFile = (input) => { const file = input.files[0]; if (!file) return; const preview = document.getElementById('img-preview'); preview.src = URL.createObjectURL(file); preview.style.display = 'block'; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let width = img.width; let height = img.height; if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); canvas.toBlob((blob) => { if (blob) { compressedFile = new File([blob], "foto_menu.jpg", { type: "image/jpeg" }); } }, 'image/jpeg', 0.7); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
+    window.tambahMenu = async () => { const name = document.getElementById('menu-name').value.trim(); const category = document.getElementById('menu-category').value; const price = parseInt(document.getElementById('menu-price').value); const imageUrl = document.getElementById('menu-image-url').value.trim(); if (!name || !price || (!compressedFile && !imageUrl)) { alert("Mohon isi Nama, Harga, dan Pilih Foto atau masukkan Link Gambar!"); return; } try { let finalImageUrl = imageUrl; if (compressedFile) { const reader = new FileReader(); reader.readAsDataURL(compressedFile); reader.onloadend = async () => { finalImageUrl = reader.result; await simpanMenuKeFirebase(name, category, price, finalImageUrl); }; } else { await simpanMenuKeFirebase(name, category, price, finalImageUrl); } } catch (error) { alert("❌ Gagal menambah menu: " + error.message); } }
+    async function simpanMenuKeFirebase(name, category, price, image) { const newId = Date.now(); await setDoc(doc(db, "menu_kebab", newId.toString()), { id: newId, name: name, category: category, type: category === 'makanan' ? 'Kebab' : 'Minuman', price: price, image: image, badge: "" }); alert("✅ Menu berhasil ditambahkan!"); document.getElementById('menu-name').value = ''; document.getElementById('menu-price').value = ''; document.getElementById('menu-image-url').value = ''; document.getElementById('menu-file').value = ''; document.getElementById('img-preview').style.display = 'none'; compressedFile = null; }
+    window.hapusMenu = async (docId, namaMenu) => { if (confirm(`Yakin ingin menghapus menu "${namaMenu}"?`)) { try { await deleteDoc(doc(db, "menu_kebab", docId)); alert("✅ Menu berhasil dihapus."); } catch (error) { alert("❌ Gagal menghapus: " + error.message); } } }
 
-        const preview = document.getElementById('img-preview');
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > MAX_WIDTH) {
-                    height *= MAX_WIDTH / width;
-                    width = MAX_WIDTH;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        compressedFile = new File([blob], "foto_menu.jpg", { type: "image/jpeg" });
-                        console.log("Ukuran asli:", (file.size / 1024).toFixed(2), "KB");
-                        console.log("Ukuran setelah kompresi:", (compressedFile.size / 1024).toFixed(2), "KB");
-                    }
-                }, 'image/jpeg', 0.7);
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+    // ==========================================
+    // FUNGSI LAPORAN (BARU)
+    // ==========================================
+    window.gantiFilterLaporan = (filter) => {
+        filterLaporan = filter;
+        document.getElementById('btn-lap-hari').classList.toggle('active', filter === 'hari');
+        document.getElementById('btn-lap-bulan').classList.toggle('active', filter === 'bulan');
+        document.getElementById('btn-lap-semua').classList.toggle('active', filter === 'semua');
+        hitungLaporan();
     }
 
-    window.tambahMenu = async () => {
-        const name = document.getElementById('menu-name').value.trim();
-        const category = document.getElementById('menu-category').value;
-        const price = parseInt(document.getElementById('menu-price').value);
-        const imageUrl = document.getElementById('menu-image-url').value.trim();
+    function hitungLaporan() {
+        const sekarang = new Date();
+        let totalPendapatan = 0;
+        let totalPesanan = 0;
+        let menuTerjual = {}; // Objek untuk menghitung qty per menu
 
-        if (!name || !price || (!compressedFile && !imageUrl)) {
-            alert("Mohon isi Nama, Harga, dan Pilih Foto atau masukkan Link Gambar!");
-            return;
-        }
+        allOrdersForReport.forEach(order => {
+            // Filter berdasarkan status (Hanya Selesai atau Lunas via Saldo)
+            const isSelesai = order.status === 'Selesai';
+            const isLunasSaldo = order.metode && order.metode.includes('Lunas via Saldo');
+            
+            if (!isSelesai && !isLunasSaldo) return; // Lewati jika belum selesai dan bukan lunas saldo
 
-        try {
-            let finalImageUrl = imageUrl;
-
-            if (compressedFile) {
-                const reader = new FileReader();
-                reader.readAsDataURL(compressedFile);
-                reader.onloadend = async () => {
-                    finalImageUrl = reader.result; 
-                    await simpanMenuKeFirebase(name, category, price, finalImageUrl);
-                };
-            } else {
-                await simpanMenuKeFirebase(name, category, price, finalImageUrl);
+            // Filter berdasarkan tanggal
+            let validTanggal = false;
+            if (order.waktu) {
+                const tglOrder = new Date(order.waktu);
+                if (filterLaporan === 'hari') {
+                    validTanggal = tglOrder.toDateString() === sekarang.toDateString();
+                } else if (filterLaporan === 'bulan') {
+                    validTanggal = tglOrder.getMonth() === sekarang.getMonth() && tglOrder.getFullYear() === sekarang.getFullYear();
+                } else {
+                    validTanggal = true; // Semua
+                }
             }
 
-        } catch (error) {
-            alert("❌ Gagal menambah menu: " + error.message);
-        }
-    }
+            if (validTanggal) {
+                totalPendapatan += (order.total_bayar || 0);
+                totalPesanan += 1;
 
-    async function simpanMenuKeFirebase(name, category, price, image) {
-        const newId = Date.now();
-        await setDoc(doc(db, "menu_kebab", newId.toString()), {
-            id: newId,
-            name: name,
-            category: category,
-            type: category === 'makanan' ? 'Kebab' : 'Minuman',
-            price: price,
-            image: image,
-            badge: ""
+                // Hitung menu terjual
+                if (order.rincian && Array.isArray(order.rincian)) {
+                    order.rincian.forEach(item => {
+                        if (menuTerjual[item.nama]) {
+                            menuTerjual[item.nama] += item.qty;
+                        } else {
+                            menuTerjual[item.nama] = item.qty;
+                        }
+                    });
+                }
+            }
         });
 
-        alert("✅ Menu berhasil ditambahkan!");
+        // Tampilkan Ringkasan
+        document.getElementById('lap-total-uang').innerText = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
+        document.getElementById('lap-total-pesanan').innerText = totalPesanan;
         
-        document.getElementById('menu-name').value = '';
-        document.getElementById('menu-price').value = '';
-        document.getElementById('menu-image-url').value = '';
-        document.getElementById('menu-file').value = '';
-        document.getElementById('img-preview').style.display = 'none';
-        compressedFile = null;
-    }
+        const rataRata = totalPesanan > 0 ? (totalPendapatan / totalPesanan) : 0;
+        document.getElementById('lap-rata-rata').innerText = `Rp ${Math.round(rataRata).toLocaleString('id-ID')}`;
 
-    window.hapusMenu = async (docId, namaMenu) => {
-        if (confirm(`Yakin ingin menghapus menu "${namaMenu}"?`)) {
-            try { await deleteDoc(doc(db, "menu_kebab", docId)); alert("✅ Menu berhasil dihapus."); } catch (error) { alert("❌ Gagal menghapus: " + error.message); }
+        // Tampilkan Menu Terlaris (Urutkan dari yang terbanyak)
+        const sortedMenu = Object.keys(menuTerjual)
+            .map(nama => ({ nama, qty: menuTerjual[nama] }))
+            .sort((a, b) => b.qty - a.qty)
+            .slice(0, 5); // Ambil 5 teratas
+
+        const listMenu = document.getElementById('list-menu-terlaris');
+        if (sortedMenu.length === 0) {
+            listMenu.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada data menu terjual (atau data lama belum memiliki rincian).</p>';
+        } else {
+            let html = '';
+            sortedMenu.forEach((item, index) => {
+                html += `
+                    <div class="top-menu-item">
+                        <span>${index + 1}. ${item.nama}</span>
+                        <span style="font-weight: bold; color: var(--accent);">${item.qty} Porsi</span>
+                    </div>
+                `;
+            });
+            listMenu.innerHTML = html;
         }
     }
 </script>
