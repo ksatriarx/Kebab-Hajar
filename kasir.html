@@ -15,7 +15,7 @@
             --radius-md: 12px; --radius-lg: 20px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; height: 100vh; height: 100dvh; overflow: hidden; }
 
         /* LAYAR DIBLOKIR */
         .access-denied { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100vh; width: 100vw; text-align: center; background: var(--bg-main); }
@@ -132,14 +132,23 @@
         .cart-total-val { font-size: 18px; font-weight: 800; color: var(--primary); }
         .btn-checkout { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4); }
 
-        /* MODAL PEMBAYARAN - FIX KEYBOARD */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        /* ==========================================
+           MODAL PEMBAYARAN (PERBAIKAN KEYBOARD)
+           ========================================== */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); 
+            display: none; align-items: flex-start; /* Ubah ke atas agar tidak tertutup keyboard */
+            justify-content: center; z-index: 1000; 
+            padding: 20px; overflow-y: auto; /* Biarkan layar bisa digeser */
+        }
+        
         .modal-box { 
             background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 400px; 
             padding: 20px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            /* Trik agar tidak tertutup keyboard */
-            max-height: 90vh; overflow-y: auto; 
+            margin-top: 10vh; /* Geser sedikit ke bawah dari atas */
+            margin-bottom: 20px;
         }
+        
         .modal-title { font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 15px; }
         .pay-methods { display: flex; gap: 10px; margin-bottom: 15px; }
         .pay-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: white; font-weight: 700; font-size: 11px; cursor: pointer; transition: 0.2s; }
@@ -322,6 +331,20 @@
             } else {
                 document.getElementById('access-denied').style.display = 'flex';
                 document.getElementById('pos-app').style.display = 'none';
+            }
+        });
+
+        // AUTO SCROLL SAAT KEYBOARD MUNCUL
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputUang = document.getElementById('uang-diterima');
+            if (inputUang) {
+                inputUang.addEventListener('focus', () => {
+                    // Beri jeda agar keyboard muncul, lalu geser layar ke bawah
+                    setTimeout(() => {
+                        const modalOverlay = document.getElementById('payment-modal');
+                        modalOverlay.scrollTop = modalOverlay.scrollHeight;
+                    }, 300);
+                });
             }
         });
 
