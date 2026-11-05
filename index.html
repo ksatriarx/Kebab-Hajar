@@ -758,7 +758,7 @@
                 </div>
             </div>
             
-            <!-- FOOTER KONTAK & SOSIAL MEDIA (TANPA EMAIL) -->
+            <!-- FOOTER KONTAK & SOSIAL MEDIA -->
             <div style="text-align:center; padding: 20px 0 10px 0; border-top: 1px solid var(--border); margin-top: 20px;">
                 <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 10px;">
                     <a href="https://wa.me/6287881318261" target="_blank" style="color: var(--text-muted); text-decoration: none; font-size: 18px;">
@@ -1176,17 +1176,12 @@
                AMBIL MENU DARI FIREBASE (REAL-TIME)
                ========================================== */
             onSnapshot(collection(db, "menu_kebab"), (snapshot) => {
-                menuData = []; // Kosongkan data lama
-                
+                menuData = []; 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     menuData.push(data);
                 });
-
-                // Urutkan menu berdasarkan ID
                 menuData.sort((a, b) => a.id - b.id);
-
-                // Render ulang menu setelah data didapat
                 renderMenu();
                 calculateTotal();
             });
@@ -1323,7 +1318,7 @@
             // ==========================================
             // FUNGSI RIWAYAT PESANAN
             // ==========================================
-            async function simpanRiwayatPesanan(orderId, total, waText, statusText) {
+            async function simpanRiwayatPesanan(orderId, total, waText, statusText, rincianPesananArray = []) {
                 let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
                 history.unshift({
                     orderId: orderId,
@@ -1346,7 +1341,8 @@
                         metode: statusText,
                         status: "Menunggu Konfirmasi Toko",
                         waktu: new Date().toISOString(),
-                        detail_pesanan: waText
+                        detail_pesanan: waText,
+                        rincian: rincianPesananArray // <-- DATA BARU UNTUK LAPORAN
                     });
                 } catch (error) {
                     console.error("Gagal kirim pesanan ke Firebase: ", error);
@@ -1930,7 +1926,19 @@
                     if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                     txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                     
-                    await simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat);
+                    // Susun Rincian untuk Laporan
+                    let rincianArray = [];
+                    Object.keys(cart).forEach(cartKey => {
+                        const qty = cart[cartKey];
+                        if (qty > 0) {
+                            const parts = cartKey.split('-');
+                            const itemId = parseInt(parts[0]);
+                            const item = menuData.find(i => i.id === itemId);
+                            if(item) rincianArray.push({ nama: item.name, qty: qty, harga: item.price });
+                        }
+                    });
+
+                    await simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat, rincianArray);
                     
                     cart = {}; 
                     localStorage.removeItem('kebabCart'); 
@@ -1984,7 +1992,19 @@
                 if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                 
-                await simpanRiwayatPesanan('KEBAB-MANUAL-' + Date.now(), totals.total, txt, "Menunggu Pembayaran/Konfirmasi");
+                // Susun Rincian untuk Laporan
+                let rincianArray = [];
+                Object.keys(cart).forEach(cartKey => {
+                    const qty = cart[cartKey];
+                    if (qty > 0) {
+                        const parts = cartKey.split('-');
+                        const itemId = parseInt(parts[0]);
+                        const item = menuData.find(i => i.id === itemId);
+                        if(item) rincianArray.push({ nama: item.name, qty: qty, harga: item.price });
+                    }
+                });
+
+                await simpanRiwayatPesanan('KEBAB-MANUAL-' + Date.now(), totals.total, txt, "Menunggu Pembayaran/Konfirmasi", rincianArray);
 
                 cart = {}; 
                 localStorage.removeItem('kebabCart'); 
