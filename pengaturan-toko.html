@@ -194,7 +194,7 @@
     let statusTerpilih = "auto"; let alasanTerpilih = ""; let statusSaatIni = "auto"; let alasanSaatIni = "";
     let unsubPesanan = null; let unsubMenu = null;
     let allOrders = []; let currentFilter = 'aktif';
-    let compressedFile = null; // Variabel untuk menyimpan file hasil kompresi
+    let compressedFile = null; 
 
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === ALLOWED_EMAIL) {
@@ -219,7 +219,7 @@
         else if (tab === 'menu') { document.getElementById('area-menu').style.display = 'block'; document.getElementById('tab-menu').classList.add('active'); }
     }
 
-    // STATUS TOKO (Sama seperti sebelumnya)
+    // STATUS TOKO
     function loadStatus() { onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => { if (docSnap.exists()) { statusSaatIni = docSnap.data().status || "auto"; alasanSaatIni = docSnap.data().alasanTutup || ""; } else { statusSaatIni = "auto"; alasanSaatIni = ""; } statusTerpilih = statusSaatIni; alasanTerpilih = alasanSaatIni; tampilkanStatus(statusSaatIni); highlightOption(statusSaatIni); document.getElementById('pilih-alasan').value = alasanSaatIni; updateTombolSimpan(); }); }
     function tampilkanStatus(status) { const display = document.getElementById('status-display'); const icon = document.getElementById('status-icon'); const text = document.getElementById('status-text'); const info = document.getElementById('status-info'); display.className = 'status-display ' + status; if (status === 'buka') { icon.innerText = '🟢'; text.innerText = 'TOKO BUKA'; info.innerText = 'Pelanggan bisa memesan'; } else if (status === 'tutup') { icon.innerText = '🔴'; text.innerText = 'TOKO TUTUP'; info.innerText = 'Pelanggan tidak bisa memesan'; } else { icon.innerText = '⏰'; text.innerText = 'OTOMATIS'; info.innerText = 'Mengikuti jadwal (10:00 - 23:00)'; } }
     function highlightOption(status) { document.getElementById('opt-auto').classList.remove('active'); document.getElementById('opt-buka').classList.remove('active'); document.getElementById('opt-tutup').classList.remove('active'); document.getElementById('opt-' + status).classList.add('active'); }
@@ -228,13 +228,13 @@
     function updateTombolSimpan() { const btn = document.getElementById('btn-save'); if (statusTerpilih === statusSaatIni && alasanTerpilih === alasanSaatIni) { btn.disabled = true; } else { btn.disabled = false; } }
     window.simpanPengaturan = async () => { const btn = document.getElementById('btn-save'); btn.disabled = true; try { await setDoc(doc(db, "pengaturan", "toko"), { status: statusTerpilih, alasanTutup: alasanTerpilih, updatedAt: new Date().toISOString(), updatedBy: auth.currentUser.email }); statusSaatIni = statusTerpilih; alasanSaatIni = alasanTerpilih; alert("✅ Pengaturan berhasil disimpan!"); } catch (error) { alert("❌ Gagal menyimpan: " + error.message); btn.disabled = false; } };
 
-    // PESANAN (Sama seperti sebelumnya)
+    // PESANAN
     window.switchFilter = (filter) => { currentFilter = filter; document.getElementById('btn-filter-aktif').classList.toggle('active', filter === 'aktif'); document.getElementById('btn-filter-selesai').classList.toggle('active', filter === 'selesai'); renderOrders(); }
     window.loadPesanan = () => { const list = document.getElementById('list-pesanan'); list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>'; if (unsubPesanan) unsubPesanan(); const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc")); unsubPesanan = onSnapshot(q, (snapshot) => { allOrders = []; snapshot.forEach((doc) => { const data = doc.data(); data.id = doc.id; allOrders.push(data); }); const activeCount = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan').length; const badgeMain = document.getElementById('badge-notif'); const badgeTab = document.getElementById('badge-aktif'); if (activeCount > 0) { badgeMain.innerText = activeCount; badgeMain.classList.add('show'); badgeTab.innerText = `(${activeCount})`; } else { badgeMain.classList.remove('show'); badgeTab.innerText = ''; } renderOrders(); }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat pesanan: ${error.message}</p>`; }); }
     function renderOrders() { const list = document.getElementById('list-pesanan'); let filtered = []; if (currentFilter === 'aktif') { filtered = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan'); } else { filtered = allOrders.filter(o => o.status === 'Selesai' || o.status === 'Dibatalkan'); } if (filtered.length === 0) { list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Tidak ada pesanan ${currentFilter === 'aktif' ? 'proses' : 'selesai'}.</p>`; return; } let html = ''; filtered.forEach((data) => { const docId = data.id; let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : "Waktu error"; const namaPembeli = data.nama || 'Pelanggan'; const emailPembeli = data.email || '-'; const detailPesanan = data.detail_pesanan || 'Detail tidak tersedia'; const total = data.total_bayar || 0; const metode = data.metode || '-'; const statusSaatIni = data.status || 'Menunggu Konfirmasi Toko'; const classSelesai = (statusSaatIni === 'Selesai') ? 'selesai' : ''; html += `<div class="order-item"><div class="order-header"><span>${tgl}</span><span style="color: var(--success); font-weight: bold;">${metode}</span></div><div class="order-name">${namaPembeli} - Rp ${total.toLocaleString('id-ID')}</div><div class="order-email"><i class="fa-solid fa-envelope"></i> ${emailPembeli}</div><div class="order-detail">${detailPesanan}</div><select class="status-select ${classSelesai}" onchange="updateStatusPesanan('${docId}', this.value)"><option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option><option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option><option value="Siap Diambil" ${statusSaatIni === 'Siap Diambil' ? 'selected' : ''}>Siap Diambil (Pickup)</option><option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option><option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option><option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option></select></div>`; }); list.innerHTML = html; }
     window.updateStatusPesanan = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); } catch (error) { alert("Gagal mengubah status: " + error.message); } }
 
-    // KELOLA MENU (DIPERBARUI DENGAN KOMPRESI)
+    // KELOLA MENU
     window.loadMenuAdmin = () => { const list = document.getElementById('list-menu-admin'); if (unsubMenu) unsubMenu(); const q = query(collection(db, "menu_kebab"), orderBy("id", "asc")); unsubMenu = onSnapshot(q, (snapshot) => { if (snapshot.empty) { list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada menu.</p>'; return; } let html = ''; snapshot.forEach((doc) => { const data = doc.data(); const docId = doc.id; html += `<div class="menu-item-admin"><img src="${data.image}" alt="${data.name}"><div class="menu-item-admin-info"><div class="menu-item-admin-title">${data.name} ${data.badge ? `<span style="font-size:8px; background:var(--primary); padding:2px 4px; border-radius:4px;">${data.badge}</span>` : ''}</div><div class="menu-item-admin-price">Rp ${data.price.toLocaleString('id-ID')} (${data.category})</div></div><button class="btn-delete-menu" onclick="hapusMenu('${docId}', '${data.name}')"><i class="fa-solid fa-trash"></i></button></div>`; }); list.innerHTML = html; }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat menu: ${error.message}</p>`; }); }
 
     // FUNGSI PREVIEW & KOMPRESI GAMBAR
@@ -246,13 +246,12 @@
         preview.src = URL.createObjectURL(file);
         preview.style.display = 'block';
 
-        // Proses kompresi menggunakan Canvas
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800; // Lebar maksimal
+                const MAX_WIDTH = 800;
                 let width = img.width;
                 let height = img.height;
 
@@ -266,7 +265,6 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Konversi ke Blob dengan kualitas 0.7 (70%)
                 canvas.toBlob((blob) => {
                     if (blob) {
                         compressedFile = new File([blob], "foto_menu.jpg", { type: "image/jpeg" });
@@ -280,14 +278,12 @@
         reader.readAsDataURL(file);
     }
 
-    // FUNGSI TAMBAH MENU (DIPERBARUI)
     window.tambahMenu = async () => {
         const name = document.getElementById('menu-name').value.trim();
         const category = document.getElementById('menu-category').value;
         const price = parseInt(document.getElementById('menu-price').value);
         const imageUrl = document.getElementById('menu-image-url').value.trim();
 
-        // Validasi: Harus ada Nama, Harga, dan (File ATAU URL)
         if (!name || !price || (!compressedFile && !imageUrl)) {
             alert("Mohon isi Nama, Harga, dan Pilih Foto atau masukkan Link Gambar!");
             return;
@@ -296,16 +292,14 @@
         try {
             let finalImageUrl = imageUrl;
 
-            // Jika user memilih file, konversi ke Base64 dan simpan sebagai string
             if (compressedFile) {
                 const reader = new FileReader();
                 reader.readAsDataURL(compressedFile);
                 reader.onloadend = async () => {
-                    finalImageUrl = reader.result; // Ini adalah string Base64
+                    finalImageUrl = reader.result; 
                     await simpanMenuKeFirebase(name, category, price, finalImageUrl);
                 };
             } else {
-                // Jika user mengisi URL, langsung simpan
                 await simpanMenuKeFirebase(name, category, price, finalImageUrl);
             }
 
@@ -314,7 +308,6 @@
         }
     }
 
-    // Fungsi bantuan untuk menyimpan ke Firebase
     async function simpanMenuKeFirebase(name, category, price, image) {
         const newId = Date.now();
         await setDoc(doc(db, "menu_kebab", newId.toString()), {
@@ -329,7 +322,6 @@
 
         alert("✅ Menu berhasil ditambahkan!");
         
-        // Reset form
         document.getElementById('menu-name').value = '';
         document.getElementById('menu-price').value = '';
         document.getElementById('menu-image-url').value = '';
