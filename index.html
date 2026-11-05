@@ -477,6 +477,12 @@
         .history-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; color: var(--text-muted); }
         .history-status { font-weight: 800; color: var(--accent); }
         .history-detail { font-size: 11px; line-height: 1.4; color: var(--text-main); }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-bounce { animation: bounce 1s infinite; display: inline-block; }
     </style>
 </head>
 <body>
@@ -1116,7 +1122,7 @@
             let distanceKm = 0;
 
             // ==========================================
-            // FUNGSI RIWAYAT PESANAN (DIUPDATE)
+            // FUNGSI RIWAYAT PESANAN
             // ==========================================
             async function simpanRiwayatPesanan(orderId, total, waText, statusText) {
                 // 1. Simpan ke HP pelanggan (Lokal)
@@ -1138,10 +1144,10 @@
                     await addDoc(collection(db, "transaksi_online"), {
                         order_id: orderId,
                         nama: namaPembeli,
-                        email: emailPembeli, // <-- EMAIL DITAMBAHKAN
+                        email: emailPembeli,
                         total_bayar: total,
                         metode: statusText,
-                        status: "Menunggu Konfirmasi Toko", // <-- STATUS AWAL
+                        status: "Menunggu Konfirmasi Toko", // Status awal
                         waktu: new Date().toISOString(),
                         detail_pesanan: waText
                     });
@@ -1157,7 +1163,7 @@
                 document.getElementById('history-modal').classList.add('show');
 
                 if (isTamu) {
-                    // Tamu: Tampilkan dari LocalStorage saja (karena tidak punya email untuk dilacak)
+                    // Tamu: Tampilkan dari LocalStorage saja
                     let history = JSON.parse(localStorage.getItem('kebabOrderHistory') || '[]');
                     if (history.length === 0) {
                         container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Belum ada riwayat pesanan.</div>`;
@@ -1176,7 +1182,7 @@
                         `).join('');
                     }
                 } else {
-                    // Login: Ambil dari Firebase agar bisa melihat update status dari Admin
+                    // Login: Ambil dari Firebase agar bisa melihat update status
                     try {
                         const q = query(collection(db, "transaksi_online"), where("email", "==", auth.currentUser.email));
                         const querySnapshot = await getDocs(q);
@@ -1188,13 +1194,19 @@
                             querySnapshot.forEach((doc) => {
                                 const data = doc.data();
                                 const tgl = new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-                                const statusWarna = data.status === 'Selesai' ? '#4caf50' : (data.status === 'Dibatalkan' ? 'var(--primary)' : 'var(--accent)');
                                 
+                                let statusWarna = 'var(--accent)'; // Default kuning
+                                if (data.status === 'Selesai') statusWarna = '#4caf50';
+                                if (data.status === 'Dibatalkan') statusWarna = 'var(--primary)';
+                                if (data.status === 'Siap Diambil') statusWarna = '#25D366'; // Hijau terang
+
                                 html += `
                                     <div class="history-item">
                                         <div class="history-header">
                                             <span>${tgl}</span>
-                                            <span class="history-status" style="color: ${statusWarna}">${data.status}</span>
+                                            <span class="history-status" style="color: ${statusWarna}; font-weight: bold;">
+                                                ${data.status === 'Siap Diambil' ? '<i class="fa-solid fa-bell animate-bounce"></i> ' : ''}${data.status}
+                                            </span>
                                         </div>
                                         <div class="history-detail">
                                             <b>ID: ${data.order_id}</b><br>
@@ -1214,6 +1226,7 @@
             window.closeHistoryModal = () => {
                 document.getElementById('history-modal').classList.remove('show');
             }
+
 
             window.chatLangsung = () => {
                 const pesan = "Halo Kebab Turki Hajar, saya mau tanya-tanya dulu sebelum pesan 😊";
@@ -1686,7 +1699,7 @@
                         alert(`Saldo Anda hanya Rp ${saldoSaatIni.toLocaleString('id-ID')}.\nSisa tagihan Rp ${sisaTagihan.toLocaleString('id-ID')} mohon disiapkan untuk dibayar manual.`);
                     }
                     
-                    // Potong Saldo di Firebase (Set jadi 0 atau sisanya)
+                    // Potong Saldo di Firebase
                     const saldoBaru = saldoSaatIni - saldoTerpotong;
                     await updateDoc(docRef, { saldo: saldoBaru });
                     
@@ -1715,7 +1728,7 @@
                     if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                     txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                     
-                    // Simpan Riwayat
+                    // Simpan Riwayat (Tunggu sampai Firebase selesai menyimpan)
                     await simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat);
                     
                     // Bersihkan Keranjang
@@ -1739,7 +1752,7 @@
             // ==========================================
             // FUNGSI KIRIM VIA WA (MANUAL / TRANSFER)
             // ==========================================
-            window.confirmAndSend = () => {
+            window.confirmAndSend = async () => {
                 closeConfirmModal();
                 const name = document.getElementById('buyer-name').value.trim();
                 const notes = document.getElementById('order-notes').value.trim();
@@ -1770,8 +1783,8 @@
                 if (notes) txt += `📝 Catatan: ${notes}\n\n`;
                 txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                 
-                // Simpan ke Riwayat Pesanan
-                simpanRiwayatPesanan('KEBAB-MANUAL-' + Date.now(), totals.total, txt, "Menunggu Pembayaran/Konfirmasi");
+                // Simpan ke Riwayat Pesanan (Tunggu sampai Firebase selesai menyimpan)
+                await simpanRiwayatPesanan('KEBAB-MANUAL-' + Date.now(), totals.total, txt, "Menunggu Pembayaran/Konfirmasi");
 
                 window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`, '_blank');
                 
