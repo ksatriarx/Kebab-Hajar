@@ -1716,7 +1716,7 @@
                     txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
                     
                     // Simpan Riwayat
-                    simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat);
+                    await simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat);
                     
                     // Bersihkan Keranjang
                     cart = {}; 
