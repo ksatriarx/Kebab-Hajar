@@ -57,14 +57,12 @@ function isiDataProfil(nama, email, fotoUrl, tipeUser) {
 // ===== SISTEM SALDO FIREBASE =====
 function pantauSaldoFirebase() {
     if (!currentUserKey || currentUserKey === "tamu") return;
-    if (!window.firebaseDb) return; // Pastikan kabel sudah tersambung
+    if (!window.firebaseDb) return; 
 
     const docRef = window.firestoreDoc(window.firebaseDb, "saldo_pelanggan", currentUserKey);
     
-    // Hentikan pantauan sebelumnya jika ada
     if (unsubscribeSaldo) unsubscribeSaldo();
 
-    // Pantau perubahan saldo secara real-time
     unsubscribeSaldo = window.firestoreOnSnapshot(docRef, (docSnap) => {
         let saldoSaatIni = 0;
         if (docSnap.exists()) {
@@ -120,11 +118,16 @@ async function prosesTopUpMidtrans(nominal) {
         if(loadingOverlay) loadingOverlay.classList.remove('show');
 
         if (data.token) {
-            // 2. Munculkan Pop-up Midtrans
+            // 2. PENGAMAN BARU: Cek apakah script Midtrans berhasil dimuat
+            if (typeof window.snap === 'undefined') {
+                alert("Gagal memuat sistem pembayaran Midtrans. Silakan tutup aplikasi, bersihkan cache browser, lalu buka kembali.");
+                return;
+            }
+
+            // 3. Munculkan Pop-up Midtrans
             window.snap.pay(data.token, {
                 onSuccess: function(result){
-                    alert("✅ Pembayaran Top Up Berhasil! Saldo akan otomatis bertambah dalam beberapa detik.");
-                    // Saldo akan otomatis terupdate karena fungsi pantauSaldoFirebase()
+                    alert("✅ Pembayaran Top Up Berhasil! Saldo akan otomatis bertambah.");
                 },
                 onPending: function(result){
                     alert("⏳ Menunggu pembayaran Top Up.");
@@ -141,7 +144,9 @@ async function prosesTopUpMidtrans(nominal) {
         }
     } catch (error) {
         if(loadingOverlay) loadingOverlay.classList.remove('show');
-        alert("Terjadi kesalahan jaringan ke server pembayaran.");
+        // TAMPILKAN ERROR ASLI, BUKAN PESAN "JARINGAN" LAGI
+        console.error("Error Top Up:", error);
+        alert("Terjadi kesalahan: " + error.message);
     }
 }
 
