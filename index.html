@@ -24,6 +24,9 @@
     <!-- ===== FILE PROFIL TERPISAH ===== -->
     <link rel="stylesheet" href="profile.css?v=2">
 
+    <!-- TAMBAHAN BARU: SCRIPT MIDTRANS SNAP -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-ccHdGHCTpj08BGVP"></script>
+
     <style>
         :root {
             --bg-main: #000000;
@@ -930,8 +933,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+        import { getFirestore, doc, onSnapshot, getDoc, updateDoc, setDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
             authDomain: "kebab-idi.firebaseapp.com",
