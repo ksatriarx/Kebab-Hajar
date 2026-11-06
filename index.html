@@ -17,6 +17,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="profile.css?v=2">
+    
+    <!-- SCRIPT MIDTRANS SNAP -->
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-ccHdGHCTpj08BGVP"></script>
 
     <style>
@@ -345,11 +347,24 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, getDoc, updateDoc, setDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
+        // TAMBAHAN BARU UNTUK FCM
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+
         const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
+        
+        // VAPID KEY UNTUK FCM
+        const VAPID_KEY = "BFbIsBphFm_i0c7kKTpGecBr2vI2wdjZaHk7jB0qty_Su3h0GWtAjwk3744DmGAluTtxCErgLO-1eavbMUClENU"; 
+        
+        let messaging;
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            try { messaging = getMessaging(app); } catch (e) { console.log("FCM tidak didukung."); }
+        }
+
+        // KABEL UNTUK PROFILE.JS
         window.firebaseDb = db; window.firestoreDoc = doc; window.firestoreOnSnapshot = onSnapshot; window.firestoreGetDoc = getDoc; window.firestoreUpdateDoc = updateDoc;
         
         let manualStoreStatus = "auto";
@@ -362,7 +377,10 @@
         const buyerNameInput = document.getElementById('buyer-name');
         let isTamu = true; let menuData = []; 
 
+        // FUNGSI TOAST NOTIFICATION
         window.showToast = (message, type = 'info') => { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast ${type}`; let icon = 'fa-circle-info'; if (type === 'success') icon = 'fa-circle-check'; if (type === 'error') icon = 'fa-circle-exclamation'; const formattedMessage = message.replace(/\n/g, '<br>'); toast.innerHTML = `<i class="fa-solid ${icon}"></i><div>${formattedMessage}</div>`; container.appendChild(toast); setTimeout(() => toast.classList.add('show'), 10); setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500); };
+
+        // FUNGSI CUSTOM CONFIRM & FALLBACK WA
         let confirmCallback = null;
         window.showCustomConfirm = (message, callback) => { document.getElementById('confirm-message').innerText = message; document.getElementById('custom-confirm-modal').classList.add('show'); confirmCallback = callback; };
         window.closeCustomConfirm = () => { document.getElementById('custom-confirm-modal').classList.remove('show'); confirmCallback = null; };
@@ -377,7 +395,13 @@
 
         function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
             authScreen.style.display = 'none'; appScreen.classList.add('show'); buyerNameInput.value = namaUser; btnLogout.style.display = 'flex';
-            if (tipeUser === "Akun Google") { isTamu = false; } else { isTamu = true; }
+            if (tipeUser === "Akun Google") {
+                isTamu = false;
+                // TAMBAHAN BARU: Panggil FCM setelah 2 detik agar web tidak lag
+                setTimeout(() => { mintaIzinNotifikasi(emailUser); }, 2000); 
+            } else {
+                isTamu = true;
+            }
             if (typeof isiDataProfil === 'function') { isiDataProfil(namaUser, emailUser || "Tidak ada email", fotoUser, tipeUser); document.getElementById('prof-type').innerText = tipeUser; }
             cekTombolSaldo(); initApp();
         }
@@ -388,6 +412,36 @@
         });
 
         function cekTombolSaldo() { document.getElementById('btn-bayar-saldo').style.display = isTamu ? 'none' : 'flex'; }
+
+        // TAMBAHAN BARU: FUNGSI MENGAMBIL TOKEN FCM
+        async function mintaIzinNotifikasi(emailUser) {
+            if (!messaging || isTamu) return;
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    console.log('Izin notifikasi diberikan.');
+                    const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+                    
+                    if (currentToken) {
+                        console.log('Token FCM:', currentToken);
+                        const emailKey = emailUser.replace(/[^a-zA-Z0-9]/g, "");
+                        // Simpan token ke database pelanggan (gabungkan dengan saldo)
+                        await setDoc(doc(db, "saldo_pelanggan", emailKey), { 
+                            fcm_token: currentToken 
+                        }, { merge: true });
+                    }
+                }
+            } catch (err) {
+                console.log('Gagal mendapatkan izin notifikasi: ', err);
+            }
+        }
+
+        // TAMBAHAN BARU: Menerima notifikasi saat web sedang dibuka (Foreground)
+        if (messaging) {
+            onMessage(messaging, (payload) => {
+                showToast(payload.notification.title + ": " + payload.notification.body, "info");
+            });
+        }
 
         function initApp() {
             if (window.appInitialized) return; window.appInitialized = true;
@@ -514,8 +568,6 @@
                     const hasVariants = item.variants && item.variants.length > 0;
                     let totalQty = 0; Object.keys(cart).forEach(key => { if (key.startsWith(item.id + '-') || key === item.id.toString()) { totalQty += cart[key]; } });
                     const imgUrl = getItemImage(item);
-                    
-                    // CEK STATUS (PERSIAPAN / SIAP)
                     const isPersiapan = item.status === 'persiapan'; 
                     let actionButton = '';
 
