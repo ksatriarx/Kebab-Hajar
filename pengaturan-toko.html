@@ -78,10 +78,10 @@
         .btn-delete-menu { background: rgba(229, 57, 53, 0.2); color: var(--primary); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .file-input-wrapper { position: relative; margin-bottom: 10px; }
         .file-input-wrapper input[type="file"] { display: none; }
-        .btn-file { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; background: var(--bg-input); border: 1px dashed var(--accent); color: var(--accent); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .btn-file { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; background: var(--bg-main); border: 1px dashed var(--accent); color: var(--accent); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
         .preview-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; display: none; }
 
-        /* LAPORAN (BARU) */
+        /* LAPORAN */
         .report-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(0,0,0,0)); border: 1px solid var(--success); padding: 20px; border-radius: var(--radius); text-align: center; margin-bottom: 15px; }
         .report-title { font-size: 12px; color: #fff; opacity: 0.8; margin-bottom: 5px; }
         .report-value { font-size: 28px; font-weight: 800; color: var(--success); }
@@ -178,7 +178,7 @@
         </div>
     </div>
 
-    <!-- LAPORAN (BARU) -->
+    <!-- LAPORAN -->
     <div id="area-laporan" style="display: none;">
         <div class="card">
             <div class="filter-tabs" style="margin-bottom: 20px;">
@@ -188,7 +188,7 @@
             </div>
 
             <div class="report-card">
-                <div class="report-title">Total Pendapatan (Selesai & Saldo)</div>
+                <div class="report-title">Total Pendapatan (Online + Kasir)</div>
                 <div class="report-value" id="lap-total-uang">Rp 0</div>
             </div>
 
@@ -221,7 +221,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
@@ -244,7 +244,9 @@
     
     // Variabel Laporan
     let filterLaporan = 'hari';
-    let allOrdersForReport = []; // Menyimpan semua data untuk dihitung
+    let allOrdersForReport = []; // Menyimpan data online
+    let allKasirForReport = []; // Menyimpan data kasir offline
+    let isKasirLoaded = false; // Penanda apakah data kasir sudah ditarik
 
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === ALLOWED_EMAIL) {
@@ -271,7 +273,17 @@
         if(tab === 'status') { document.getElementById('area-status').style.display = 'block'; document.getElementById('tab-status').classList.add('active'); }
         else if (tab === 'pesanan') { document.getElementById('area-pesanan').style.display = 'block'; document.getElementById('tab-pesanan').classList.add('active'); }
         else if (tab === 'menu') { document.getElementById('area-menu').style.display = 'block'; document.getElementById('tab-menu').classList.add('active'); }
-        else if (tab === 'laporan') { document.getElementById('area-laporan').style.display = 'block'; document.getElementById('tab-laporan').classList.add('active'); hitungLaporan(); }
+        else if (tab === 'laporan') { 
+            document.getElementById('area-laporan').style.display = 'block'; 
+            document.getElementById('tab-laporan').classList.add('active'); 
+            
+            // JIKA DATA KASIR BELUM DIMUAT, TARIK DARI FIREBASE
+            if (!isKasirLoaded) {
+                loadLaporanKasir();
+            } else {
+                hitungLaporan();
+            }
+        }
     }
 
     // STATUS TOKO
@@ -298,47 +310,85 @@
     window.hapusMenu = async (docId, namaMenu) => { if (confirm(`Yakin ingin menghapus menu "${namaMenu}"?`)) { try { await deleteDoc(doc(db, "menu_kebab", docId)); alert("✅ Menu berhasil dihapus."); } catch (error) { alert("❌ Gagal menghapus: " + error.message); } } }
 
     // ==========================================
-    // FUNGSI LAPORAN (BARU)
+    // FUNGSI LAPORAN (UPDATE: ONLINE + KASIR)
     // ==========================================
+    
+    // Fungsi untuk mengambil data dari Kasir Offline (hanya dipanggil sekali saat tab Laporan dibuka)
+    async function loadLaporanKasir() {
+        const listMenu = document.getElementById('list-menu-terlaris');
+        listMenu.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Menarik data kasir...</p>';
+        
+        try {
+            const querySnapshot = await getDocs(collection(db, "transaksi_kasir"));
+            allKasirForReport = [];
+            querySnapshot.forEach((doc) => {
+                allKasirForReport.push(doc.data());
+            });
+            isKasirLoaded = true;
+            hitungLaporan(); // Setelah data kasir didapat, hitung semuanya
+        } catch (error) {
+            console.error("Gagal load kasir:", error);
+            listMenu.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat data kasir: ${error.message}</p>`;
+        }
+    }
+
     window.gantiFilterLaporan = (filter) => {
         filterLaporan = filter;
         document.getElementById('btn-lap-hari').classList.toggle('active', filter === 'hari');
         document.getElementById('btn-lap-bulan').classList.toggle('active', filter === 'bulan');
         document.getElementById('btn-lap-semua').classList.toggle('active', filter === 'semua');
-        hitungLaporan();
+        
+        if (!isKasirLoaded) {
+            loadLaporanKasir();
+        } else {
+            hitungLaporan();
+        }
     }
 
     function hitungLaporan() {
         const sekarang = new Date();
         let totalPendapatan = 0;
         let totalPesanan = 0;
-        let menuTerjual = {}; // Objek untuk menghitung qty per menu
+        let menuTerjual = {}; 
 
+        // Fungsi pembantu untuk memfilter tanggal
+        const isTanggalValid = (waktuStr) => {
+            if (!waktuStr) return false;
+            const tglOrder = new Date(waktuStr);
+            if (filterLaporan === 'hari') return tglOrder.toDateString() === sekarang.toDateString();
+            if (filterLaporan === 'bulan') return tglOrder.getMonth() === sekarang.getMonth() && tglOrder.getFullYear() === sekarang.getFullYear();
+            return true; // 'semua'
+        };
+
+        // 1. PROSES PESANAN ONLINE (transaksi_online)
         allOrdersForReport.forEach(order => {
-            // Filter berdasarkan status (Hanya Selesai atau Lunas via Saldo)
             const isSelesai = order.status === 'Selesai';
             const isLunasSaldo = order.metode && order.metode.includes('Lunas via Saldo');
             
-            if (!isSelesai && !isLunasSaldo) return; // Lewati jika belum selesai dan bukan lunas saldo
-
-            // Filter berdasarkan tanggal
-            let validTanggal = false;
-            if (order.waktu) {
-                const tglOrder = new Date(order.waktu);
-                if (filterLaporan === 'hari') {
-                    validTanggal = tglOrder.toDateString() === sekarang.toDateString();
-                } else if (filterLaporan === 'bulan') {
-                    validTanggal = tglOrder.getMonth() === sekarang.getMonth() && tglOrder.getFullYear() === sekarang.getFullYear();
-                } else {
-                    validTanggal = true; // Semua
-                }
-            }
-
-            if (validTanggal) {
+            // Hanya hitung jika status Selesai atau Lunas via Saldo, DAN tanggalnya valid
+            if ((isSelesai || isLunasSaldo) && isTanggalValid(order.waktu)) {
                 totalPendapatan += (order.total_bayar || 0);
                 totalPesanan += 1;
+                
+                if (order.rincian && Array.isArray(order.rincian)) {
+                    order.rincian.forEach(item => {
+                        if (menuTerjual[item.nama]) {
+                            menuTerjual[item.nama] += item.qty;
+                        } else {
+                            menuTerjual[item.nama] = item.qty;
+                        }
+                    });
+                }
+            }
+        });
 
-                // Hitung menu terjual
+        // 2. PROSES PESANAN KASIR OFFLINE (transaksi_kasir)
+        allKasirForReport.forEach(order => {
+            // Semua transaksi kasir otomatis dianggap sukses
+            if (isTanggalValid(order.waktu)) {
+                totalPendapatan += (order.total || 0);
+                totalPesanan += 1;
+                
                 if (order.rincian && Array.isArray(order.rincian)) {
                     order.rincian.forEach(item => {
                         if (menuTerjual[item.nama]) {
