@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pesan Mandiri - Kebab Turki Hajar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-ccHdGHCTpj08BGVP"></script>
+    <style>
+        :root {
+            --bg-main: #fcfbf7; --bg-card: #ffffff;
+            --text-main: #2d3748; --text-muted: #718096;
+            --primary: #ff7e67; --primary-hover: #ff6b52;
+            --accent: #ffb142; --success: #38b2ac;
+            --border: #e2e8f0;
+            --radius-md: 16px; --radius-lg: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; overflow: hidden; }
+        
+        .kiosk-container { width: 100%; max-width: 100vw; height: 100vh; display: flex; flex-direction: column; background: var(--bg-main); }
+        
+        /* HEADER */
+        .header { background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); z-index: 10; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .header h1 { font-size: 18px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .header h1 span { color: var(--text-main); font-style: normal; }
+        
+        /* LAYOUT */
+        .main-layout { display: flex; flex-grow: 1; overflow: hidden; padding: 15px; gap: 15px; }
+        
+        /* MENU AREA */
+        .menu-area { flex: 2; overflow-y: auto; padding-bottom: 80px; }
+        .category-pills { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .category-pills::-webkit-scrollbar { display: none; }
+        .cat-pill { background: #fff; border: 1px solid var(--border); padding: 8px 20px; border-radius: 20px; font-weight: 700; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(255,126,103,0.3); }
+        
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .menu-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); display: flex; flex-direction: column; transition: transform 0.2s; border: 1px solid #f0f0f0; }
+        .menu-card:active { transform: scale(0.98); }
+        .menu-img { width: 100%; aspect-ratio: 1/1; border-radius: 12px; object-fit: cover; margin-bottom: 8px; }
+        .menu-title { font-size: 13px; font-weight: 800; margin-bottom: 4px; line-height: 1.3; }
+        .menu-price { font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+        .btn-add { background: var(--primary); color: white; border: none; width: 100%; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-add:active { background: var(--primary-hover); }
+        .btn-add:disabled { background: #cbd5e0; cursor: not-allowed; }
+        .qty-control { display: flex; justify-content: space-between; align-items: center; background: #f7fafc; border-radius: 8px; padding: 4px; border: 1px solid var(--border); }
+        .qty-control button { background: white; border: 1px solid var(--border); color: var(--text-main); width: 26px; height: 26px; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .qty-control span { font-weight: 800; font-size: 13px; }
+
+        /* CART AREA (Sisi Kanan di Tablet/Desktop, Bawah di HP) */
+        .cart-area { flex: 1; min-width: 300px; max-width: 350px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: 0 8px 30px rgba(0,0,0,0.06); display: flex; flex-direction: column; border: 1px solid #f0f0f0; }
+        .cart-header { padding: 15px; border-bottom: 1px dashed var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .cart-header h2 { font-size: 16px; font-weight: 800; }
+        .cart-list { flex-grow: 1; overflow-y: auto; padding: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #edf2f7; }
+        .cart-item-info { flex-grow: 1; }
+        .cart-item-name { font-size: 13px; font-weight: 700; }
+        .cart-item-price { font-size: 12px; color: var(--text-muted); }
+        .cart-footer { padding: 15px; border-top: 1px solid var(--border); background: #fafafa; border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg); }
+        .total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; margin-bottom: 15px; }
+        .btn-checkout { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(56,178,172,0.3); }
+
+        /* MODAL PEMBAYARAN */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(45, 55, 72, 0.6); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-box { background: white; border-radius: 24px; width: 100%; max-width: 400px; padding: 25px; text-align: center; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-box h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+        .modal-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+        .pay-options { display: flex; gap: 15px; }
+        .pay-btn { flex: 1; padding: 20px 10px; border-radius: 16px; border: 2px solid var(--border); background: white; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .pay-btn:hover { border-color: var(--primary); background: #fff5f3; }
+        .pay-btn i { font-size: 28px; color: var(--text-main); }
+        .pay-btn span { font-weight: 800; font-size: 14px; }
+        .pay-btn small { color: var(--text-muted); font-size: 11px; }
+        .btn-close-modal { margin-top: 20px; background: transparent; border: none; color: var(--text-muted); font-weight: 700; cursor: pointer; }
+
+        /* SUKSES MODAL */
+        #success-modal { z-index: 1001; }
+        .success-icon { width: 80px; height: 80px; background: #e6fffa; color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px; }
+        .queue-number { font-size: 48px; font-weight: 800; color: var(--primary); margin: 15px 0; }
+
+        /* RESPONSIVE (MODE HP) */
+        @media (max-width: 768px) {
+            .main-layout { flex-direction: column; padding: 0; gap: 0; }
+            .menu-area { padding: 15px; padding-bottom: 150px; }
+            .cart-area { position: fixed; bottom: 0; left: 0; width: 100%; max-width: 100%; border-radius: 24px 24px 0 0; max-height: 50vh; transform: translateY(100%); transition: transform 0.3s; z-index: 100; }
+            .cart-area.show { transform: translateY(0); }
+            .cart-header { padding: 10px 15px; }
+            .cart-header h2 { font-size: 14px; }
+            .cart-list { padding: 10px 15px; max-height: 200px; }
+            .cart-footer { padding: 10px 15px; }
+            .btn-checkout { padding: 12px; font-size: 14px; }
+            
+            /* Tombol Keranjang Melayang */
+            .floating-cart-btn { display: flex; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 800; box-shadow: 0 10px 25px rgba(255,126,103,0.5); z-index: 99; align-items: center; gap: 10px; border: none; cursor: pointer; width: 90%; justify-content: center; }
+        }
+        @media (min-width: 769px) {
+            .floating-cart-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="kiosk-container">
+        <div class="header">
+            <h1><i class="fa-solid fa-utensils"></i> Kebab <span>Hajar</span></h1>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); background: #f0f0f0; padding: 5px 12px; border-radius: 20px;">Self Service</div>
+        </div>
+
+        <div class="main-layout">
+            <!-- MENU -->
+            <div class="menu-area">
+                <div class="category-pills">
+                    <button class="cat-pill active" onclick="switchCategory('makanan')" id="cat-makanan">Makanan</button>
+                    <button class="cat-pill" onclick="switchCategory('minuman')" id="cat-minuman">Minuman</button>
+                </div>
+                <div class="menu-grid" id="menu-grid">
+                    <!-- Diisi JS -->
+                </div>
+            </div>
+
+            <!-- KERANJANG -->
+            <div class="cart-area" id="cart-area">
+                <div class="cart-header">
+                    <h2>Pesanan Anda</h2>
+                    <button onclick="toggleCart()" style="display: none; background:none; border:none; font-size: 20px;" id="btn-close-cart-mobile"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="cart-list" id="cart-list">
+                    <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 20px;">Belum ada pesanan.</p>
+                </div>
+                <div class="cart-footer">
+                    <div class="total-row">
+                        <span>Total:</span>
+                        <span id="cart-total">Rp 0</span>
+                    </div>
+                    <button class="btn-checkout" onclick="openPaymentModal()">Lanjut Pembayaran</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol Keranjang untuk HP -->
+    <button class="floating-cart-btn" onclick="toggleCart()" id="floating-cart-btn">
+        <i class="fa-solid fa-cart-shopping"></i> Lihat Pesanan (<span id="floating-cart-count">0</span>)
+    </button>
+
+    <!-- MODAL PILIH PEMBAYARAN -->
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal-box">
+            <h3>Pilih Pembayaran</h3>
+            <p>Silakan pilih metode pembayaran Anda</p>
+            
+            <div class="pay-options">
+                <button class="pay-btn" onclick="prosesTunai()">
+                    <i class="fa-solid fa-money-bill-wave" style="color: var(--success);"></i>
+                    <span>Tunai</span>
+                    <small>Bayar di Kasir</small>
+                </button>
+                <button class="pay-btn" onclick="prosesQRIS()">
+                    <i class="fa-solid fa-qrcode" style="color: var(--primary);"></i>
+                    <span>QRIS</span>
+                    <small>Scan & Bayar</small>
+                </button>
+            </div>
+            
+            <button class="btn-close-modal" onclick="closeModal('payment-modal')">Batal</button>
+        </div>
+    </div>
+
+    <!-- MODAL SUKSES -->
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-box">
+            <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+            <h3 id="success-title">Pesanan Dibuat!</h3>
+            <p id="success-desc">Silakan tunjukkan nomor ini ke Kasir untuk melakukan pembayaran.</p>
+            
+            <div style="font-size: 14px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Nomor Antrean</div>
+            <div class="queue-number" id="display-queue">#00</div>
+            
+            <button class="btn-checkout" onclick="kembaliKeAwal()" style="margin-top: 20px;">Selesai</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let menuData = []; let cart = {}; let currentCategory = 'makanan'; let isCartOpen = false;
+
+        // 1. Ambil Data Menu
+        onSnapshot(collection(db, "menu_kebab"), (snapshot) => {
+            menuData = [];
+            snapshot.forEach((doc) => { menuData.push(doc.data()); });
+            menuData.sort((a, b) => a.id - b.id);
+            renderMenu();
+        });
+
+        window.switchCategory = (cat) => {
+            currentCategory = cat;
+            document.getElementById('cat-makanan').classList.toggle('active', cat === 'makanan');
+            document.getElementById('cat-minuman').classList.toggle('active', cat === 'minuman');
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            const filtered = menuData.filter(item => item.category === currentCategory);
+            
+            if(filtered.length === 0) { grid.innerHTML = `<p style="text-align:center; width:100%; color:var(--text-muted);">Belum ada menu.</p>`; return; }
+
+            grid.innerHTML = filtered.map(item => {
+                const qty = cart[item.id] || 0;
+                const isPersiapan = item.status === 'persiapan';
+                let btn = '';
+
+                if (isPersiapan) {
+                    btn = `<button class="btn-add" disabled>Sedang Persiapan</button>`;
+                } else {
+                    btn = qty === 0 
+                        ? `<button class="btn-add" onclick="addToCart(${item.id})">Tambah</button>` 
+                        : `<div class="qty-control"><button onclick="updateQty(${item.id}, -1)">-</button><span>${qty}</span><button onclick="updateQty(${item.id}, 1)">+</button></div>`;
+                }
+
+                return `
+                    <div class="menu-card">
+                        <img src="${item.image}" class="menu-img" alt="${item.name}">
+                        <div class="menu-title">${item.name}</div>
+                        <div class="menu-price">Rp ${item.price.toLocaleString('id-ID')}</div>
+                        ${btn}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addToCart = (id) => { updateQty(id, 1); }
+        window.updateQty = (id, change) => {
+            if (!cart[id]) cart[id] = 0;
+            cart[id] += change;
+            if (cart[id] <= 0) delete cart[id];
+            renderMenu();
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-list');
+            let html = '', total = 0, count = 0;
+
+            Object.keys(cart).forEach(id => {
+                const qty = cart[id];
+                const item = menuData.find(i => i.id === parseInt(id));
+                if (item) {
+                    total += item.price * qty;
+                    count += qty;
+                    html += `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-price">${qty} x Rp ${item.price.toLocaleString('id-ID')}</div>
+                            </div>
+                            <div style="font-weight: 800; font-size: 13px;">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (html === '') html = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 20px;">Belum ada pesanan.</p>`;
+            
+            list.innerHTML = html;
+            document.getElementById('cart-total').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('floating-cart-count').innerText = count;
+        }
+
+        window.toggleCart = () => {
+            const cartArea = document.getElementById('cart-area');
+            const btnClose = document.getElementById('btn-close-cart-mobile');
+            isCartOpen = !isCartOpen;
+            if (isCartOpen) {
+                cartArea.classList.add('show');
+                btnClose.style.display = 'block';
+            } else {
+                cartArea.classList.remove('show');
+                btnClose.style.display = 'none';
+            }
+        }
+
+        window.openPaymentModal = () => {
+            if (Object.keys(cart).length === 0) { alert("Pilih menu dulu ya!"); return; }
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+
+        window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; }
+
+        // Logika Generate Nomor Antrean (Sederhana & Cepat)
+        function getQueueNumber() {
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0');
+            return `S-${timeStr}`; // Contoh: S-1430 (Self-service jam 14:30)
+        }
+
+        async function simpanPesanan(metode, status) {
+            const queueNum = getQueueNumber();
+            let total = 0, rincian = [];
+            
+            Object.keys(cart).forEach(id => {
+                const qty = cart[id];
+                const item = menuData.find(i => i.id === parseInt(id));
+                if (item) {
+                    total += item.price * qty;
+                    rincian.push({ nama: item.name, qty: qty, harga: item.price, id: item.id });
+                }
+            });
+
+            const orderData = {
+                order_id: 'SELF-' + Date.now(),
+                queue_number: queueNum,
+                waktu: new Date().toISOString(),
+                rincian: rincian,
+                total: total,
+                metode: metode,
+                status: status
+            };
+
+            const docRef = await addDoc(collection(db, "transaksi_selfservice"), orderData);
+            return { queueNum, docRef: docRef.id, total, orderId: orderData.order_id };
+        }
+
+        // Skenario 1: Tunai
+        window.prosesTunai = async () => {
+            closeModal('payment-modal');
+            try {
+                const res = await simpanPesanan('Tunai', 'Menunggu Pembayaran Kasir');
+                document.getElementById('success-title').innerText = "Pesanan Dibuat!";
+                document.getElementById('success-desc').innerText = "Silakan bayar ke Kasir. Tunjukkan nomor antrean ini.";
+                document.getElementById('display-queue').innerText = res.queueNum;
+                document.getElementById('success-modal').style.display = 'flex';
+            } catch (e) {
+                alert("Gagal membuat pesanan: " + e.message);
+            }
+        }
+
+        // Skenario 2: QRIS (Midtrans)
+        window.prosesQRIS = async () => {
+            closeModal('payment-modal');
+            try {
+                // 1. Simpan pesanan sementara
+                const res = await simpanPesanan('QRIS', 'Menunggu Pembayaran QRIS');
+                
+                // 2. Panggil Vercel untuk minta Token
+                const response = await fetch('https://kebab-backend.vercel.app/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: res.orderId,
+                        gross_amount: res.total,
+                        nama_pembeli: "Pelanggan Self Service",
+                        email_pembeli: "selfservice@kebabidi.com"
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.token) {
+                    window.snap.pay(data.token, {
+                        onSuccess: function(result){
+                            // Karena webhook akan mengupdate status, kita langsung tampilkan sukses
+                            document.getElementById('success-title').innerText = "Pembayaran Berhasil!";
+                            document.getElementById('success-desc').innerText = "Terima kasih. Pesanan Anda sedang disiapkan.";
+                            document.getElementById('display-queue').innerText = res.queueNum;
+                            document.getElementById('success-modal').style.display = 'flex';
+                        },
+                        onPending: function(result){
+                            alert("⏳ Menunggu pembayaran.");
+                            kembaliKeAwal();
+                        },
+                        onError: function(result){
+                            alert("❌ Pembayaran gagal.");
+                            kembaliKeAwal();
+                        }
+                    });
+                } else {
+                    alert("Gagal memuat sistem pembayaran.");
+                }
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        }
+
+        window.kembaliKeAwal = () => {
+            cart = {};
+            document.getElementById('success-modal').style.display = 'none';
+            renderMenu();
+            renderCart();
+            if (isCartOpen) toggleCart();
+            window.location.reload(); // Segarkan halaman agar bersih
+        }
+    </script>
+</body>
+</html>
