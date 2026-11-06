@@ -113,7 +113,7 @@
         .menu-price { font-size: 10px; font-weight: 800; color: var(--accent); }
         .btn-add { background: var(--primary); color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; transition: transform 0.1s; }
         .btn-add:active { transform: scale(0.9); }
-        .btn-add:disabled { background: #555; cursor: not-allowed; font-size: 6px; width: auto; padding: 0 6px; border-radius: 10px; color: #aaa; }
+        .btn-add:disabled { background: #ffb300; cursor: not-allowed; font-size: 7px; width: auto; padding: 0 6px; border-radius: 10px; color: #000; font-weight: bold; }
         .qty-wrap { display: flex; align-items: center; gap: 4px; background: var(--bg-input); padding: 2px; border-radius: 12px; }
         .qty-btn { background: var(--bg-card-hover); border: none; color: #fff; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; cursor: pointer; }
         .qty-num { font-size: 9px; font-weight: 700; min-width: 10px; text-align: center; }
@@ -343,7 +343,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, getDoc, updateDoc, setDoc, collection, addDoc, query, where, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, getDoc, updateDoc, setDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
         const app = initializeApp(firebaseConfig);
@@ -448,17 +448,6 @@
                     const namaPembeli = document.getElementById('buyer-name').value.trim() || "Pelanggan";
                     const emailPembeli = isTamu ? "Tamu (Tanpa Email)" : auth.currentUser.email;
                     await addDoc(collection(db, "transaksi_online"), { order_id: orderId, nama: namaPembeli, email: emailPembeli, total_bayar: total, metode: statusText, status: "Menunggu Konfirmasi Toko", waktu: new Date().toISOString(), detail_pesanan: waText, rincian: rincianPesananArray });
-                    
-                    // ==== POTONG STOK OTOMATIS SAAT PESANAN MASUK ====
-                    for (const item of rincianPesananArray) {
-                        // Cari menu yang namanya cocok untuk mendapatkan ID
-                        const menuAsli = menuData.find(m => m.name === item.nama);
-                        if (menuAsli) {
-                            await updateDoc(doc(db, "menu_kebab", menuAsli.id.toString()), { stok: increment(-item.qty) });
-                        }
-                    }
-                    // =================================================
-                    
                 } catch (error) { console.error("Gagal kirim pesanan ke Firebase: ", error); }
             }
 
@@ -526,12 +515,12 @@
                     let totalQty = 0; Object.keys(cart).forEach(key => { if (key.startsWith(item.id + '-') || key === item.id.toString()) { totalQty += cart[key]; } });
                     const imgUrl = getItemImage(item);
                     
-                    // CEK STOK (Jika stok undefined, anggap tersedia)
-                    const stokTersedia = item.stok !== undefined ? item.stok : 999; 
+                    // CEK STATUS (PERSIAPAN / SIAP)
+                    const isPersiapan = item.status === 'persiapan'; 
                     let actionButton = '';
 
-                    if (stokTersedia <= 0) {
-                        actionButton = `<button class="btn-add" disabled>Habis</button>`;
+                    if (isPersiapan) {
+                        actionButton = `<button class="btn-add" disabled>Persiapan</button>`;
                     } else if (hasVariants) {
                         if (totalQty === 0) { actionButton = `<button class="btn-add" onclick="openVariantModal(${item.id})"><i class="fa-solid fa-plus"></i></button>`; } 
                         else { actionButton = `<div class="qty-wrap"><button class="qty-btn" onclick="removeOneVariant(${item.id})"><i class="fa-solid fa-minus"></i></button><span class="qty-num">${totalQty}</span><button class="qty-btn" onclick="openVariantModal(${item.id})"><i class="fa-solid fa-plus"></i></button></div>`; }
