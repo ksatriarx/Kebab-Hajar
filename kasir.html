@@ -28,19 +28,22 @@
         .btn-icon { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: 0.2s; }
         .btn-icon-admin { display: none; }
         .btn-logout { background: rgba(229, 57, 53, 0.1); color: var(--primary); border: 1px solid var(--primary); padding: 0 12px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 10px; transition: 0.2s; }
-        .tabs { display: flex; padding: 10px 15px 0 15px; gap: 10px; border-bottom: 1px solid var(--border); background: var(--bg-main); flex-shrink: 0; }
-        .tab-btn { flex: 1; padding: 10px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; position: relative; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 6px; }
+        
+        .tabs { display: flex; padding: 10px 15px 0 15px; gap: 10px; border-bottom: 1px solid var(--border); background: var(--bg-main); flex-shrink: 0; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 10px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; position: relative; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 6px; white-space: nowrap; }
         .tab-btn.active { color: var(--primary); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; box-shadow: 0 -2px 10px rgba(229, 57, 53, 0.5); }
         .badge-notif { background: var(--accent); color: #000; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; display: none; animation: pulse 2s infinite; }
         .badge-notif.show { display: inline-block; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
         .content-area { flex-grow: 1; overflow-y: auto; display: none; position: relative; }
         .content-area.active { display: block; }
 
-        .online-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        .online-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 12px; border: 1px solid var(--border); position: relative; overflow: hidden; }
-        .online-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+        /* KARTU PESANAN (Dipakai untuk Online & Self Service) */
+        .order-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .order-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 12px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .order-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
         .oc-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 9px; color: var(--text-muted); }
         .order-badge { background: var(--primary); color: white; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
         .oc-name { font-size: 14px; font-weight: 800; color: white; margin-bottom: 2px; }
@@ -53,6 +56,7 @@
         .btn-proses { background: rgba(255, 179, 0, 0.2); color: var(--accent); border: 1px solid var(--accent); }
         .btn-selesai { background: var(--success); color: white; }
 
+        /* KASIR OFFLINE */
         .pos-layout { display: flex; flex-direction: column; height: 100%; }
         .menu-section { flex-grow: 1; padding: 10px; overflow-y: auto; }
         .category-scroll { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; scrollbar-width: none; }
@@ -107,17 +111,6 @@
         .custom-keypad .btn-del { color: var(--accent); }
         .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 11px; }
         .empty-state i { font-size: 30px; opacity: 0.3; margin-bottom: 8px; display: block; }
-
-        @media (orientation: landscape) and (max-height: 500px) {
-            .pos-container { max-width: 100vw; } .pos-header { display: none; } .tabs { position: absolute; top: 0; left: 0; width: 100%; background: var(--bg-main); z-index: 5; padding: 0 15px; height: 40px; }
-            .content-area.active { display: flex; width: 100%; height: 100vh; height: 100dvh; padding-top: 40px; } .pos-layout { display: flex; flex-direction: row; width: 100%; height: 100%; margin: 0; }
-            .menu-section { flex: 1; height: 100%; border-right: 1px solid var(--border); padding: 15px; overflow-y: auto; } .menu-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-            .cart-section { width: 35%; min-width: 280px; max-width: 350px; height: 100%; max-height: none; margin-left: auto; border-radius: 0; border-top: none; border-left: 1px solid var(--border); box-shadow: none; padding: 15px; }
-            .cart-list-pos { flex-grow: 1; height: auto; } .btn-checkout { margin-top: auto; } .online-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; width: 100%; padding: 15px; }
-            .modal-box { max-width: 650px; height: 95dvh; max-height: 95dvh; padding: 8px 12px; } .modal-title { display: none; } .pay-methods { margin-bottom: 4px; gap: 4px; } .pay-btn { padding: 4px; font-size: 9px; }
-            .form-group { margin-bottom: 4px; } .form-label { margin-bottom: 1px; font-size: 8px; } .form-input { padding: 4px; font-size: 14px; } .change-box { padding: 4px; margin-bottom: 4px; } .change-row { font-size: 9px; margin-bottom: 2px; } .change-val { font-size: 12px; }
-            .modal-actions { gap: 4px; } .btn-cancel, .btn-confirm { padding: 6px; font-size: 10px; } .custom-keypad { gap: 3px; } .custom-keypad button { font-size: 12px; }
-        }
     </style>
 </head>
 <body>
@@ -143,12 +136,19 @@
         </div>
 
         <div class="tabs">
-            <button id="tab-btn-online" class="tab-btn active" onclick="switchTab('online')">Pesanan Web <span id="badge-online" class="badge-notif">0</span></button>
+            <button id="tab-btn-online" class="tab-btn active" onclick="switchTab('online')">Web <span id="badge-online" class="badge-notif">0</span></button>
+            <button id="tab-btn-self" class="tab-btn" onclick="switchTab('self')">Self Service <span id="badge-self" class="badge-notif">0</span></button>
             <button id="tab-btn-offline" class="tab-btn" onclick="switchTab('offline')">Kasir Offline</button>
         </div>
 
         <div id="area-online" class="content-area active">
-            <div class="online-list" id="online-orders-list">
+            <div class="order-list" id="online-orders-list">
+                <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Memuat pesanan...</div>
+            </div>
+        </div>
+
+        <div id="area-self" class="content-area">
+            <div class="order-list" id="self-orders-list">
                 <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Memuat pesanan...</div>
             </div>
         </div>
@@ -228,13 +228,13 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         const ALLOWED_EMAIL = "rxstore101@gmail.com";
-        let menuData = []; let cart = {}; let metodePembayaran = 'cash'; let currentCategory = 'makanan'; let unsubOnlineOrders = null; let inputUangString = ""; 
-        let isFirstLoad = true; let knownOrderIds = new Set(); let audioCtx = null;
+        let menuData = []; let cart = {}; let metodePembayaran = 'cash'; let currentCategory = 'makanan'; let unsubOnlineOrders = null; let unsubSelfOrders = null; let inputUangString = ""; 
+        let isFirstLoadOnline = true; let knownOrderIdsOnline = new Set(); let isFirstLoadSelf = true; let knownOrderIdsSelf = new Set(); let audioCtx = null;
 
         window.toggleFullscreen = () => { if (!document.fullscreenElement) { if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen().catch(err => { console.log(`Gagal: ${err.message}`); }); } } else { if (document.exitFullscreen) { document.exitFullscreen(); } } };
         document.body.addEventListener('click', function unlockAudio() { if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } if (audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
@@ -244,12 +244,21 @@
             if (user && user.email === ALLOWED_EMAIL) {
                 document.getElementById('access-denied').style.display = 'none'; document.getElementById('pos-app').style.display = 'flex'; document.getElementById('header-email').innerText = user.email;
                 if(user.email === ALLOWED_EMAIL) document.getElementById('btn-settings-admin').style.display = 'flex';
-                loadMenuOffline(); listenOnlineOrders();
+                loadMenuOffline(); listenOnlineOrders(); listenSelfServiceOrders();
             } else { document.getElementById('access-denied').style.display = 'flex'; document.getElementById('pos-app').style.display = 'none'; }
         });
 
-        window.switchTab = (tab) => { document.getElementById('area-online').classList.remove('active'); document.getElementById('area-offline').classList.remove('active'); document.getElementById('tab-btn-online').classList.remove('active'); document.getElementById('tab-btn-offline').classList.remove('active'); if(tab === 'online') { document.getElementById('area-online').classList.add('active'); document.getElementById('tab-btn-online').classList.add('active'); } else { document.getElementById('area-offline').classList.add('active'); document.getElementById('tab-btn-offline').classList.add('active'); } }
+        window.switchTab = (tab) => { 
+            document.getElementById('area-online').classList.remove('active'); document.getElementById('area-offline').classList.remove('active'); document.getElementById('area-self').classList.remove('active'); 
+            document.getElementById('tab-btn-online').classList.remove('active'); document.getElementById('tab-btn-offline').classList.remove('active'); document.getElementById('tab-btn-self').classList.remove('active'); 
+            if(tab === 'online') { document.getElementById('area-online').classList.add('active'); document.getElementById('tab-btn-online').classList.add('active'); } 
+            else if(tab === 'self') { document.getElementById('area-self').classList.add('active'); document.getElementById('tab-btn-self').classList.add('active'); }
+            else { document.getElementById('area-offline').classList.add('active'); document.getElementById('tab-btn-offline').classList.add('active'); } 
+        }
 
+        // ==========================================
+        // LOGIKA PESANAN WEB (SEPERTI SEBELUMNYA)
+        // ==========================================
         function listenOnlineOrders() {
             const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc"));
             unsubOnlineOrders = onSnapshot(q, (snapshot) => {
@@ -257,41 +266,102 @@
                 snapshot.forEach((doc) => {
                     const data = doc.data(); const docId = doc.id;
                     if (data.status !== 'Selesai' && data.status !== 'Dibatalkan') {
-                        countAktif++; currentIds.add(docId); if (!knownOrderIds.has(docId) && !isFirstLoad) newOrderArrived = true;
+                        countAktif++; currentIds.add(docId); if (!knownOrderIdsOnline.has(docId) && !isFirstLoadOnline) newOrderArrived = true;
                         let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
                         const isProses = data.status === 'Sedang Dimasak' || data.status === 'Sedang Diantar' || data.status === 'Siap Diambil';
                         const borderColor = isProses ? 'var(--accent)' : 'var(--primary)';
-                        html += `<div class="online-card" style="border-left-color: ${borderColor};"><div class="order-badge">Antrean #${queueNumber}</div><div class="oc-header"><span class="oc-id">${data.order_id}</span><span>${tgl}</span></div><div class="oc-name">${data.nama}</div><div class="oc-email"><i class="fa-solid fa-envelope"></i> ${data.email}</div><div class="oc-detail">${data.detail_pesanan}</div><div class="oc-footer"><div class="oc-total">Rp ${(data.total_bayar || 0).toLocaleString('id-ID')}</div><div class="oc-actions">${!isProses ? `<button class="btn-action btn-proses" onclick="updateStatusOnline('${docId}', 'Sedang Dimasak')"><i class="fa-solid fa-fire"></i> Proses</button>` : `<span style="font-size:10px; color:var(--accent); font-weight:bold;">${data.status}</span>`}<button class="btn-action btn-selesai" onclick="updateStatusOnline('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button></div></div></div>`;
+                        html += `<div class="order-card" style="border-left-color: ${borderColor};"><div class="order-badge">Antrean #${queueNumber}</div><div class="oc-header"><span class="oc-id">${data.order_id}</span><span>${tgl}</span></div><div class="oc-name">${data.nama}</div><div class="oc-email"><i class="fa-solid fa-envelope"></i> ${data.email}</div><div class="oc-detail">${data.detail_pesanan}</div><div class="oc-footer"><div class="oc-total">Rp ${(data.total_bayar || 0).toLocaleString('id-ID')}</div><div class="oc-actions">${!isProses ? `<button class="btn-action btn-proses" onclick="updateStatusOnline('${docId}', 'Sedang Dimasak')"><i class="fa-solid fa-fire"></i> Proses</button>` : `<span style="font-size:10px; color:var(--accent); font-weight:bold;">${data.status}</span>`}<button class="btn-action btn-selesai" onclick="updateStatusOnline('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button></div></div></div>`;
                         queueNumber++; 
                     }
                 });
-                if (newOrderArrived) playNotifSound(); knownOrderIds = currentIds; isFirstLoad = false;
-                if (countAktif === 0) { list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-mug-hot"></i>Tidak ada pesanan online baru.</div>`; document.getElementById('badge-online').classList.remove('show'); } 
+                if (newOrderArrived) playNotifSound(); knownOrderIdsOnline = currentIds; isFirstLoadOnline = false;
+                if (countAktif === 0) { list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-mug-hot"></i>Tidak ada pesanan web baru.</div>`; document.getElementById('badge-online').classList.remove('show'); } 
                 else { list.innerHTML = html; const badge = document.getElementById('badge-online'); badge.innerText = countAktif; badge.classList.add('show'); }
             });
         }
-
         window.updateStatusOnline = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); } catch (error) { alert("Gagal: " + error.message); } }
 
-        function loadMenuOffline() { onSnapshot(collection(db, "menu_kebab"), (snapshot) => { menuData = []; snapshot.forEach((doc) => { const data = doc.data(); menuData.push(data); }); menuData.sort((a, b) => a.id - b.id); renderPosMenu(); }); }
+        // ==========================================
+        // LOGIKA PESANAN SELF SERVICE (BARU)
+        // ==========================================
+        function listenSelfServiceOrders() {
+            // Hanya ambil yang belum selesai
+            const q = query(collection(db, "transaksi_selfservice"), orderBy("waktu", "desc"));
+            unsubSelfOrders = onSnapshot(q, (snapshot) => {
+                const list = document.getElementById('self-orders-list'); let html = ''; let countAktif = 0; let currentIds = new Set(); let newOrderArrived = false;
+                
+                snapshot.forEach((doc) => {
+                    const data = doc.data(); const docId = doc.id;
+                    
+                    if (data.status !== 'Selesai' && data.status !== 'Dibatalkan') {
+                        countAktif++; currentIds.add(docId); if (!knownOrderIdsSelf.has(docId) && !isFirstLoadSelf) newOrderArrived = true;
+                        
+                        let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+                        const isLunasQRIS = data.status === 'Lunas (QRIS)';
+                        const isMenungguKasir = data.status === 'Menunggu Pembayaran Kasir';
+                        
+                        let borderColor = isMenungguKasir ? 'var(--primary)' : 'var(--success)';
+                        
+                        let actionBtn = '';
+                        if (isMenungguKasir) {
+                            actionBtn = `<button class="btn-action btn-proses" onclick="terimaPembayaranTunai('${docId}')"><i class="fa-solid fa-money-bill-wave"></i> Terima Tunai</button>`;
+                        } else if (data.status === 'Sedang Dimasak' || isLunasQRIS) {
+                            actionBtn = `<button class="btn-action btn-selesai" onclick="updateStatusSelf('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button>`;
+                        }
 
+                        let detailPesanan = data.rincian.map(i => `▪ ${i.nama} (${i.qty}x)`).join('<br>');
+
+                        html += `
+                            <div class="order-card" style="border-left-color: ${borderColor};">
+                                <div class="order-badge" style="background: ${isMenungguKasir ? 'var(--primary)' : 'var(--success)'};">${data.queue_number}</div>
+                                <div class="oc-header"><span class="oc-id">${tgl}</span><span style="font-weight:bold; color:${isMenungguKasir ? 'var(--primary)' : 'var(--success)'}">${data.status}</span></div>
+                                <div class="oc-name">Metode: ${data.metode}</div>
+                                <div class="oc-detail">${detailPesanan}</div>
+                                <div class="oc-footer">
+                                    <div class="oc-total">Rp ${data.total.toLocaleString('id-ID')}</div>
+                                    <div class="oc-actions">${actionBtn}</div>
+                                </div>
+                            </div>`;
+                    }
+                });
+                
+                if (newOrderArrived) playNotifSound(); knownOrderIdsSelf = currentIds; isFirstLoadSelf = false;
+                
+                if (countAktif === 0) { 
+                    list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-mug-hot"></i>Tidak ada pesanan self service.</div>`; 
+                    document.getElementById('badge-self').classList.remove('show'); 
+                } else { 
+                    list.innerHTML = html; 
+                    const badge = document.getElementById('badge-self'); 
+                    badge.innerText = countAktif; badge.classList.add('show'); 
+                }
+            });
+        }
+
+        window.terimaPembayaranTunai = async (docId) => {
+            if(confirm("Uang tunai sudah diterima?")) {
+                try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: 'Sedang Dimasak' }); } catch (error) { alert("Gagal: " + error.message); }
+            }
+        }
+
+        window.updateStatusSelf = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: newStatus }); } catch (error) { alert("Gagal: " + error.message); } }
+
+
+        // ==========================================
+        // KASIR OFFLINE
+        // ==========================================
+        function loadMenuOffline() { onSnapshot(collection(db, "menu_kebab"), (snapshot) => { menuData = []; snapshot.forEach((doc) => { const data = doc.data(); menuData.push(data); }); menuData.sort((a, b) => a.id - b.id); renderPosMenu(); }); }
         window.switchCategory = (cat) => { currentCategory = cat; document.getElementById('cat-makanan').classList.remove('active'); document.getElementById('cat-minuman').classList.remove('active'); document.getElementById(`cat-${cat}`).classList.add('active'); renderPosMenu(); }
 
         function renderPosMenu() {
             const grid = document.getElementById('pos-menu-grid'); const filtered = menuData.filter(item => item.category === currentCategory);
             if(filtered.length === 0) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); font-size:11px; padding:20px;">Belum ada menu.</div>`; return; }
-            
             grid.innerHTML = filtered.map(item => {
                 const qty = cart[item.id] || 0;
                 const isPersiapan = item.status === 'persiapan';
                 let actionButton = '';
-
-                if (isPersiapan) {
-                    actionButton = `<button class="pos-add" disabled>Persiapan</button>`;
-                } else {
-                    actionButton = qty === 0 ? `<button class="pos-add" onclick="addToCart(${item.id})">Tambah</button>` : `<div class="qty-control"><button onclick="updateQty(${item.id}, -1)">-</button><span>${qty}</span><button onclick="updateQty(${item.id}, 1)">+</button></div>`;
-                }
-
+                if (isPersiapan) { actionButton = `<button class="pos-add" disabled>Persiapan</button>`; } 
+                else { actionButton = qty === 0 ? `<button class="pos-add" onclick="addToCart(${item.id})">Tambah</button>` : `<div class="qty-control"><button onclick="updateQty(${item.id}, -1)">-</button><span>${qty}</span><button onclick="updateQty(${item.id}, 1)">+</button></div>`; }
                 return `<div class="pos-card"><img src="${item.image}" class="pos-img" alt="${item.name}"><div class="pos-info"><div class="pos-title">${item.name}</div><div class="pos-price">Rp ${item.price.toLocaleString('id-ID')}</div><div class="pos-bottom">${actionButton}</div></div></div>`;
             }).join('');
         }
@@ -312,45 +382,22 @@
         }
 
         window.resetCart = () => { if(confirm("Kosongkan keranjang?")) { cart = {}; renderPosMenu(); renderPosCart(); } }
-
-        window.bukaPembayaran = () => {
-            let total = 0; Object.keys(cart).forEach(id => { const item = menuData.find(i => i.id === parseInt(id)); if(item) total += item.price * cart[id]; });
-            if(total === 0) { alert("Pilih menu dulu!"); return; }
-            document.getElementById('payment-modal').style.display = 'flex'; inputUangString = ""; document.getElementById('uang-diterima').value = ""; document.getElementById('modal-kembalian').innerText = "Rp 0"; pilihMetode('cash');
-        }
-
+        window.bukaPembayaran = () => { let total = 0; Object.keys(cart).forEach(id => { const item = menuData.find(i => i.id === parseInt(id)); if(item) total += item.price * cart[id]; }); if(total === 0) { alert("Pilih menu dulu!"); return; } document.getElementById('payment-modal').style.display = 'flex'; inputUangString = ""; document.getElementById('uang-diterima').value = ""; document.getElementById('modal-kembalian').innerText = "Rp 0"; pilihMetode('cash'); }
         window.tutupPembayaran = () => { document.getElementById('payment-modal').style.display = 'none'; }
-
-        window.pilihMetode = (metode) => {
-            metodePembayaran = metode;
-            if(metode === 'cash') { document.getElementById('btn-cash').classList.add('active'); document.getElementById('btn-qris').classList.remove('active'); document.getElementById('area-cash').style.display = 'block'; document.getElementById('custom-keypad-area').style.display = 'flex'; document.getElementById('area-qris').style.display = 'none'; } 
-            else { document.getElementById('btn-qris').classList.add('active'); document.getElementById('btn-cash').classList.remove('active'); document.getElementById('area-cash').style.display = 'none'; document.getElementById('custom-keypad-area').style.display = 'none'; document.getElementById('area-qris').style.display = 'block'; }
-        }
-
+        window.pilihMetode = (metode) => { metodePembayaran = metode; if(metode === 'cash') { document.getElementById('btn-cash').classList.add('active'); document.getElementById('btn-qris').classList.remove('active'); document.getElementById('area-cash').style.display = 'block'; document.getElementById('custom-keypad-area').style.display = 'flex'; document.getElementById('area-qris').style.display = 'none'; } else { document.getElementById('btn-qris').classList.add('active'); document.getElementById('btn-cash').classList.remove('active'); document.getElementById('area-cash').style.display = 'none'; document.getElementById('custom-keypad-area').style.display = 'none'; document.getElementById('area-qris').style.display = 'block'; } }
         window.pressNum = (num) => { if(inputUangString.length > 9) return; if(inputUangString === "0") inputUangString = ""; inputUangString += num; updateInputUang(); }
         window.deleteNum = () => { inputUangString = inputUangString.slice(0, -1); updateInputUang(); }
         window.clearNum = () => { inputUangString = ""; updateInputUang(); }
         function updateInputUang() { document.getElementById('uang-diterima').value = inputUangString; hitungKembalian(); }
-
-        window.hitungKembalian = () => {
-            let total = 0; Object.keys(cart).forEach(id => { const item = menuData.find(i => i.id === parseInt(id)); if(item) total += item.price * cart[id]; });
-            const diterima = parseInt(inputUangString) || 0; const kembalian = diterima - total;
-            document.getElementById('modal-kembalian').innerText = kembalian > 0 ? `Rp ${kembalian.toLocaleString('id-ID')}` : 'Rp 0';
-        }
+        window.hitungKembalian = () => { let total = 0; Object.keys(cart).forEach(id => { const item = menuData.find(i => i.id === parseInt(id)); if(item) total += item.price * cart[id]; }); const diterima = parseInt(inputUangString) || 0; const kembalian = diterima - total; document.getElementById('modal-kembalian').innerText = kembalian > 0 ? `Rp ${kembalian.toLocaleString('id-ID')}` : 'Rp 0'; }
 
         window.selesaikanPesanan = async () => {
             let total = 0, rincian = [];
-            Object.keys(cart).forEach(id => {
-                const qty = cart[id];
-                if(qty > 0) { const item = menuData.find(i => i.id === parseInt(id)); if(item) { total += item.price * qty; rincian.push({ nama: item.name, qty: qty, harga: item.price, id: item.id }); } }
-            });
+            Object.keys(cart).forEach(id => { const qty = cart[id]; if(qty > 0) { const item = menuData.find(i => i.id === parseInt(id)); if(item) { total += item.price * qty; rincian.push({ nama: item.name, qty: qty, harga: item.price, id: item.id }); } } });
             const diterima = parseInt(inputUangString) || 0;
             if(metodePembayaran === 'cash' && diterima < total) { alert("Uang diterima kurang!"); return; }
             try {
-                await addDoc(collection(db, "transaksi_kasir"), {
-                    waktu: new Date().toISOString(), rincian: rincian, total: total, metode: metodePembayaran,
-                    uangDiterima: metodePembayaran === 'cash' ? diterima : total, kembalian: metodePembayaran === 'cash' ? (diterima - total) : 0, kasir: auth.currentUser.email
-                });
+                await addDoc(collection(db, "transaksi_kasir"), { waktu: new Date().toISOString(), rincian: rincian, total: total, metode: metodePembayaran, uangDiterima: metodePembayaran === 'cash' ? diterima : total, kembalian: metodePembayaran === 'cash' ? (diterima - total) : 0, kasir: auth.currentUser.email });
                 alert("✅ Transaksi Kasir Berhasil!");
                 cart = {}; renderPosMenu(); renderPosCart(); tutupPembayaran();
             } catch (error) { alert("❌ Gagal: " + error.message); }
