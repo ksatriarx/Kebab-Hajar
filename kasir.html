@@ -139,6 +139,7 @@
         .btn-order { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .btn-proses { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid var(--warning); }
         .btn-selesai { background: var(--success); color: #fff; }
+        .btn-batal { background: rgba(229, 57, 53, 0.1); color: var(--primary); border: 1px solid var(--primary); }
 
         /* MODAL PEMBAYARAN */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
@@ -239,7 +240,6 @@
                 <div class="info-badge"><i class="fa-regular fa-calendar"></i> <span id="date-now">Memuat...</span></div>
                 <div class="info-badge"><i class="fa-regular fa-clock"></i> <span id="time-now">Memuat...</span></div>
                 
-                <!-- TOMBOL MODE LAMA/BARU & FULLSCREEN -->
                 <button class="btn-icon-top" onclick="toggleTheme()" id="theme-btn" title="Ganti Tema"><i class="fa-solid fa-moon"></i></button>
                 <button class="btn-icon-top" onclick="toggleFullscreen()" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
             </div>
@@ -614,11 +614,25 @@
                 let html = ''; let activeCount = 0;
                 snapshot.forEach((doc) => {
                     const data = doc.data(); const docId = doc.id;
+                    
+                    // Tampilkan semua yang belum Selesai DAN belum Dibatalkan
                     if (data.status !== 'Selesai' && data.status !== 'Dibatalkan') {
                         activeCount++;
+                        
                         let btn = '';
-                        if (data.status === 'Menunggu Pembayaran Kasir') { btn = `<button class="btn-order btn-proses" onclick="updateSelfStatus('${docId}', 'Sedang Dimasak')"><i class="fa-solid fa-money-bill"></i> Terima Tunai</button>`; }
-                        else if (data.status === 'Lunas (QRIS)' || data.status === 'Sedang Dimasak') { btn = `<button class="btn-order btn-selesai" onclick="updateSelfStatus('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button>`; }
+                        // JIKA MENUNGGU BAYAR TUNAI (Tampilkan Tombol Terima & Batal)
+                        if (data.status === 'Menunggu Pembayaran Kasir') { 
+                            btn = `<button class="btn-order btn-batal" onclick="batalkanSelf('${docId}')" style="margin-right:5px;"><i class="fa-solid fa-xmark"></i> Batal</button>
+                                   <button class="btn-order btn-proses" onclick="updateSelfStatus('${docId}', 'Sedang Dimasak')"><i class="fa-solid fa-money-bill"></i> Terima Tunai</button>`; 
+                        }
+                        // JIKA MENUNGGU BAYAR QRIS (Tampilkan Tombol Batal)
+                        else if (data.status === 'Menunggu Pembayaran QRIS') {
+                            btn = `<button class="btn-order btn-batal" onclick="batalkanSelf('${docId}')"><i class="fa-solid fa-xmark"></i> Batal / Hapus</button>`;
+                        }
+                        // JIKA SUDAH LUNAS QRIS ATAU SEDANG DIMASAK
+                        else if (data.status === 'Lunas (QRIS)' || data.status === 'Sedang Dimasak') { 
+                            btn = `<button class="btn-order btn-selesai" onclick="updateSelfStatus('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button>`; 
+                        }
                         
                         let detail = data.rincian.map(i => `▪ ${i.nama} (${i.qty}x)`).join('<br>');
                         html += `
@@ -654,6 +668,18 @@
 
         window.updateWebStatus = async (id, status, email) => { await updateDoc(doc(db, "transaksi_online", id), { status: status }); kirimNotif(email, status); }
         window.updateSelfStatus = async (id, status) => { await updateDoc(doc(db, "transaksi_selfservice", id), { status: status }); }
+        
+        // FUNGSI BARU UNTUK MENGHAPUS/MEMBATALKAN PESANAN SELF SERVICE YANG MACET
+        window.batalkanSelf = async (id) => {
+            showConfirm("Yakin ingin membatalkan/menghapus pesanan ini dari antrean?", async () => {
+                try {
+                    await updateDoc(doc(db, "transaksi_selfservice", id), { status: 'Dibatalkan' });
+                    showToast("Pesanan berhasil dibatalkan", "success");
+                } catch (error) {
+                    showToast("Gagal: " + error.message, "error");
+                }
+            });
+        }
     </script>
 </body>
 </html>
