@@ -7,7 +7,7 @@
 <title>RX Kebab — Self Service Order</title>
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-ccHdGHCTpj08BGVP"></script>
 <style>
-/* CSS ASLI DARI AI (TIDAK DIUBAH SAMA SEKALI) */
+/* DESAIN ASLI 100% DARI FILE YANG ANDA KIRIM */
 :root{--red:#ed1018;--red2:#ff292e;--dark:#09090d;--ink:#15151c;--muted:#737381;--line:#e8e8ef;--green:#08b957}
 *{box-sizing:border-box}body{margin:0;background:#08080c;color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
 button{font:inherit;cursor:pointer;border:0} .app{width:min(1600px,100%);min-height:100vh;margin:auto;padding:14px;display:flex;flex-direction:column;gap:12px;background:radial-gradient(ellipse at 48% 0%,#2b1110 0,#09090d 48%)}
@@ -25,18 +25,28 @@ button{font:inherit;cursor:pointer;border:0} .app{width:min(1600px,100%);min-hei
 .cart{display:flex;flex-direction:column}.carttabs{display:flex;gap:8px;margin-bottom:10px}.carttab{flex:1;padding:13px 8px;border-radius:26px;background:#e7e7f2;font-weight:850}.carttab.active{background:linear-gradient(135deg,#ff393b,#d90008);color:#fff}.cartlist{flex:1;min-height:180px;overflow:auto}.empty{text-align:center;color:#777;padding:40px 12px}.cartitem{display:grid;grid-template-columns:68px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid #dddde7}.cartitem img{width:68px;height:62px;object-fit:cover;border-radius:10px}.itemtop{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:850}.itemtop b{color:#e00009;white-space:nowrap}.qtyrow{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:6px}.qtyrow button{width:28px;height:28px;border-radius:50%;background:#e9e9f1;font-weight:900}.qtyrow .remove{background:transparent;color:#222;font-size:18px}
 .summary{border-top:1px solid #dddde7;padding-top:10px}.sumrow{display:flex;justify-content:space-between;padding:5px 3px;font-weight:700}.total{background:linear-gradient(100deg,#f00,#c90008);color:#fff;border-radius:12px;padding:13px 15px;margin:8px 0;font-size:18px;font-weight:900;display:flex;justify-content:space-between;box-shadow:0 4px 12px #e0000033}.total strong{font-size:23px}.pay{width:100%;padding:16px;border-radius:14px;background:linear-gradient(100deg,#09d45e,#009c43);color:white;font-weight:950;font-size:20px;box-shadow:0 4px 14px #00a84d55}.secondary{display:flex;gap:8px;margin-top:8px}.secondary button{flex:1;padding:12px 6px;border-radius:12px;color:#fff;font-weight:850;background:linear-gradient(100deg,#9a35f4,#6425ce)}.secondary button:last-child{background:linear-gradient(100deg,#159cff,#0874db)}
 .bottom{display:flex;gap:10px}.bottom button{flex:1;border-radius:28px;padding:13px 10px;background:#19181e;color:#fff;border:1px solid #49434a;font-weight:800;font-size:15px;box-shadow:0 4px 12px #0008}.bottom .hot{background:linear-gradient(100deg,#f20,#a90008);border-color:#ff5252}
-.modalback{position:fixed;inset:0;background:#000b;display:none;place-items:center;z-index:10;padding:20px;backdrop-filter:blur(4px)}.modalback.show{display:grid}.modal{width:min(480px,100%);background:#fff;color:#171720;border-radius:22px;padding:26px;text-align:center;box-shadow:0 20px 70px #0009}.modal h2{margin:4px 0 8px; font-size: 24px;}.modal p{color:#666; font-size: 14px;}.modal button{padding:13px 24px;border-radius:12px;background:var(--red);color:#fff;font-weight:900;margin-top:10px; font-size: 16px; width: 100%;}
-@media(max-width:900px){.app{padding:8px}.top{height:68px;padding:7px 12px}.brand img{width:54px;height:46px}.brand strong{font-size:22px}.topright{gap:10px}.clock{font-size:15px}.home{padding:10px 14px}.hero{height:190px;padding:20px}.badge{width:88px;height:88px;font-size:15px}.main{grid-template-columns:1fr}.cart{min-height:430px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.product img{height:130px}.bottom{flex-wrap:wrap}.bottom button{min-width:28%}}
-@media(max-width:480px){.topright .clock{display:none}.hero{height:170px;padding:16px}.herotxt .welcome{font-size:16px}.herotxt h1{font-size:43px;letter-spacing:-2px}.herotxt .sub{font-size:22px}.herotxt p{font-size:10px}.badge{right:4%;width:65px;height:65px;border-width:3px;font-size:11px}.categories{gap:5px}.cat{font-size:11px;padding:11px 3px}.catalog,.cart{padding:9px}.grid{gap:8px}.product img{height:105px}.pname{font-size:12px}.price{font-size:14px}.add{width:32px;height:32px;flex-basis:32px;font-size:23px}.bottom button{font-size:12px;padding:11px 5px}}
+
 /* TAMBAHAN CSS UNTUK POPUP KALKULATOR & PEMBAYARAN */
+.modalback{position:fixed;inset:0;background:#000b;display:none;place-items:center;z-index:10;padding:20px;backdrop-filter:blur(4px)}
+.modalback.show{display:grid}
+.modal{width:min(480px,100%);background:#fff;color:#171720;border-radius:22px;padding:26px;text-align:center;box-shadow:0 20px 70px #0009}
+.modal h2{margin:4px 0 8px; font-size: 24px;}
+.modal p{color:#666; font-size: 14px;}
+.modal button{padding:13px 24px;border-radius:12px;background:var(--red);color:#fff;font-weight:900;margin-top:10px; font-size: 16px; width: 100%;}
 .pay-options { display: flex; gap: 15px; margin-top: 20px; }
 .pay-btn-choice { flex: 1; padding: 20px 10px; border-radius: 16px; border: 2px solid #ddd; background: #f9f9f9; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .pay-btn-choice:hover { border-color: var(--red); background: #fff0f0; }
 .pay-btn-choice i { font-size: 32px; color: var(--ink); }
 .pay-btn-choice span { font-weight: 800; font-size: 16px; }
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-.keypad button { padding: 15px; font-size: 20px; font-weight: bold; background: #eee; border-radius: 10px; }
-.input-cash { width: 100%; font-size: 28px; text-align: right; padding: 10px; border: 2px solid #ccc; border-radius: 10px; margin-bottom: 10px; font-weight: bold; }
+.keypad button { padding: 15px; font-size: 20px; font-weight: bold; background: #eee; border-radius: 10px; border: none; cursor: pointer;}
+.keypad button:active { background: #ddd; }
+.input-cash { width: 100%; font-size: 28px; text-align: right; padding: 10px; border: 2px solid #ccc; border-radius: 10px; margin-bottom: 10px; font-weight: bold; background: #fff; color: #000; }
+.success-icon { width: 80px; height: 80px; background: #e6fffa; color: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px; }
+.queue-number { font-size: 54px; font-weight: 800; color: var(--red); margin: 15px 0; letter-spacing: 2px; }
+
+@media(max-width:900px){.app{padding:8px}.top{height:68px;padding:7px 12px}.brand img{width:54px;height:46px}.brand strong{font-size:22px}.topright{gap:10px}.clock{font-size:15px}.home{padding:10px 14px}.hero{height:190px;padding:20px}.badge{width:88px;height:88px;font-size:15px}.main{grid-template-columns:1fr}.cart{min-height:430px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.product img{height:130px}.bottom{flex-wrap:wrap}.bottom button{min-width:28%}}
+@media(max-width:480px){.topright .clock{display:none}.hero{height:170px;padding:16px}.herotxt .welcome{font-size:16px}.herotxt h1{font-size:43px;letter-spacing:-2px}.herotxt .sub{font-size:22px}.herotxt p{font-size:10px}.badge{right:4%;width:65px;height:65px;border-width:3px;font-size:11px}.categories{gap:5px}.cat{font-size:11px;padding:11px 3px}.catalog,.cart{padding:9px}.grid{gap:8px}.product img{height:105px}.pname{font-size:12px}.price{font-size:14px}.add{width:32px;height:32px;flex-basis:32px;font-size:23px}.bottom button{font-size:12px;padding:11px 5px}}
 </style>
 </head>
 <body>
@@ -73,7 +83,7 @@ button{font:inherit;cursor:pointer;border:0} .app{width:min(1600px,100%);min-hei
   </main>
 </div>
 
-<!-- MODAL PEMBAYARAN -->
+<!-- MODAL PILIH PEMBAYARAN -->
 <div class="modalback" id="payment-modal">
   <div class="modal">
     <h2>Pilih Pembayaran</h2>
@@ -126,12 +136,12 @@ button{font:inherit;cursor:pointer;border:0} .app{width:min(1600px,100%);min-hei
 <!-- MODAL SUKSES -->
 <div class="modalback" id="success-modal">
   <div class="modal">
-    <div style="width: 80px; height: 80px; background: #e6fffa; color: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px;"><i class="fa-solid fa-check"></i></div>
+    <div class="success-icon"><i class="fa-solid fa-check"></i></div>
     <h2 id="success-title">Pesanan Dibuat!</h2>
     <p id="success-desc">Silakan tunjukkan nomor ini ke Kasir untuk melakukan pembayaran.</p>
     
-    <div style="font-size: 14px; color: #777; font-weight: 700; text-transform: uppercase; margin-top:15px;">Nomor Antrean</div>
-    <div style="font-size: 54px; font-weight: 800; color: var(--red); margin: 15px 0; letter-spacing: 2px;" id="display-queue">#00</div>
+    <div style="font-size: 14px; color: #777; font-weight: 700; text-transform: uppercase;">Nomor Antrean</div>
+    <div class="queue-number" id="display-queue">#00</div>
     
     <button onclick="kembaliKeAwal()">Selesai</button>
   </div>
