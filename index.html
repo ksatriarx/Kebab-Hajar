@@ -399,7 +399,7 @@
             if (tipeUser === "Akun Google") {
                 isTamu = false;
                 
-                // --- SIMPAN DATA PELANGGAN KE DATABASE ---
+                // --- TAMBAHAN BARU: SIMPAN DATA PELANGGAN KE DATABASE ---
                 const emailKey = emailUser.replace(/[^a-zA-Z0-9]/g, "");
                 setDoc(doc(db, "saldo_pelanggan", emailKey), { 
                     email: emailUser,
