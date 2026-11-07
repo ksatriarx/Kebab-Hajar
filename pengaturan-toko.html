@@ -3,440 +3,462 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kebab IDI - Pengaturan Toko</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Admin Dashboard - Kebab IDI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-main: #000; --bg-card: #1a1a1a; --text-main: #fff;
-            --text-muted: #888; --primary: #e53935; --accent: #ffb300;
-            --success: #10b981; --border: #333; --radius: 12px;
+            --bg-body: #0f172a; --bg-sidebar: #1e293b; --bg-card: #1e293b;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --primary: #ef4444; --primary-hover: #dc2626; --accent: #f59e0b;
+            --success: #10b981; --border: #334155; --radius: 12px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        /* SIDEBAR (Desktop) */
+        .sidebar { width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; position: fixed; height: 100vh; z-index: 100; }
+        .brand { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .nav-menu { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 8px; color: var(--text-muted); font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; border: none; background: transparent; text-align: left; width: 100%; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item i { font-size: 18px; width: 24px; text-align: center; }
+
+        /* MAIN CONTENT */
+        .main-content { margin-left: 250px; flex-grow: 1; padding: 30px; width: calc(100% - 250px); }
+        .page-title { font-size: 24px; font-weight: 700; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* CARDS */
+        .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         
-        .app { max-width: 480px; width: 100%; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { font-size: 22px; margin-bottom: 5px; }
-        .header p { font-size: 12px; color: var(--text-muted); }
+        /* DASHBOARD STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(0,0,0,0)); border: 1px solid var(--primary); border-radius: var(--radius); padding: 20px; }
+        .stat-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 10px; }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--text-main); }
+        .stat-sub { font-size: 12px; color: var(--success); margin-top: 5px; }
+
+        /* FORMS & BUTTONS */
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+        .form-input { width: 100%; padding: 10px 12px; background: var(--bg-body); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 14px; outline: none; transition: 0.2s; }
+        .form-input:focus { border-color: var(--primary); }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); }
+
+        /* TABLES & LISTS */
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid var(--border); }
+        .list-item:last-child { border-bottom: none; }
+        .item-info { display: flex; align-items: center; gap: 15px; }
+        .item-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--bg-body); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text-muted); }
+        .item-details h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .item-details p { font-size: 12px; color: var(--text-muted); }
         
-        .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
+        /* BADGES */
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--accent); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--primary); }
+
+        /* SETTINGS OPTIONS */
+        .option-btn { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        .option-btn.active { border-color: var(--primary); background: rgba(239, 68, 68, 0.1); }
+        .option-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .option-btn.active .option-icon { background: var(--primary); color: white; }
         
-        .main-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;}
-        .main-tab-btn {
-            flex: 1; min-width: 90px; padding: 10px; border-radius: var(--radius); border: none; background: var(--bg-card); color: white; font-weight: bold; font-size: 11px; cursor: pointer; border: 1px solid var(--border); position: relative; display: flex; justify-content: center; align-items: center; gap: 5px; white-space: nowrap;
+        /* MOBILE RESPONSIVE */
+        .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg-sidebar); border-top: 1px solid var(--border); z-index: 100; justify-content: space-around; padding: 10px 0; }
+        .mobile-nav .nav-item { flex-direction: column; gap: 5px; padding: 10px; font-size: 10px; width: auto; }
+        .mobile-nav .nav-item i { font-size: 20px; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; padding: 15px; padding-bottom: 80px; }
+            .mobile-nav { display: flex; }
+            .page-title { font-size: 20px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
         }
-        .main-tab-btn.active { background: var(--primary); border-color: var(--primary); }
-        
-        .notif-badge { background: var(--accent); color: #000; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; display: none; }
-        .notif-badge.show { display: inline-block; }
-
-        /* STATUS TOKO */
-        .status-display { text-align: center; padding: 20px; margin-bottom: 20px; border-radius: var(--radius); border: 2px solid var(--border); }
-        .status-display.buka { border-color: var(--success); background: rgba(16, 185, 129, 0.1); }
-        .status-display.tutup { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
-        .status-display.auto { border-color: var(--accent); background: rgba(255, 179, 0, 0.1); }
-        .status-icon { font-size: 50px; margin-bottom: 10px; }
-        .status-text { font-size: 24px; font-weight: 800; }
-        .status-display.buka .status-text { color: var(--success); }
-        .status-display.tutup .status-text { color: var(--primary); }
-        .status-display.auto .status-text { color: var(--accent); }
-        .status-info { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
-
-        .option-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
-        .option-btn { width: 100%; display: flex; align-items: center; gap: 15px; padding: 15px; margin-bottom: 10px; cursor: pointer; border-radius: var(--radius); border: 2px solid var(--border); background: var(--bg-main); color: var(--text-main); text-align: left; transition: all 0.2s; }
-        .option-btn.active { border-color: var(--primary); background: rgba(229, 57, 53, 0.1); }
-        .option-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-        .option-btn.active .option-icon { background: var(--primary); }
-        .option-text h4 { font-size: 14px; margin-bottom: 2px; }
-        .option-text p { font-size: 11px; color: var(--text-muted); }
-        
-        .select-alasan { width: 100%; padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-main); font-size: 13px; outline: none; margin-top: 5px; }
-        .btn-save { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: var(--radius); font-size: 14px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-save:disabled { background: #555; cursor: not-allowed; }
-
-        /* PESANAN */
-        .filter-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-        .filter-btn { flex: 1; padding: 8px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-main); color: var(--text-muted); font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s; }
-        .filter-btn.active { background: var(--bg-card-hover); color: var(--accent); border-color: var(--accent); }
-        .order-item { background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; }
-        .order-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; color: var(--text-muted); }
-        .order-name { font-weight: 800; color: var(--accent); font-size: 13px; margin-bottom: 4px; }
-        .order-email { font-size: 10px; color: #3b82f6; margin-bottom: 6px; }
-        .order-detail { font-size: 11px; line-height: 1.5; margin-top: 5px; color: #ccc; white-space: pre-wrap; margin-bottom: 10px; }
-        .status-select { width: 100%; padding: 8px; background: var(--bg-card); border: 1px solid var(--accent); color: var(--accent); font-weight: bold; border-radius: 6px; outline: none; font-size: 12px; }
-        .status-select.selesai { border-color: var(--success); color: var(--success); }
-
-        /* MENU */
-        .form-input { width: 100%; padding: 10px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; }
-        .form-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;}
-        .menu-item-admin { display: flex; align-items: center; gap: 10px; background: var(--bg-main); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; }
-        .menu-item-admin img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
-        .menu-item-admin-info { flex-grow: 1; }
-        .menu-item-admin-title { font-size: 12px; font-weight: 700; }
-        .menu-item-admin-price { font-size: 11px; color: var(--accent); }
-        
-        .btn-status { border: none; padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; cursor: pointer; margin-right: 5px; }
-        .btn-status.ready { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .btn-status.persiapan { background: rgba(255, 179, 0, 0.2); color: var(--accent); border: 1px solid var(--accent); }
-        
-        .btn-delete-menu { background: rgba(229, 57, 53, 0.2); color: var(--primary); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .file-input-wrapper { position: relative; margin-bottom: 10px; }
-        .file-input-wrapper input[type="file"] { display: none; }
-        .btn-file { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; background: var(--bg-main); border: 1px dashed var(--accent); color: var(--accent); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
-        .preview-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; display: none; }
-
-        /* LAPORAN */
-        .report-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(0,0,0,0)); border: 1px solid var(--success); padding: 20px; border-radius: var(--radius); text-align: center; margin-bottom: 15px; }
-        .report-title { font-size: 12px; color: #fff; opacity: 0.8; margin-bottom: 5px; }
-        .report-value { font-size: 28px; font-weight: 800; color: var(--success); }
-        .report-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
-        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .report-box { background: var(--bg-main); border: 1px solid var(--border); padding: 15px; border-radius: var(--radius); text-align: center; }
-        .report-box-val { font-size: 18px; font-weight: 800; color: var(--accent); }
-        .report-box-label { font-size: 10px; color: var(--text-muted); }
-        .top-menu-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
-        .top-menu-item:last-child { border-bottom: none; }
-
-        .access-denied { display: none; text-align: center; padding: 50px 20px; }
-        .access-denied h2 { color: var(--primary); margin: 15px 0; }
     </style>
 </head>
 <body>
 
-<div class="app" id="app-content" style="display: none;">
-    <div class="header">
-        <h1>⚙️ Dashboard Owner</h1>
-        <p>Atur status, pesanan, & laporan Kebab IDI</p>
+    <!-- SIDEBAR (DESKTOP) -->
+    <div class="sidebar">
+        <div class="brand"><i class="fa-solid fa-utensils"></i> Kebab IDI</div>
+        <div class="nav-menu">
+            <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+            <button class="nav-item" id="nav-pesanan" onclick="switchTab('pesanan')"><i class="fa-solid fa-receipt"></i> Pesanan</button>
+            <button class="nav-item" id="nav-menu" onclick="switchTab('menu')"><i class="fa-solid fa-bowl-food"></i> Kelola Menu</button>
+            <button class="nav-item" id="nav-pelanggan" onclick="switchTab('pelanggan')"><i class="fa-solid fa-users"></i> Pelanggan</button>
+            <button class="nav-item" id="nav-pengaturan" onclick="switchTab('pengaturan')"><i class="fa-solid fa-gear"></i> Pengaturan</button>
+        </div>
     </div>
 
-    <div class="main-tabs">
-        <button id="tab-status" onclick="switchTab('status')" class="main-tab-btn">Status</button>
-        <button id="tab-pesanan" onclick="switchTab('pesanan')" class="main-tab-btn">Pesanan <span id="badge-notif" class="notif-badge">0</span></button>
-        <button id="tab-menu" onclick="switchTab('menu')" class="main-tab-btn">Menu</button>
-        <button id="tab-laporan" onclick="switchTab('laporan')" class="main-tab-btn">Laporan</button>
-    </div>
-
-    <!-- STATUS TOKO -->
-    <div id="area-status">
-        <div class="status-display auto" id="status-display">
-            <div class="status-icon" id="status-icon">⏰</div>
-            <div class="status-text" id="status-text">Memuat...</div>
-            <div class="status-info" id="status-info">Menghubungkan ke server...</div>
-        </div>
-        <div class="card">
-            <div class="option-title">1. Pilih Status Toko</div>
-            <button class="option-btn" id="opt-auto" onclick="pilihStatus('auto')"><div class="option-icon"><i class="fa-solid fa-clock"></i></div><div class="option-text"><h4>Otomatis</h4><p>Ikuti jam operasional</p></div></button>
-            <button class="option-btn" id="opt-buka" onclick="pilihStatus('buka')"><div class="option-icon"><i class="fa-solid fa-circle-check"></i></div><div class="option-text"><h4>Paksa Buka</h4><p>Buka di luar jam jadwal</p></div></button>
-            <button class="option-btn" id="opt-tutup" onclick="pilihStatus('tutup')"><div class="option-icon"><i class="fa-solid fa-circle-xmark"></i></div><div class="option-text"><h4>Paksa Tutup</h4><p>Tutup toko sementara</p></div></button>
-        </div>
-        <div class="card">
-            <div class="option-title">2. Pengumuman</div>
-            <select class="select-alasan" id="pilih-alasan">
-                <option value="">-- Tidak ada pengumuman --</option>
-                <option value="Libur Nasional (Tanggal Merah) 🇮🇩">Libur Nasional (Tanggal Merah) 🇮🇩</option>
-                <option value="Tutup sebentar, owner lagi 'meeting' sama Allah di masjid 🤝">Tutup sebentar, owner lagi 'meeting' sama Allah di masjid 🤝</option>
-                <option value="Owner lagi lowbat 🤒, tunggu sampai nyawa 100% 🔋😂">Owner lagi lowbat 🤒, tunggu sampai nyawa 100% 🔋😂</option>
-            </select>
-        </div>
-        <button class="btn-save" id="btn-save" onclick="simpanPengaturan()" disabled><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
-    </div>
-
-    <!-- PESANAN -->
-    <div id="area-pesanan" style="display: none;">
-        <div class="card">
-            <div class="option-title" style="display: flex; justify-content: space-between;">Daftar Pesanan <i class="fa-solid fa-rotate-right" onclick="loadPesanan()" style="cursor: pointer; color: var(--accent);"></i></div>
-            <div class="filter-tabs">
-                <button id="btn-filter-aktif" class="filter-btn active" onclick="switchFilter('aktif')">Sedang Proses <span id="badge-aktif" style="color: var(--accent);"></span></button>
-                <button id="btn-filter-selesai" class="filter-btn" onclick="switchFilter('selesai')">Selesai / Batal</button>
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="app-content">
+        
+        <!-- TAB DASHBOARD / LAPORAN -->
+        <div id="area-dashboard">
+            <div class="page-title">
+                <span>Dashboard Overview</span>
+                <button class="btn-outline" onclick="loadLaporanKasir()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
             </div>
-            <div id="list-pesanan"><p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p></div>
-        </div>
-    </div>
-
-    <!-- MENU -->
-    <div id="area-menu" style="display: none;">
-        <div class="card" style="margin-bottom: 15px;">
-            <div class="option-title">Tambah Menu Baru</div>
-            <label class="form-label">Nama Menu</label>
-            <input type="text" id="menu-name" class="form-input" placeholder="Contoh: Kebab Daging Spesial">
-            <label class="form-label">Kategori</label>
-            <select id="menu-category" class="form-input"><option value="makanan">Makanan</option><option value="minuman">Minuman</option></select>
-            <label class="form-label">Harga (Angka saja)</label>
-            <input type="number" id="menu-price" class="form-input" placeholder="Contoh: 15000">
             
-            <label class="form-label">Foto Menu (Pilih salah satu)</label>
-            <div class="file-input-wrapper">
-                <input type="file" id="menu-file" accept="image/*" onchange="previewFile(this)">
-                <label for="menu-file" class="btn-file"><i class="fa-solid fa-camera"></i> Pilih Foto dari Galeri</label>
-            </div>
-            <img id="img-preview" class="preview-img" alt="Preview">
-            
-            <label class="form-label" style="margin-top: 10px;">Atau masukkan Link Gambar (URL)</label>
-            <input type="text" id="menu-image-url" class="form-input" placeholder="https://...">
-
-            <button class="btn-save" style="background: #3b82f6; margin-top: 10px;" onclick="tambahMenu()"><i class="fa-solid fa-plus"></i> Tambah Menu</button>
-        </div>
-        <div class="card">
-            <div class="option-title">Daftar Menu Saat Ini</div>
-            <div id="list-menu-admin"><p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p></div>
-        </div>
-    </div>
-
-    <!-- LAPORAN -->
-    <div id="area-laporan" style="display: none;">
-        <div class="card">
-            <div class="filter-tabs" style="margin-bottom: 20px;">
-                <button id="btn-lap-hari" class="filter-btn active" onclick="gantiFilterLaporan('hari')">Hari Ini</button>
-                <button id="btn-lap-bulan" class="filter-btn" onclick="gantiFilterLaporan('bulan')">Bulan Ini</button>
-                <button id="btn-lap-semua" class="filter-btn" onclick="gantiFilterLaporan('semua')">Semua</button>
-            </div>
-
-            <div class="report-card">
-                <div class="report-title">Total Pendapatan (Online + Kasir)</div>
-                <div class="report-value" id="lap-total-uang">Rp 0</div>
-            </div>
-
-            <div class="report-grid">
-                <div class="report-box">
-                    <div class="report-box-val" id="lap-total-pesanan">0</div>
-                    <div class="report-box-label">Pesanan Sukses</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Pendapatan</div>
+                    <div class="stat-value" id="lap-total-uang">Rp 0</div>
+                    <div class="stat-sub" id="lap-rata-rata">Rata-rata: Rp 0</div>
                 </div>
-                <div class="report-box">
-                    <div class="report-box-val" id="lap-rata-rata">Rp 0</div>
-                    <div class="report-box-label">Rata-rata / Pesanan</div>
+                <div class="stat-card" style="border-color: var(--success); background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(0,0,0,0));">
+                    <div class="stat-title">Pesanan Sukses</div>
+                    <div class="stat-value" id="lap-total-pesanan">0</div>
+                    <div class="stat-sub">Online + Kasir + Self Service</div>
                 </div>
             </div>
 
-            <div class="option-title" style="margin-top: 20px;">Menu Terlaris</div>
-            <div id="list-menu-terlaris">
-                <p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>
+            <div class="card">
+                <div class="page-title" style="font-size: 18px; margin-bottom: 15px;">Menu Terlaris</div>
+                <div id="list-menu-terlaris">
+                    <p style="text-align: center; color: var(--text-muted); font-size: 13px;">Memuat data...</p>
+                </div>
             </div>
         </div>
+
+        <!-- TAB PESANAN -->
+        <div id="area-pesanan" style="display: none;">
+            <div class="page-title">Daftar Pesanan Online</div>
+            <div class="card">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button id="btn-filter-aktif" class="btn-outline active" onclick="switchFilter('aktif')" style="background: var(--primary); color: white; border-color: var(--primary);">Sedang Proses</button>
+                    <button id="btn-filter-selesai" class="btn-outline" onclick="switchFilter('selesai')">Selesai / Batal</button>
+                </div>
+                <div id="list-pesanan"><p style="text-align: center; color: var(--text-muted); font-size: 13px;">Memuat data...</p></div>
+            </div>
+        </div>
+
+        <!-- TAB MENU -->
+        <div id="area-menu" style="display: none;">
+            <div class="page-title">Kelola Menu</div>
+            <div class="card" style="margin-bottom: 20px;">
+                <div style="font-size: 16px; font-weight: 700; margin-bottom: 15px;">Tambah Menu Baru</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Nama Menu</label>
+                        <input type="text" id="menu-name" class="form-input" placeholder="Contoh: Kebab Spesial">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kategori</label>
+                        <select id="menu-category" class="form-input"><option value="makanan">Makanan</option><option value="minuman">Minuman</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Harga (Rp)</label>
+                        <input type="number" id="menu-price" class="form-input" placeholder="Contoh: 15000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Foto Menu (URL)</label>
+                        <input type="text" id="menu-image-url" class="form-input" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Atau Upload Foto</label>
+                    <input type="file" id="menu-file" accept="image/*" onchange="previewFile(this)" class="form-input" style="padding: 8px;">
+                </div>
+                <img id="img-preview" class="preview-img" style="display: none; width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                <button class="btn-primary" onclick="tambahMenu()"><i class="fa-solid fa-plus"></i> Tambah Menu</button>
+            </div>
+            
+            <div class="card">
+                <div style="font-size: 16px; font-weight: 700; margin-bottom: 15px;">Daftar Menu Saat Ini</div>
+                <div id="list-menu-admin"><p style="text-align: center; color: var(--text-muted); font-size: 13px;">Memuat data...</p></div>
+            </div>
+        </div>
+
+        <!-- TAB PELANGGAN (BARU) -->
+        <div id="area-pelanggan" style="display: none;">
+            <div class="page-title">Daftar Pelanggan Terdaftar</div>
+            <div class="card">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <input type="text" id="search-pelanggan" class="form-input" placeholder="Cari email pelanggan..." oninput="filterPelanggan(this.value)">
+                </div>
+                <div id="list-pelanggan">
+                    <p style="text-align: center; color: var(--text-muted); font-size: 13px;">Memuat data pelanggan...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB PENGATURAN -->
+        <div id="area-pengaturan" style="display: none;">
+            <div class="page-title">Pengaturan Toko</div>
+            
+            <div class="card">
+                <div class="status-display auto" id="status-display" style="text-align: center; padding: 20px; border-radius: 12px; border: 2px solid var(--border); margin-bottom: 20px;">
+                    <div style="font-size: 40px; margin-bottom: 10px;" id="status-icon">⏰</div>
+                    <div style="font-size: 24px; font-weight: 800;" id="status-text">Memuat...</div>
+                    <div style="font-size: 12px; color: var(--text-muted);" id="status-info">Menghubungkan ke server...</div>
+                </div>
+
+                <div style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">Pilih Status Toko</div>
+                <button class="option-btn" id="opt-auto" onclick="pilihStatus('auto')"><div class="option-icon"><i class="fa-solid fa-clock"></i></div><div><h4 style="font-size: 14px;">Otomatis</h4><p style="font-size: 12px; color: var(--text-muted);">Ikuti jam operasional</p></div></button>
+                <button class="option-btn" id="opt-buka" onclick="pilihStatus('buka')"><div class="option-icon"><i class="fa-solid fa-circle-check"></i></div><div><h4 style="font-size: 14px;">Paksa Buka</h4><p style="font-size: 12px; color: var(--text-muted);">Buka di luar jam jadwal</p></div></button>
+                <button class="option-btn" id="opt-tutup" onclick="pilihStatus('tutup')"><div class="option-icon"><i class="fa-solid fa-circle-xmark"></i></div><div><h4 style="font-size: 14px;">Paksa Tutup</h4><p style="font-size: 12px; color: var(--text-muted);">Tutup toko sementara</p></div></button>
+
+                <div style="font-size: 14px; font-weight: 700; margin: 20px 0 10px 0;">Pengumuman</div>
+                <select class="form-input" id="pilih-alasan">
+                    <option value="">-- Tidak ada pengumuman --</option>
+                    <option value="Libur Nasional (Tanggal Merah) 🇮🇩">Libur Nasional (Tanggal Merah) 🇮🇩</option>
+                    <option value="Tutup sebentar, owner lagi 'meeting' sama Allah di masjid 🤝">Tutup sebentar, owner lagi 'meeting' sama Allah di masjid 🤝</option>
+                    <option value="Owner lagi lowbat 🤒, tunggu sampai nyawa 100% 🔋😂">Owner lagi lowbat 🤒, tunggu sampai nyawa 100% 🔋😂</option>
+                </select>
+                
+                <button class="btn-primary" id="btn-save" onclick="simpanPengaturan()" disabled style="width: 100%; margin-top: 20px; justify-content: center;"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
+            </div>
+        </div>
+
     </div>
-</div>
 
-<div class="access-denied" id="access-denied">
-    <i class="fa-solid fa-lock" style="font-size: 50px; color: var(--primary);"></i>
-    <h2>Akses Ditolak</h2>
-    <p>Halaman ini hanya untuk Akun Owner Kebab IDI.</p>
-    <a href="index.html" style="color: var(--accent);">Kembali ke Beranda</a>
-</div>
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav">
+        <button class="nav-item active" id="m-nav-dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+        <button class="nav-item" id="m-nav-pesanan" onclick="switchTab('pesanan')"><i class="fa-solid fa-receipt"></i> Pesanan</button>
+        <button class="nav-item" id="m-nav-menu" onclick="switchTab('menu')"><i class="fa-solid fa-bowl-food"></i> Menu</button>
+        <button class="nav-item" id="m-nav-pelanggan" onclick="switchTab('pelanggan')"><i class="fa-solid fa-users"></i> Pelanggan</button>
+        <button class="nav-item" id="m-nav-pengaturan" onclick="switchTab('pengaturan')"><i class="fa-solid fa-gear"></i> Setelan</button>
+    </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY",
-        authDomain: "kebab-idi.firebaseapp.com",
-        projectId: "kebab-idi",
-        storageBucket: "kebab-idi.firebasestorage.app",
-        messagingSenderId: "303997052314",
-        appId: "1:303997052314:web:1db122bc5911297b710623"
-    };
+        const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        const ALLOWED_EMAIL = "rxstore101@gmail.com";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const ALLOWED_EMAIL = "rxstore101@gmail.com";
+        let statusTerpilih = "auto"; let alasanTerpilih = ""; let statusSaatIni = "auto"; let alasanSaatIni = "";
+        let unsubPesanan = null; let unsubMenu = null; let unsubPelanggan = null;
+        let allOrders = []; let currentFilter = 'aktif'; let compressedFile = null; 
+        let filterLaporan = 'hari'; let allOrdersForReport = []; let allKasirForReport = []; let allSelfForReport = []; let isKasirLoaded = false; 
+        let allPelanggan = [];
 
-    let statusTerpilih = "auto"; let alasanTerpilih = ""; let statusSaatIni = "auto"; let alasanSaatIni = "";
-    let unsubPesanan = null; let unsubMenu = null;
-    let allOrders = []; let currentFilter = 'aktif';
-    let compressedFile = null; 
-    
-    let filterLaporan = 'hari';
-    let allOrdersForReport = []; 
-    let allKasirForReport = []; 
-    let isKasirLoaded = false; 
-
-    onAuthStateChanged(auth, (user) => {
-        if (user && user.email === ALLOWED_EMAIL) {
-            document.getElementById('app-content').style.display = 'block';
-            document.getElementById('access-denied').style.display = 'none';
-            loadStatus(); loadPesanan(); loadMenuAdmin();
-        } else {
-            document.getElementById('app-content').style.display = 'none';
-            document.getElementById('access-denied').style.display = 'block';
-        }
-    });
-
-    window.switchTab = (tab) => {
-        document.getElementById('area-status').style.display = 'none';
-        document.getElementById('area-pesanan').style.display = 'none';
-        document.getElementById('area-menu').style.display = 'none';
-        document.getElementById('area-laporan').style.display = 'none';
-        
-        document.getElementById('tab-status').classList.remove('active');
-        document.getElementById('tab-pesanan').classList.remove('active');
-        document.getElementById('tab-menu').classList.remove('active');
-        document.getElementById('tab-laporan').classList.remove('active');
-        
-        if(tab === 'status') { document.getElementById('area-status').style.display = 'block'; document.getElementById('tab-status').classList.add('active'); }
-        else if (tab === 'pesanan') { document.getElementById('area-pesanan').style.display = 'block'; document.getElementById('tab-pesanan').classList.add('active'); }
-        else if (tab === 'menu') { document.getElementById('area-menu').style.display = 'block'; document.getElementById('tab-menu').classList.add('active'); }
-        else if (tab === 'laporan') { 
-            document.getElementById('area-laporan').style.display = 'block'; 
-            document.getElementById('tab-laporan').classList.add('active'); 
-            if (!isKasirLoaded) { loadLaporanKasir(); } else { hitungLaporan(); }
-        }
-    }
-
-    // STATUS TOKO
-    function loadStatus() { onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => { if (docSnap.exists()) { statusSaatIni = docSnap.data().status || "auto"; alasanSaatIni = docSnap.data().alasanTutup || ""; } else { statusSaatIni = "auto"; alasanSaatIni = ""; } statusTerpilih = statusSaatIni; alasanTerpilih = alasanSaatIni; tampilkanStatus(statusSaatIni); highlightOption(statusSaatIni); document.getElementById('pilih-alasan').value = alasanSaatIni; updateTombolSimpan(); }); }
-    function tampilkanStatus(status) { const display = document.getElementById('status-display'); const icon = document.getElementById('status-icon'); const text = document.getElementById('status-text'); const info = document.getElementById('status-info'); display.className = 'status-display ' + status; if (status === 'buka') { icon.innerText = '🟢'; text.innerText = 'TOKO BUKA'; info.innerText = 'Pelanggan bisa memesan'; } else if (status === 'tutup') { icon.innerText = '🔴'; text.innerText = 'TOKO TUTUP'; info.innerText = 'Pelanggan tidak bisa memesan'; } else { icon.innerText = '⏰'; text.innerText = 'OTOMATIS'; info.innerText = 'Mengikuti jadwal (10:00 - 23:00)'; } }
-    function highlightOption(status) { document.getElementById('opt-auto').classList.remove('active'); document.getElementById('opt-buka').classList.remove('active'); document.getElementById('opt-tutup').classList.remove('active'); document.getElementById('opt-' + status).classList.add('active'); }
-    window.pilihStatus = (status) => { statusTerpilih = status; highlightOption(status); updateTombolSimpan(); };
-    document.getElementById('pilih-alasan').addEventListener('change', (e) => { alasanTerpilih = e.target.value; updateTombolSimpan(); });
-    function updateTombolSimpan() { const btn = document.getElementById('btn-save'); if (statusTerpilih === statusSaatIni && alasanTerpilih === alasanSaatIni) { btn.disabled = true; } else { btn.disabled = false; } }
-    window.simpanPengaturan = async () => { const btn = document.getElementById('btn-save'); btn.disabled = true; try { await setDoc(doc(db, "pengaturan", "toko"), { status: statusTerpilih, alasanTutup: alasanTerpilih, updatedAt: new Date().toISOString(), updatedBy: auth.currentUser.email }); statusSaatIni = statusTerpilih; alasanSaatIni = alasanTerpilih; alert("✅ Pengaturan berhasil disimpan!"); } catch (error) { alert("❌ Gagal menyimpan: " + error.message); btn.disabled = false; } };
-
-    // PESANAN
-    window.switchFilter = (filter) => { currentFilter = filter; document.getElementById('btn-filter-aktif').classList.toggle('active', filter === 'aktif'); document.getElementById('btn-filter-selesai').classList.toggle('active', filter === 'selesai'); renderOrders(); }
-    window.loadPesanan = () => { const list = document.getElementById('list-pesanan'); list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Memuat data...</p>'; if (unsubPesanan) unsubPesanan(); const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc")); unsubPesanan = onSnapshot(q, (snapshot) => { allOrders = []; allOrdersForReport = []; snapshot.forEach((doc) => { const data = doc.data(); data.id = doc.id; allOrders.push(data); allOrdersForReport.push(data); }); const activeCount = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan').length; const badgeMain = document.getElementById('badge-notif'); const badgeTab = document.getElementById('badge-aktif'); if (activeCount > 0) { badgeMain.innerText = activeCount; badgeMain.classList.add('show'); badgeTab.innerText = `(${activeCount})`; } else { badgeMain.classList.remove('show'); badgeTab.innerText = ''; } renderOrders(); }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat pesanan: ${error.message}</p>`; }); }
-    function renderOrders() { const list = document.getElementById('list-pesanan'); let filtered = []; if (currentFilter === 'aktif') { filtered = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan'); } else { filtered = allOrders.filter(o => o.status === 'Selesai' || o.status === 'Dibatalkan'); } if (filtered.length === 0) { list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Tidak ada pesanan ${currentFilter === 'aktif' ? 'proses' : 'selesai'}.</p>`; return; } let html = ''; filtered.forEach((data) => { const docId = data.id; let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : "Waktu error"; const namaPembeli = data.nama || 'Pelanggan'; const emailPembeli = data.email || '-'; const detailPesanan = data.detail_pesanan || 'Detail tidak tersedia'; const total = data.total_bayar || 0; const metode = data.metode || '-'; const statusSaatIni = data.status || 'Menunggu Konfirmasi Toko'; const classSelesai = (statusSaatIni === 'Selesai') ? 'selesai' : ''; html += `<div class="order-item"><div class="order-header"><span>${tgl}</span><span style="color: var(--success); font-weight: bold;">${metode}</span></div><div class="order-name">${namaPembeli} - Rp ${total.toLocaleString('id-ID')}</div><div class="order-email"><i class="fa-solid fa-envelope"></i> ${emailPembeli}</div><div class="order-detail">${detailPesanan}</div><select class="status-select ${classSelesai}" onchange="updateStatusPesanan('${docId}', this.value)"><option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option><option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option><option value="Siap Diambil" ${statusSaatIni === 'Siap Diambil' ? 'selected' : ''}>Siap Diambil (Pickup)</option><option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option><option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option><option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option></select></div>`; }); list.innerHTML = html; }
-    window.updateStatusPesanan = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); } catch (error) { alert("Gagal mengubah status: " + error.message); } }
-
-    // KELOLA MENU
-    window.loadMenuAdmin = () => { const list = document.getElementById('list-menu-admin'); if (unsubMenu) unsubMenu(); const q = query(collection(db, "menu_kebab"), orderBy("id", "asc")); unsubMenu = onSnapshot(q, (snapshot) => { if (snapshot.empty) { list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada menu.</p>'; return; } let html = ''; snapshot.forEach((doc) => { const data = doc.data(); const docId = doc.id; const isPersiapan = data.status === 'persiapan'; html += `<div class="menu-item-admin"><img src="${data.image}" alt="${data.name}"><div class="menu-item-admin-info"><div class="menu-item-admin-title">${data.name}</div><div class="menu-item-admin-price">Rp ${data.price.toLocaleString('id-ID')}</div></div><button class="btn-status ${isPersiapan ? 'persiapan' : 'ready'}" onclick="toggleStatusMenu('${docId}', '${data.status || 'ready'}')">${isPersiapan ? 'Persiapan' : 'Siap'}</button><button class="btn-delete-menu" onclick="hapusMenu('${docId}', '${data.name}')"><i class="fa-solid fa-trash"></i></button></div>`; }); list.innerHTML = html; }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat menu: ${error.message}</p>`; }); }
-
-    window.toggleStatusMenu = async (docId, currentStatus) => {
-        const newStatus = currentStatus === 'persiapan' ? 'ready' : 'persiapan';
-        try {
-            await updateDoc(doc(db, "menu_kebab", docId), { status: newStatus });
-        } catch (error) {
-            alert("Gagal mengubah status menu: " + error.message);
-        }
-    }
-
-    window.previewFile = (input) => { const file = input.files[0]; if (!file) return; const preview = document.getElementById('img-preview'); preview.src = URL.createObjectURL(file); preview.style.display = 'block'; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let width = img.width; let height = img.height; if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); canvas.toBlob((blob) => { if (blob) { compressedFile = new File([blob], "foto_menu.jpg", { type: "image/jpeg" }); } }, 'image/jpeg', 0.7); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
-    
-    window.tambahMenu = async () => { 
-        const name = document.getElementById('menu-name').value.trim(); 
-        const category = document.getElementById('menu-category').value; 
-        const price = parseInt(document.getElementById('menu-price').value); 
-        const imageUrl = document.getElementById('menu-image-url').value.trim(); 
-        if (!name || !price || (!compressedFile && !imageUrl)) { alert("Mohon isi Nama, Harga, dan Pilih Foto atau masukkan Link Gambar!"); return; } 
-        try { 
-            let finalImageUrl = imageUrl; 
-            if (compressedFile) { 
-                const reader = new FileReader(); 
-                reader.readAsDataURL(compressedFile); 
-                reader.onloadend = async () => { 
-                    finalImageUrl = reader.result; 
-                    await simpanMenuKeFirebase(name, category, price, finalImageUrl); 
-                }; 
-            } else { 
-                await simpanMenuKeFirebase(name, category, price, finalImageUrl); 
-            } 
-        } catch (error) { alert("❌ Gagal menambah menu: " + error.message); } 
-    }
-    
-    async function simpanMenuKeFirebase(name, category, price, image) { 
-        const newId = Date.now(); 
-        await setDoc(doc(db, "menu_kebab", newId.toString()), { 
-            id: newId, 
-            name: name, 
-            category: category, 
-            type: category === 'makanan' ? 'Kebab' : 'Minuman', 
-            price: price, 
-            status: 'ready', // Default siap
-            image: image, 
-            badge: "" 
-        }); 
-        alert("✅ Menu berhasil ditambahkan!"); 
-        document.getElementById('menu-name').value = ''; 
-        document.getElementById('menu-price').value = ''; 
-        document.getElementById('menu-image-url').value = ''; 
-        document.getElementById('menu-file').value = ''; 
-        document.getElementById('img-preview').style.display = 'none'; 
-        compressedFile = null; 
-    }
-    
-    window.hapusMenu = async (docId, namaMenu) => { if (confirm(`Yakin ingin menghapus menu "${namaMenu}"?`)) { try { await deleteDoc(doc(db, "menu_kebab", docId)); alert("✅ Menu berhasil dihapus."); } catch (error) { alert("❌ Gagal menghapus: " + error.message); } } }
-
-    async function loadLaporanKasir() {
-        const listMenu = document.getElementById('list-menu-terlaris');
-        listMenu.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Menarik data kasir...</p>';
-        try {
-            const querySnapshot = await getDocs(collection(db, "transaksi_kasir"));
-            allKasirForReport = [];
-            querySnapshot.forEach((doc) => { allKasirForReport.push(doc.data()); });
-            isKasirLoaded = true;
-            hitungLaporan(); 
-        } catch (error) {
-            console.error("Gagal load kasir:", error);
-            listMenu.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 12px;">Gagal memuat data kasir: ${error.message}</p>`;
-        }
-    }
-
-    window.gantiFilterLaporan = (filter) => {
-        filterLaporan = filter;
-        document.getElementById('btn-lap-hari').classList.toggle('active', filter === 'hari');
-        document.getElementById('btn-lap-bulan').classList.toggle('active', filter === 'bulan');
-        document.getElementById('btn-lap-semua').classList.toggle('active', filter === 'semua');
-        if (!isKasirLoaded) { loadLaporanKasir(); } else { hitungLaporan(); }
-    }
-
-    function hitungLaporan() {
-        const sekarang = new Date();
-        let totalPendapatan = 0;
-        let totalPesanan = 0;
-        let menuTerjual = {}; 
-
-        const isTanggalValid = (waktuStr) => {
-            if (!waktuStr) return false;
-            const tglOrder = new Date(waktuStr);
-            if (filterLaporan === 'hari') return tglOrder.toDateString() === sekarang.toDateString();
-            if (filterLaporan === 'bulan') return tglOrder.getMonth() === sekarang.getMonth() && tglOrder.getFullYear() === sekarang.getFullYear();
-            return true; 
-        };
-
-        allOrdersForReport.forEach(order => {
-            const isSelesai = order.status === 'Selesai';
-            const isLunasSaldo = order.metode && order.metode.includes('Lunas via Saldo');
-            if ((isSelesai || isLunasSaldo) && isTanggalValid(order.waktu)) {
-                totalPendapatan += (order.total_bayar || 0);
-                totalPesanan += 1;
-                if (order.rincian && Array.isArray(order.rincian)) {
-                    order.rincian.forEach(item => {
-                        menuTerjual[item.nama] = (menuTerjual[item.nama] || 0) + item.qty;
-                    });
-                }
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ALLOWED_EMAIL) {
+                document.getElementById('app-content').style.display = 'block';
+                loadStatus(); loadPesanan(); loadMenuAdmin(); loadPelanggan();
+            } else {
+                alert("Akses Ditolak. Hanya untuk Owner.");
+                window.location.href = 'index.html';
             }
         });
 
-        allKasirForReport.forEach(order => {
-            if (isTanggalValid(order.waktu)) {
-                totalPendapatan += (order.total || 0);
-                totalPesanan += 1;
-                if (order.rincian && Array.isArray(order.rincian)) {
-                    order.rincian.forEach(item => {
-                        menuTerjual[item.nama] = (menuTerjual[item.nama] || 0) + item.qty;
-                    });
-                }
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.main-content > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`area-${tab}`).style.display = 'block';
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            document.getElementById(`m-nav-${tab}`).classList.add('active');
+
+            if (tab === 'dashboard' && !isKasirLoaded) {
+                loadLaporanData();
             }
-        });
+        }
 
-        document.getElementById('lap-total-uang').innerText = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
-        document.getElementById('lap-total-pesanan').innerText = totalPesanan;
-        const rataRata = totalPesanan > 0 ? (totalPendapatan / totalPesanan) : 0;
-        document.getElementById('lap-rata-rata').innerText = `Rp ${Math.round(rataRata).toLocaleString('id-ID')}`;
+        // --- PENGATURAN TOKO ---
+        function loadStatus() { onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => { if (docSnap.exists()) { statusSaatIni = docSnap.data().status || "auto"; alasanSaatIni = docSnap.data().alasanTutup || ""; } else { statusSaatIni = "auto"; alasanSaatIni = ""; } statusTerpilih = statusSaatIni; alasanTerpilih = alasanSaatIni; tampilkanStatus(statusSaatIni); highlightOption(statusSaatIni); document.getElementById('pilih-alasan').value = alasanSaatIni; updateTombolSimpan(); }); }
+        function tampilkanStatus(status) { const display = document.getElementById('status-display'); const icon = document.getElementById('status-icon'); const text = document.getElementById('status-text'); const info = document.getElementById('status-info'); display.className = 'status-display ' + status; if (status === 'buka') { icon.innerText = '🟢'; text.innerText = 'TOKO BUKA'; info.innerText = 'Pelanggan bisa memesan'; display.style.borderColor = 'var(--success)'; display.style.background = 'rgba(16, 185, 129, 0.1)'; } else if (status === 'tutup') { icon.innerText = '🔴'; text.innerText = 'TOKO TUTUP'; info.innerText = 'Pelanggan tidak bisa memesan'; display.style.borderColor = 'var(--primary)'; display.style.background = 'rgba(239, 68, 68, 0.1)'; } else { icon.innerText = '⏰'; text.innerText = 'OTOMATIS'; info.innerText = 'Mengikuti jadwal (10:00 - 23:00)'; display.style.borderColor = 'var(--accent)'; display.style.background = 'rgba(245, 158, 11, 0.1)'; } }
+        function highlightOption(status) { document.getElementById('opt-auto').classList.remove('active'); document.getElementById('opt-buka').classList.remove('active'); document.getElementById('opt-tutup').classList.remove('active'); document.getElementById('opt-' + status).classList.add('active'); }
+        window.pilihStatus = (status) => { statusTerpilih = status; highlightOption(status); updateTombolSimpan(); };
+        document.getElementById('pilih-alasan').addEventListener('change', (e) => { alasanTerpilih = e.target.value; updateTombolSimpan(); });
+        function updateTombolSimpan() { const btn = document.getElementById('btn-save'); if (statusTerpilih === statusSaatIni && alasanTerpilih === alasanSaatIni) { btn.disabled = true; btn.style.opacity = '0.5'; } else { btn.disabled = false; btn.style.opacity = '1'; } }
+        window.simpanPengaturan = async () => { const btn = document.getElementById('btn-save'); btn.disabled = true; try { await setDoc(doc(db, "pengaturan", "toko"), { status: statusTerpilih, alasanTutup: alasanTerpilih, updatedAt: new Date().toISOString(), updatedBy: auth.currentUser.email }); statusSaatIni = statusTerpilih; alasanSaatIni = alasanTerpilih; alert("✅ Pengaturan berhasil disimpan!"); } catch (error) { alert("❌ Gagal menyimpan: " + error.message); btn.disabled = false; } };
 
-        const sortedMenu = Object.keys(menuTerjual).map(nama => ({ nama, qty: menuTerjual[nama] })).sort((a, b) => b.qty - a.qty).slice(0, 5);
-        const listMenu = document.getElementById('list-menu-terlaris');
-        if (sortedMenu.length === 0) {
-            listMenu.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px;">Belum ada data menu terjual.</p>';
-        } else {
-            let html = '';
-            sortedMenu.forEach((item, index) => {
-                html += `<div class="top-menu-item"><span>${index + 1}. ${item.nama}</span><span style="font-weight: bold; color: var(--accent);">${item.qty} Porsi</span></div>`;
+        // --- PESANAN ONLINE ---
+        window.switchFilter = (filter) => { currentFilter = filter; document.getElementById('btn-filter-aktif').style.background = filter === 'aktif' ? 'var(--primary)' : 'transparent'; document.getElementById('btn-filter-aktif').style.color = filter === 'aktif' ? 'white' : 'var(--text-main)'; document.getElementById('btn-filter-aktif').style.borderColor = filter === 'aktif' ? 'var(--primary)' : 'var(--border)'; document.getElementById('btn-filter-selesai').style.background = filter === 'selesai' ? 'var(--primary)' : 'transparent'; document.getElementById('btn-filter-selesai').style.color = filter === 'selesai' ? 'white' : 'var(--text-main)'; document.getElementById('btn-filter-selesai').style.borderColor = filter === 'selesai' ? 'var(--primary)' : 'var(--border)'; renderOrders(); }
+        window.loadPesanan = () => { const list = document.getElementById('list-pesanan'); list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px;">Memuat data...</p>'; if (unsubPesanan) unsubPesanan(); const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc")); unsubPesanan = onSnapshot(q, (snapshot) => { allOrders = []; allOrdersForReport = []; snapshot.forEach((doc) => { const data = doc.data(); data.id = doc.id; allOrders.push(data); allOrdersForReport.push(data); }); renderOrders(); }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 13px;">Gagal memuat pesanan: ${error.message}</p>`; }); }
+        
+        function renderOrders() { 
+            const list = document.getElementById('list-pesanan'); let filtered = []; 
+            if (currentFilter === 'aktif') { filtered = allOrders.filter(o => o.status !== 'Selesai' && o.status !== 'Dibatalkan'); } else { filtered = allOrders.filter(o => o.status === 'Selesai' || o.status === 'Dibatalkan'); } 
+            if (filtered.length === 0) { list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">Tidak ada pesanan ${currentFilter === 'aktif' ? 'proses' : 'selesai'}.</p>`; return; } 
+            
+            let html = ''; 
+            filtered.forEach((data) => { 
+                const docId = data.id; let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : "Waktu error"; 
+                const namaPembeli = data.nama || 'Pelanggan'; const emailPembeli = data.email || '-'; const detailPesanan = data.detail_pesanan || 'Detail tidak tersedia'; const total = data.total_bayar || 0; const metode = data.metode || '-'; const statusSaatIni = data.status || 'Menunggu Konfirmasi Toko'; 
+                
+                let badgeClass = 'badge-warning';
+                if (statusSaatIni === 'Selesai') badgeClass = 'badge-success';
+                if (statusSaatIni === 'Dibatalkan') badgeClass = 'badge-danger';
+
+                html += `
+                <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <div class="item-info">
+                            <div class="item-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="item-details">
+                                <h4>${namaPembeli}</h4>
+                                <p>${emailPembeli}</p>
+                            </div>
+                        </div>
+                        <div class="badge ${badgeClass}">${statusSaatIni}</div>
+                    </div>
+                    <div style="background: var(--bg-body); padding: 10px; border-radius: 8px; width: 100%; font-size: 12px; color: #ccc; white-space: pre-wrap;">${detailPesanan}</div>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; border-top: 1px dashed var(--border); padding-top: 10px;">
+                        <div style="font-weight: 700;">${metode} - Rp ${total.toLocaleString('id-ID')}</div>
+                        <select class="form-input" style="width: auto; padding: 6px; font-size: 12px;" onchange="updateStatusPesanan('${docId}', this.value)">
+                            <option value="Menunggu Konfirmasi Toko" ${statusSaatIni === 'Menunggu Konfirmasi Toko' ? 'selected' : ''}>Menunggu Konfirmasi</option>
+                            <option value="Sedang Dimasak" ${statusSaatIni === 'Sedang Dimasak' ? 'selected' : ''}>Sedang Dimasak</option>
+                            <option value="Siap Diambil" ${statusSaatIni === 'Siap Diambil' ? 'selected' : ''}>Siap Diambil</option>
+                            <option value="Sedang Diantar" ${statusSaatIni === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option>
+                            <option value="Selesai" ${statusSaatIni === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                            <option value="Dibatalkan" ${statusSaatIni === 'Dibatalkan' ? 'selected' : ''}>Dibatalkan</option>
+                        </select>
+                    </div>
+                </div>`; 
+            }); 
+            list.innerHTML = html; 
+        }
+        window.updateStatusPesanan = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); } catch (error) { alert("Gagal mengubah status: " + error.message); } }
+
+        // --- KELOLA MENU ---
+        window.loadMenuAdmin = () => { const list = document.getElementById('list-menu-admin'); if (unsubMenu) unsubMenu(); const q = query(collection(db, "menu_kebab"), orderBy("id", "asc")); unsubMenu = onSnapshot(q, (snapshot) => { if (snapshot.empty) { list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px;">Belum ada menu.</p>'; return; } let html = ''; snapshot.forEach((doc) => { const data = doc.data(); const docId = doc.id; const isPersiapan = data.status === 'persiapan'; html += `<div class="list-item"><div class="item-info"><img src="${data.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;"><div class="item-details"><h4>${data.name}</h4><p>Rp ${data.price.toLocaleString('id-ID')} • ${data.category}</p></div></div><div style="display: flex; gap: 10px; align-items: center;"><button class="btn-outline" style="${isPersiapan ? 'color: var(--accent); border-color: var(--accent);' : 'color: var(--success); border-color: var(--success);'}" onclick="toggleStatusMenu('${docId}', '${data.status || 'ready'}')">${isPersiapan ? 'Persiapan' : 'Siap'}</button><button class="btn-outline" style="color: var(--primary); border-color: var(--primary); padding: 8px;" onclick="hapusMenu('${docId}', '${data.name}')"><i class="fa-solid fa-trash"></i></button></div></div>`; }); list.innerHTML = html; }, (error) => { list.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 13px;">Gagal memuat menu: ${error.message}</p>`; }); }
+        window.toggleStatusMenu = async (docId, currentStatus) => { const newStatus = currentStatus === 'persiapan' ? 'ready' : 'persiapan'; try { await updateDoc(doc(db, "menu_kebab", docId), { status: newStatus }); } catch (error) { alert("Gagal mengubah status menu: " + error.message); } }
+        window.previewFile = (input) => { const file = input.files[0]; if (!file) return; const preview = document.getElementById('img-preview'); preview.src = URL.createObjectURL(file); preview.style.display = 'block'; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let width = img.width; let height = img.height; if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); canvas.toBlob((blob) => { if (blob) { compressedFile = new File([blob], "foto_menu.jpg", { type: "image/jpeg" }); } }, 'image/jpeg', 0.7); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
+        window.tambahMenu = async () => { const name = document.getElementById('menu-name').value.trim(); const category = document.getElementById('menu-category').value; const price = parseInt(document.getElementById('menu-price').value); const imageUrl = document.getElementById('menu-image-url').value.trim(); if (!name || !price || (!compressedFile && !imageUrl)) { alert("Mohon isi Nama, Harga, dan Pilih Foto atau masukkan Link Gambar!"); return; } try { let finalImageUrl = imageUrl; if (compressedFile) { const reader = new FileReader(); reader.readAsDataURL(compressedFile); reader.onloadend = async () => { finalImageUrl = reader.result; await simpanMenuKeFirebase(name, category, price, finalImageUrl); }; } else { await simpanMenuKeFirebase(name, category, price, finalImageUrl); } } catch (error) { alert("❌ Gagal menambah menu: " + error.message); } }
+        async function simpanMenuKeFirebase(name, category, price, image) { const newId = Date.now(); await setDoc(doc(db, "menu_kebab", newId.toString()), { id: newId, name: name, category: category, type: category === 'makanan' ? 'Kebab' : 'Minuman', price: price, status: 'ready', image: image, badge: "" }); alert("✅ Menu berhasil ditambahkan!"); document.getElementById('menu-name').value = ''; document.getElementById('menu-price').value = ''; document.getElementById('menu-image-url').value = ''; document.getElementById('menu-file').value = ''; document.getElementById('img-preview').style.display = 'none'; compressedFile = null; }
+        window.hapusMenu = async (docId, namaMenu) => { if (confirm(`Yakin ingin menghapus menu "${namaMenu}"?`)) { try { await deleteDoc(doc(db, "menu_kebab", docId)); alert("✅ Menu berhasil dihapus."); } catch (error) { alert("❌ Gagal menghapus: " + error.message); } } }
+
+        // --- PELANGGAN (BARU) ---
+        function loadPelanggan() {
+            if (unsubPelanggan) unsubPelanggan();
+            unsubPelanggan = onSnapshot(collection(db, "saldo_pelanggan"), (snapshot) => {
+                allPelanggan = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    allPelanggan.push({ id: doc.id, ...data });
+                });
+                renderPelanggan(allPelanggan);
             });
-            listMenu.innerHTML = html;
         }
-    }
-</script>
+
+        window.filterPelanggan = (keyword) => {
+            const filtered = allPelanggan.filter(p => p.email && p.email.toLowerCase().includes(keyword.toLowerCase()));
+            renderPelanggan(filtered);
+        }
+
+        function renderPelanggan(dataArray) {
+            const list = document.getElementById('list-pelanggan');
+            if (dataArray.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px;">Belum ada pelanggan terdaftar.</p>';
+                return;
+            }
+            let html = '';
+            dataArray.forEach(p => {
+                const email = p.email || p.id;
+                const saldo = p.saldo || 0;
+                const hasToken = p.fcm_token ? '<span class="badge badge-success">Notif Aktif</span>' : '<span class="badge badge-danger">Notif Mati</span>';
+                
+                html += `
+                <div class="list-item">
+                    <div class="item-info">
+                        <div class="item-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--primary);"><i class="fa-solid fa-user"></i></div>
+                        <div class="item-details">
+                            <h4>${email}</h4>
+                            <p>Saldo: Rp ${saldo.toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                    <div>${hasToken}</div>
+                </div>`;
+            });
+            list.innerHTML = html;
+        }
+
+        // --- DASHBOARD / LAPORAN ---
+        async function loadLaporanData() {
+            const listMenu = document.getElementById('list-menu-terlaris');
+            listMenu.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px;">Menarik data laporan...</p>';
+            try {
+                // Ambil data kasir dan self service (sekali saja)
+                const snapKasir = await getDocs(collection(db, "transaksi_kasir"));
+                allKasirForReport = []; snapKasir.forEach(d => allKasirForReport.push(d.data()));
+
+                const snapSelf = await getDocs(collection(db, "transaksi_selfservice"));
+                allSelfForReport = []; snapSelf.forEach(d => allSelfForReport.push(d.data()));
+
+                isKasirLoaded = true;
+                hitungLaporan(); 
+            } catch (error) {
+                console.error("Gagal load laporan:", error);
+                listMenu.innerHTML = `<p style="text-align: center; color: var(--primary); font-size: 13px;">Gagal memuat data: ${error.message}</p>`;
+            }
+        }
+
+        function hitungLaporan() {
+            const sekarang = new Date();
+            let totalPendapatan = 0;
+            let totalPesanan = 0;
+            let menuTerjual = {}; 
+
+            const isTanggalValid = (waktuStr) => {
+                if (!waktuStr) return false;
+                const tglOrder = new Date(waktuStr);
+                if (filterLaporan === 'hari') return tglOrder.toDateString() === sekarang.toDateString();
+                if (filterLaporan === 'bulan') return tglOrder.getMonth() === sekarang.getMonth() && tglOrder.getFullYear() === sekarang.getFullYear();
+                return true; 
+            };
+
+            // Online
+            allOrdersForReport.forEach(order => {
+                const isSelesai = order.status === 'Selesai';
+                const isLunasSaldo = order.metode && order.metode.includes('Lunas via Saldo');
+                if ((isSelesai || isLunasSaldo) && isTanggalValid(order.waktu)) {
+                    totalPendapatan += (order.total_bayar || 0);
+                    totalPesanan += 1;
+                    if (order.rincian && Array.isArray(order.rincian)) { order.rincian.forEach(item => { menuTerjual[item.nama] = (menuTerjual[item.nama] || 0) + item.qty; }); }
+                }
+            });
+
+            // Kasir
+            allKasirForReport.forEach(order => {
+                if (isTanggalValid(order.waktu)) {
+                    totalPendapatan += (order.total || 0);
+                    totalPesanan += 1;
+                    if (order.rincian && Array.isArray(order.rincian)) { order.rincian.forEach(item => { menuTerjual[item.nama] = (menuTerjual[item.nama] || 0) + item.qty; }); }
+                }
+            });
+
+            // Self Service (Hanya yang Lunas/Selesai)
+            allSelfForReport.forEach(order => {
+                if (order.status === 'Selesai' || order.status === 'Lunas (QRIS)' || order.status === 'Sedang Dimasak') {
+                    if (isTanggalValid(order.waktu)) {
+                        totalPendapatan += (order.total || 0);
+                        totalPesanan += 1;
+                        if (order.rincian && Array.isArray(order.rincian)) { order.rincian.forEach(item => { menuTerjual[item.nama] = (menuTerjual[item.nama] || 0) + item.qty; }); }
+                    }
+                }
+            });
+
+            document.getElementById('lap-total-uang').innerText = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
+            document.getElementById('lap-total-pesanan').innerText = totalPesanan;
+            const rataRata = totalPesanan > 0 ? (totalPendapatan / totalPesanan) : 0;
+            document.getElementById('lap-rata-rata').innerText = `Rata-rata: Rp ${Math.round(rataRata).toLocaleString('id-ID')}`;
+
+            const sortedMenu = Object.keys(menuTerjual).map(nama => ({ nama, qty: menuTerjual[nama] })).sort((a, b) => b.qty - a.qty).slice(0, 5);
+            const listMenu = document.getElementById('list-menu-terlaris');
+            if (sortedMenu.length === 0) {
+                listMenu.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px;">Belum ada data menu terjual.</p>';
+            } else {
+                let html = '';
+                sortedMenu.forEach((item, index) => {
+                    html += `<div class="list-item"><div class="item-info"><div class="item-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--accent);">${index + 1}</div><div class="item-details"><h4>${item.nama}</h4></div></div><div style="font-weight: 800; color: var(--accent);">${item.qty} Porsi</div></div>`;
+                });
+                listMenu.innerHTML = html;
+            }
+        }
+    </script>
 </body>
 </html>
