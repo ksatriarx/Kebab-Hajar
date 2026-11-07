@@ -395,13 +395,28 @@
 
         function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
             authScreen.style.display = 'none'; appScreen.classList.add('show'); buyerNameInput.value = namaUser; btnLogout.style.display = 'flex';
+            
             if (tipeUser === "Akun Google") {
                 isTamu = false;
-                // TAMBAHAN BARU: Panggil FCM setelah 2 detik agar web tidak lag
+                
+                // --- TAMBAHAN BARU: SIMPAN DATA PELANGGAN KE DATABASE ---
+                const emailKey = emailUser.replace(/[^a-zA-Z0-9]/g, "");
+                setDoc(doc(db, "saldo_pelanggan", emailKey), { 
+                    email: emailUser,
+                    nama: namaUser,
+                    foto: fotoUser,
+                    terakhir_login: new Date().toISOString()
+                }, { merge: true }).then(() => {
+                    console.log("Data pelanggan tersimpan.");
+                }).catch(err => console.log("Gagal simpan pelanggan:", err));
+                // ---------------------------------------------------------
+
+                // Panggil FCM setelah 2 detik agar web tidak lag
                 setTimeout(() => { mintaIzinNotifikasi(emailUser); }, 2000); 
             } else {
                 isTamu = true;
             }
+            
             if (typeof isiDataProfil === 'function') { isiDataProfil(namaUser, emailUser || "Tidak ada email", fotoUser, tipeUser); document.getElementById('prof-type').innerText = tipeUser; }
             cekTombolSaldo(); initApp();
         }
@@ -413,7 +428,7 @@
 
         function cekTombolSaldo() { document.getElementById('btn-bayar-saldo').style.display = isTamu ? 'none' : 'flex'; }
 
-        // TAMBAHAN BARU: FUNGSI MENGAMBIL TOKEN FCM
+        // FUNGSI MENGAMBIL TOKEN FCM
         async function mintaIzinNotifikasi(emailUser) {
             if (!messaging || isTamu) return;
             try {
@@ -425,7 +440,6 @@
                     if (currentToken) {
                         console.log('Token FCM:', currentToken);
                         const emailKey = emailUser.replace(/[^a-zA-Z0-9]/g, "");
-                        // Simpan token ke database pelanggan (gabungkan dengan saldo)
                         await setDoc(doc(db, "saldo_pelanggan", emailKey), { 
                             fcm_token: currentToken 
                         }, { merge: true });
@@ -436,7 +450,7 @@
             }
         }
 
-        // TAMBAHAN BARU: Menerima notifikasi saat web sedang dibuka (Foreground)
+        // Menerima notifikasi saat web sedang dibuka (Foreground)
         if (messaging) {
             onMessage(messaging, (payload) => {
                 showToast(payload.notification.title + ": " + payload.notification.body, "info");
