@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kebab-pwa-v12'; // UBAH KE V6
+const CACHE_NAME = 'kebab-pwa-v13'; // UBAH KE V6
 const urlsToCache = [
   './',
   './index.html',
