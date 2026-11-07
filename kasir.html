@@ -113,6 +113,17 @@
         .custom-keypad .btn-del { color: var(--accent); }
         .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 11px; }
         .empty-state i { font-size: 30px; opacity: 0.3; margin-bottom: 8px; display: block; }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .pos-container { max-width: 100vw; } .pos-header { display: none; } .tabs { position: absolute; top: 0; left: 0; width: 100%; background: var(--bg-main); z-index: 5; padding: 0 15px; height: 40px; }
+            .content-area.active { display: flex; width: 100%; height: 100vh; height: 100dvh; padding-top: 40px; } .pos-layout { display: flex; flex-direction: row; width: 100%; height: 100%; margin: 0; }
+            .menu-section { flex: 1; height: 100%; border-right: 1px solid var(--border); padding: 15px; overflow-y: auto; } .menu-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+            .cart-section { width: 35%; min-width: 280px; max-width: 350px; height: 100%; max-height: none; margin-left: auto; border-radius: 0; border-top: none; border-left: 1px solid var(--border); box-shadow: none; padding: 15px; }
+            .cart-list-pos { flex-grow: 1; height: auto; } .btn-checkout { margin-top: auto; } .online-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; width: 100%; padding: 15px; }
+            .modal-box { max-width: 650px; height: 95dvh; max-height: 95dvh; padding: 8px 12px; } .modal-title { display: none; } .pay-methods { margin-bottom: 4px; gap: 4px; } .pay-btn { padding: 4px; font-size: 9px; }
+            .form-group { margin-bottom: 4px; } .form-label { margin-bottom: 1px; font-size: 8px; } .form-input { padding: 4px; font-size: 14px; } .change-box { padding: 4px; margin-bottom: 4px; } .change-row { font-size: 9px; margin-bottom: 2px; } .change-val { font-size: 12px; }
+            .modal-actions { gap: 4px; } .btn-cancel, .btn-confirm { padding: 6px; font-size: 10px; } .custom-keypad { gap: 3px; } .custom-keypad button { font-size: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -130,7 +141,6 @@
             <div style="text-align: right;">
                 <div class="header-info" id="header-email">-</div>
                 <div class="header-actions">
-                    <!-- TOMBOL INSTALL PWA -->
                     <button class="btn-icon btn-install-pwa" id="btn-install-pwa" onclick="picuInstall()" title="Install Aplikasi Kasir"><i class="fa-solid fa-download"></i></button>
                     <button class="btn-icon" onclick="toggleFullscreen()" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
                     <a href="pengaturan-toko.html" id="btn-settings-admin" class="btn-icon btn-icon-admin" title="Buka Pengaturan Toko"><i class="fa-solid fa-gear"></i></a>
@@ -232,7 +242,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, where, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
@@ -240,19 +250,11 @@
         let menuData = []; let cart = {}; let metodePembayaran = 'cash'; let currentCategory = 'makanan'; let unsubOnlineOrders = null; let unsubSelfOrders = null; let inputUangString = ""; 
         let isFirstLoadOnline = true; let knownOrderIdsOnline = new Set(); let isFirstLoadSelf = true; let knownOrderIdsSelf = new Set(); let audioCtx = null;
 
-        // PWA Install Logic
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('btn-install-pwa').style.display = 'flex'; });
         window.picuInstall = () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') { console.log('User accepted install'); }
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("Untuk Install Aplikasi: Klik titik tiga (⋮) di pojok kanan atas Chrome, lalu pilih 'Install App' atau 'Tambahkan ke Layar Utama'.");
-            }
+            if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then((choiceResult) => { if (choiceResult.outcome === 'accepted') { console.log('User accepted install'); } deferredPrompt = null; }); } 
+            else { alert("Untuk Install Aplikasi: Klik titik tiga (⋮) di pojok kanan atas Chrome, lalu pilih 'Install App' atau 'Tambahkan ke Layar Utama'."); }
         };
 
         window.toggleFullscreen = () => { if (!document.fullscreenElement) { if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen().catch(err => { console.log(`Gagal: ${err.message}`); }); } } else { if (document.exitFullscreen) { document.exitFullscreen(); } } };
@@ -286,7 +288,7 @@
                         let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
                         const isProses = data.status === 'Sedang Dimasak' || data.status === 'Sedang Diantar' || data.status === 'Siap Diambil';
                         const borderColor = isProses ? 'var(--accent)' : 'var(--primary)';
-                        html += `<div class="order-card" style="border-left-color: ${borderColor};"><div class="order-badge">Antrean #${queueNumber}</div><div class="oc-header"><span class="oc-id">${data.order_id}</span><span>${tgl}</span></div><div class="oc-name">${data.nama}</div><div class="oc-email"><i class="fa-solid fa-envelope"></i> ${data.email}</div><div class="oc-detail">${data.detail_pesanan}</div><div class="oc-footer"><div class="oc-total">Rp ${(data.total_bayar || 0).toLocaleString('id-ID')}</div><div class="oc-actions">${!isProses ? `<button class="btn-action btn-proses" onclick="updateStatusOnline('${docId}', 'Sedang Dimasak')"><i class="fa-solid fa-fire"></i> Proses</button>` : `<span style="font-size:10px; color:var(--accent); font-weight:bold;">${data.status}</span>`}<button class="btn-action btn-selesai" onclick="updateStatusOnline('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button></div></div></div>`;
+                        html += `<div class="order-card" style="border-left-color: ${borderColor};"><div class="order-badge">Antrean #${queueNumber}</div><div class="oc-header"><span class="oc-id">${data.order_id}</span><span>${tgl}</span></div><div class="oc-name">${data.nama}</div><div class="oc-email"><i class="fa-solid fa-envelope"></i> ${data.email}</div><div class="oc-detail">${data.detail_pesanan}</div><div class="oc-footer"><div class="oc-total">Rp ${(data.total_bayar || 0).toLocaleString('id-ID')}</div><div class="oc-actions">${!isProses ? `<button class="btn-action btn-proses" onclick="updateStatusOnline('${docId}', 'Sedang Dimasak', '${data.email}')"><i class="fa-solid fa-fire"></i> Proses</button>` : `<span style="font-size:10px; color:var(--accent); font-weight:bold;">${data.status}</span>`}<button class="btn-action btn-selesai" onclick="updateStatusOnline('${docId}', 'Selesai', '${data.email}')"><i class="fa-solid fa-check"></i> Selesai</button></div></div></div>`;
                         queueNumber++; 
                     }
                 });
@@ -295,77 +297,64 @@
                 else { list.innerHTML = html; const badge = document.getElementById('badge-online'); badge.innerText = countAktif; badge.classList.add('show'); }
             });
         }
-        window.updateStatusOnline = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); } catch (error) { alert("Gagal: " + error.message); } }
+        
+        // FUNGSI NOTIFIKASI OTOMATIS
+        async function kirimNotifKePelanggan(emailPembeli, statusBaru) {
+            if (!emailPembeli || emailPembeli === 'Tamu (Tanpa Email)') return;
+            try {
+                const emailKey = emailPembeli.replace(/[^a-zA-Z0-9]/g, '');
+                const custDoc = await getDoc(doc(db, "saldo_pelanggan", emailKey));
+                if (custDoc.exists() && custDoc.data().fcm_token) {
+                    let title = '', body = '';
+                    if (statusBaru === 'Sedang Dimasak') { title = 'Pesanan Dimasak 🍳'; body = 'Kebab pesananmu sedang disiapkan ya kak!'; }
+                    else if (statusBaru === 'Siap Diambil') { title = 'Pesanan Siap Diambil 🛍️'; body = 'Pesananmu sudah siap diambil di toko ya kak!'; }
+                    else if (statusBaru === 'Sedang Diantar') { title = 'Pesanan Diantar 🛵'; body = 'Kurir kami sedang menuju ke lokasimu!'; }
+                    else if (statusBaru === 'Selesai') { title = 'Pesanan Selesai ✅'; body = 'Terima kasih telah memesan di Kebab Hajar!'; }
+                    if (title !== '') {
+                        await fetch('https://kebab-backend.vercel.app/api/send-notif', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: custDoc.data().fcm_token, title: title, body: body })
+                        });
+                    }
+                }
+            } catch (error) { console.log("Gagal kirim notif:", error); }
+        }
+
+        window.updateStatusOnline = async (docId, newStatus, email) => { 
+            try { 
+                await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); 
+                kirimNotifKePelanggan(email, newStatus);
+            } catch (error) { alert("Gagal: " + error.message); } 
+        }
 
         function listenSelfServiceOrders() {
             const q = query(collection(db, "transaksi_selfservice"), orderBy("waktu", "desc"));
             unsubSelfOrders = onSnapshot(q, (snapshot) => {
                 const list = document.getElementById('self-orders-list'); let html = ''; let countAktif = 0; let currentIds = new Set(); let newOrderArrived = false;
-                
                 snapshot.forEach((doc) => {
                     const data = doc.data(); const docId = doc.id;
-                    
                     if (data.status !== 'Selesai' && data.status !== 'Dibatalkan') {
                         countAktif++; currentIds.add(docId); if (!knownOrderIdsSelf.has(docId) && !isFirstLoadSelf) newOrderArrived = true;
-                        
                         let tgl = data.waktu ? new Date(data.waktu).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
-                        const isLunasQRIS = data.status === 'Lunas (QRIS)';
-                        const isMenungguKasir = data.status === 'Menunggu Pembayaran Kasir';
-                        
+                        const isLunasQRIS = data.status === 'Lunas (QRIS)'; const isMenungguKasir = data.status === 'Menunggu Pembayaran Kasir';
                         let borderColor = isMenungguKasir ? 'var(--primary)' : 'var(--success)';
-                        
                         let actionBtn = '';
-                        if (isMenungguKasir) {
-                            actionBtn = `<button class="btn-action btn-batal" onclick="batalkanSelf('${docId}')"><i class="fa-solid fa-xmark"></i> Batal</button><button class="btn-action btn-proses" onclick="terimaPembayaranTunai('${docId}')"><i class="fa-solid fa-money-bill-wave"></i> Terima Tunai</button>`;
-                        } else if (data.status === 'Sedang Dimasak' || isLunasQRIS) {
-                            actionBtn = `<button class="btn-action btn-selesai" onclick="updateStatusSelf('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button>`;
-                        } else if (data.status === 'Menunggu Pembayaran QRIS') {
-                            actionBtn = `<button class="btn-action btn-batal" onclick="batalkanSelf('${docId}')"><i class="fa-solid fa-xmark"></i> Batal</button>`;
-                        }
-
+                        if (isMenungguKasir) { actionBtn = `<button class="btn-action btn-batal" onclick="batalkanSelf('${docId}')"><i class="fa-solid fa-xmark"></i> Batal</button><button class="btn-action btn-proses" onclick="terimaPembayaranTunai('${docId}')"><i class="fa-solid fa-money-bill-wave"></i> Terima Tunai</button>`; } 
+                        else if (data.status === 'Sedang Dimasak' || isLunasQRIS) { actionBtn = `<button class="btn-action btn-selesai" onclick="updateStatusSelf('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button>`; } 
+                        else if (data.status === 'Menunggu Pembayaran QRIS') { actionBtn = `<button class="btn-action btn-batal" onclick="batalkanSelf('${docId}')"><i class="fa-solid fa-xmark"></i> Batal</button>`; }
                         let detailPesanan = data.rincian.map(i => `▪ ${i.nama} (${i.qty}x)`).join('<br>');
-
-                        html += `
-                            <div class="order-card" style="border-left-color: ${borderColor};">
-                                <div class="order-badge" style="background: ${isMenungguKasir ? 'var(--primary)' : 'var(--success)'};">${data.queue_number}</div>
-                                <div class="oc-header"><span class="oc-id">${tgl}</span><span style="font-weight:bold; color:${isMenungguKasir ? 'var(--primary)' : 'var(--success)'}">${data.status}</span></div>
-                                <div class="oc-name">Metode: ${data.metode}</div>
-                                <div class="oc-detail">${detailPesanan}</div>
-                                <div class="oc-footer">
-                                    <div class="oc-total">Rp ${data.total.toLocaleString('id-ID')}</div>
-                                    <div class="oc-actions">${actionBtn}</div>
-                                </div>
-                            </div>`;
+                        html += `<div class="order-card" style="border-left-color: ${borderColor};"><div class="order-badge" style="background: ${isMenungguKasir ? 'var(--primary)' : 'var(--success)'};">${data.queue_number}</div><div class="oc-header"><span class="oc-id">${tgl}</span><span style="font-weight:bold; color:${isMenungguKasir ? 'var(--primary)' : 'var(--success)'}">${data.status}</span></div><div class="oc-name">Metode: ${data.metode}</div><div class="oc-detail">${detailPesanan}</div><div class="oc-footer"><div class="oc-total">Rp ${data.total.toLocaleString('id-ID')}</div><div class="oc-actions">${actionBtn}</div></div></div>`;
                     }
                 });
-                
                 if (newOrderArrived) playNotifSound(); knownOrderIdsSelf = currentIds; isFirstLoadSelf = false;
-                
-                if (countAktif === 0) { 
-                    list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-mug-hot"></i>Tidak ada pesanan self service.</div>`; 
-                    document.getElementById('badge-self').classList.remove('show'); 
-                } else { 
-                    list.innerHTML = html; 
-                    const badge = document.getElementById('badge-self'); 
-                    badge.innerText = countAktif; badge.classList.add('show'); 
-                }
+                if (countAktif === 0) { list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-mug-hot"></i>Tidak ada pesanan self service.</div>`; document.getElementById('badge-self').classList.remove('show'); } 
+                else { list.innerHTML = html; const badge = document.getElementById('badge-self'); badge.innerText = countAktif; badge.classList.add('show'); }
             });
         }
 
-        window.terimaPembayaranTunai = async (docId) => {
-            if(confirm("Uang tunai sudah diterima?")) {
-                try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: 'Sedang Dimasak' }); } catch (error) { alert("Gagal: " + error.message); }
-            }
-        }
-
-        window.batalkanSelf = async (docId) => {
-            if(confirm("Yakin ingin membatalkan pesanan ini?")) {
-                try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: 'Dibatalkan' }); } catch (error) { alert("Gagal: " + error.message); }
-            }
-        }
-
+        window.terimaPembayaranTunai = async (docId) => { if(confirm("Uang tunai sudah diterima?")) { try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: 'Sedang Dimasak' }); } catch (error) { alert("Gagal: " + error.message); } } }
+        window.batalkanSelf = async (docId) => { if(confirm("Yakin ingin membatalkan pesanan ini?")) { try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: 'Dibatalkan' }); } catch (error) { alert("Gagal: " + error.message); } } }
         window.updateStatusSelf = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: newStatus }); } catch (error) { alert("Gagal: " + error.message); } }
-
 
         function loadMenuOffline() { onSnapshot(collection(db, "menu_kebab"), (snapshot) => { menuData = []; snapshot.forEach((doc) => { const data = doc.data(); menuData.push(data); }); menuData.sort((a, b) => a.id - b.id); renderPosMenu(); }); }
         window.switchCategory = (cat) => { currentCategory = cat; document.getElementById('cat-makanan').classList.remove('active'); document.getElementById('cat-minuman').classList.remove('active'); document.getElementById(`cat-${cat}`).classList.add('active'); renderPosMenu(); }
@@ -374,9 +363,7 @@
             const grid = document.getElementById('pos-menu-grid'); const filtered = menuData.filter(item => item.category === currentCategory);
             if(filtered.length === 0) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); font-size:11px; padding:20px;">Belum ada menu.</div>`; return; }
             grid.innerHTML = filtered.map(item => {
-                const qty = cart[item.id] || 0;
-                const isPersiapan = item.status === 'persiapan';
-                let actionButton = '';
+                const qty = cart[item.id] || 0; const isPersiapan = item.status === 'persiapan'; let actionButton = '';
                 if (isPersiapan) { actionButton = `<button class="pos-add" disabled>Persiapan</button>`; } 
                 else { actionButton = qty === 0 ? `<button class="pos-add" onclick="addToCart(${item.id})">Tambah</button>` : `<div class="qty-control"><button onclick="updateQty(${item.id}, -1)">-</button><span>${qty}</span><button onclick="updateQty(${item.id}, 1)">+</button></div>`; }
                 return `<div class="pos-card"><img src="${item.image}" class="pos-img" alt="${item.name}"><div class="pos-info"><div class="pos-title">${item.name}</div><div class="pos-price">Rp ${item.price.toLocaleString('id-ID')}</div><div class="pos-bottom">${actionButton}</div></div></div>`;
