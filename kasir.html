@@ -41,7 +41,7 @@
         .btn-confirm-yes { flex: 1; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-confirm-no { flex: 1; padding: 12px; background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* ================= SIDEBAR ================= */
+        /* ================= SIDEBAR (Tampil Atas di HP) ================= */
         .sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); color: #fff; display: flex; flex-direction: column; z-index: 100; transition: all 0.3s; flex-shrink: 0; }
         .brand { padding: 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .brand img { width: 70px; border-radius: 50%; margin-bottom: 10px; border: 2px solid var(--primary); }
@@ -87,14 +87,14 @@
         .cat-btn { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 20px; border-radius: 25px; font-weight: 700; font-size: 13px; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
         .cat-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 10px rgba(229,57,53,0.3); }
 
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .pos-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; position: relative; transition: transform 0.2s; }
         .pos-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .pos-img { width: 100%; aspect-ratio: 1/1; border-radius: 8px; object-fit: cover; margin-bottom: 10px; }
-        .pos-title { font-size: 12px; font-weight: 800; margin-bottom: 5px; line-height: 1.3; color: var(--text-main); }
-        .pos-price { font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+        .pos-title { font-size: 13px; font-weight: 800; margin-bottom: 5px; line-height: 1.3; color: var(--text-main); }
+        .pos-price { font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
         .pos-bottom { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
-        .btn-add { background: var(--primary); color: #fff; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 14px; box-shadow: 0 2px 5px rgba(229,57,53,0.4); }
+        .btn-add { background: var(--primary); color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 14px; box-shadow: 0 2px 5px rgba(229,57,53,0.4); }
         .btn-add:disabled { background: var(--warning); color: #000; width: auto; padding: 0 10px; border-radius: 15px; font-size: 10px; font-weight: bold; cursor: not-allowed; box-shadow: none; }
         .badge { position: absolute; top: 15px; left: 15px; background: var(--primary); color: #fff; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; z-index: 2; }
         
@@ -168,49 +168,38 @@
         .mobile-overlay.show { display: block; opacity: 1; }
         .floating-cart-btn { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 15px 30px; border-radius: 30px; font-weight: 800; box-shadow: 0 10px 20px rgba(229,57,53,0.4); z-index: 200; border: none; cursor: pointer; align-items: center; gap: 10px; }
 
-        /* ==================================================== */
-        /* DESKTOP ADAPTIF (OPSI A)                             */
-        /* ==================================================== */
-
-        /* Tablet / Layar Sedang */
+        /* RESPONSIVE (MOBILE & TABLET) */
         @media (max-width: 1024px) {
-            :root { --sidebar-width: 70px; --cart-width: 300px; }
-            .brand h1, .brand p, .nav-item span, .profile-text, .sidebar-footer .btn-action { display: none; }
-            .brand img { width: 40px; margin-bottom: 0; }
-            .nav-item { justify-content: center; padding: 15px 0; }
-            .nav-item i { font-size: 20px; margin: 0; }
-            .sidebar-footer { padding: 10px; }
-            .profile-info { justify-content: center; margin: 0; }
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: 60px; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid var(--border); }
+            .brand { padding: 0; flex-direction: row; gap: 10px; border: none; } .brand img { width: 30px; margin: 0; } .brand p { display: none; }
+            .nav-menu { flex-direction: row; padding: 0; gap: 10px; overflow-x: auto; flex-grow: 0; }
+            .nav-item { padding: 8px 12px; font-size: 12px; } .nav-item span { display: none; }
+            .sidebar-footer { display: none; }
+            .main-wrapper { height: calc(100vh - 60px); }
             
-            .menu-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-            .topbar { padding: 0 10px; }
-            .search-box { width: 200px; }
-            .info-badge { display: none; }
-        }
-
-        /* HP (Layar Kecil) */
-        @media (max-width: 768px) {
-            :root { --sidebar-width: 55px; --cart-width: 260px; }
-            .brand img { width: 30px; }
-            .nav-item i { font-size: 16px; }
+            /* Topbar menyesuaikan */
+            .topbar { flex-wrap: wrap; height: auto; padding: 10px 15px; gap: 10px; }
+            .search-box { flex-grow: 1; max-width: 300px; }
+            .topbar-right { gap: 10px; margin-left: auto; }
             
-            .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            /* Grid Menu 3 Kolom */
+            .menu-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
             .pos-card { padding: 8px; }
             .pos-title { font-size: 11px; }
             .pos-price { font-size: 12px; }
+            .btn-add { width: 26px; height: 26px; font-size: 12px; }
             
-            .topbar { height: 60px; }
-            .search-box { flex-grow: 1; width: auto; max-width: none; }
-            
-            /* Menyembunyikan teks di keranjang agar tidak sesak */
-            .cart-header h2 { font-size: 14px; }
-            .cart-item img { width: 35px; height: 35px; }
-            .cart-item-name { font-size: 11px; }
-            .cart-item-price { font-size: 10px; }
-            .summary-row { font-size: 11px; }
-            .summary-row.total { font-size: 16px; }
-            .btn-checkout { padding: 10px; font-size: 14px; }
-            .cart-actions { flex-direction: column; }
+            /* Keranjang jadi Popup Modal di HP/Tablet */
+            .cart-panel { 
+                position: fixed; top: 50%; left: 50%; 
+                transform: translate(-50%, -50%) scale(0.9); 
+                width: 90%; max-width: 400px; height: 80vh; max-height: 600px; 
+                border-radius: 16px; border: none; opacity: 0; pointer-events: none; 
+                z-index: 1000; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            }
+            .cart-panel.show { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
+            .floating-cart-btn { display: flex; }
         }
     </style>
 </head>
@@ -228,6 +217,9 @@
             </div>
         </div>
     </div>
+
+    <!-- MOBILE OVERLAY UNTUK KERANJANG -->
+    <div class="mobile-overlay" id="mobile-overlay" onclick="toggleCart()"></div>
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -296,6 +288,7 @@
     <aside class="cart-panel" id="cart-panel">
         <div class="cart-header">
             <h2><i class="fa-solid fa-cart-shopping" style="color:var(--primary);"></i> Keranjang <span class="cart-badge" id="cart-count">0</span></h2>
+            <button onclick="toggleCart()" style="display:block; background:none; border:none; font-size:20px; color:var(--text-main); cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         
         <div class="cart-list" id="pos-cart-list">
@@ -313,6 +306,11 @@
             </div>
         </div>
     </aside>
+
+    <!-- FLOATING CART BUTTON (Untuk Mobile) -->
+    <button class="floating-cart-btn" onclick="toggleCart()" id="floating-cart-btn">
+        <i class="fa-solid fa-cart-shopping"></i> Keranjang (<span id="float-count">0</span>)
+    </button>
 
     <!-- MODAL PEMBAYARAN -->
     <div class="modal-overlay" id="payment-modal">
@@ -431,6 +429,14 @@
             else if(view === 'self') { document.getElementById('area-self').classList.add('active'); document.getElementById('nav-self').classList.add('active'); }
         }
 
+        // KERANJANG MOBILE TOGGLE
+        window.toggleCart = () => {
+            const cart = document.getElementById('cart-panel');
+            const overlay = document.getElementById('mobile-overlay');
+            cart.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+
         function loadMenu() {
             onSnapshot(collection(db, "menu_kebab"), (snapshot) => {
                 menuData = [];
@@ -513,6 +519,7 @@
             
             list.innerHTML = html;
             document.getElementById('cart-count').innerText = count;
+            document.getElementById('float-count').innerText = count;
 
             const pajak = subtotal * 0.10;
             const total = (subtotal - diskonManual) + pajak;
@@ -565,6 +572,7 @@
                 });
                 showToast("✅ Transaksi Berhasil!", "success");
                 cart = {}; diskonManual = 0; renderMenu(); renderCart(); tutupPembayaran();
+                if(window.innerWidth <= 1024) toggleCart();
             } catch (error) { showToast("Gagal: " + error.message, "error"); }
         }
 
