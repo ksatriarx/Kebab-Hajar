@@ -168,8 +168,8 @@
         .mobile-overlay.show { display: block; opacity: 1; }
         .floating-cart-btn { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 15px 30px; border-radius: 30px; font-weight: 800; box-shadow: 0 10px 20px rgba(229,57,53,0.4); z-index: 200; border: none; cursor: pointer; align-items: center; gap: 10px; }
 
-        /* RESPONSIVE (MOBILE) */
-        @media (max-width: 1024px) {
+        /* RESPONSIVE (MOBILE & TABLET) - Breakpoint dinaikkan ke 1200px agar iPad/Tablet aman */
+        @media (max-width: 1200px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; height: 60px; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid var(--border); }
             .brand { padding: 0; flex-direction: row; gap: 10px; border: none; } .brand img { width: 30px; margin: 0; } .brand p { display: none; }
@@ -178,7 +178,15 @@
             .sidebar-footer { display: none; }
             .main-wrapper { height: calc(100vh - 60px); }
             
-            /* Keranjang jadi Popup Modal di HP */
+            /* Topbar menyesuaikan */
+            .topbar { flex-wrap: wrap; height: auto; padding: 10px 15px; gap: 10px; }
+            .search-box { flex-grow: 1; max-width: 300px; }
+            .topbar-right { gap: 10px; margin-left: auto; }
+            
+            /* Grid Menu agar 2 kolom rapi di HP */
+            .menu-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+            
+            /* Keranjang jadi Popup Modal di HP/Tablet */
             .cart-panel { 
                 position: fixed; top: 50%; left: 50%; 
                 transform: translate(-50%, -50%) scale(0.9); 
@@ -571,7 +579,7 @@
                 });
                 showToast("✅ Transaksi Berhasil!", "success");
                 cart = {}; diskonManual = 0; renderMenu(); renderCart(); tutupPembayaran();
-                if(window.innerWidth <= 1024) toggleCart();
+                if(window.innerWidth <= 1200) toggleCart();
             } catch (error) { showToast("Gagal: " + error.message, "error"); }
         }
 
