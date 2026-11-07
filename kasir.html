@@ -27,6 +27,9 @@
         .header-actions { display: flex; gap: 6px; align-items: center; }
         .btn-icon { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: 0.2s; }
         .btn-icon-admin { display: none; }
+        .btn-install-pwa { display: none; background: rgba(255, 179, 0, 0.2); border-color: var(--accent); color: var(--accent); animation: pulse-install 2s infinite; }
+        @keyframes pulse-install { 0% { box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(255, 179, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 179, 0, 0); } }
+        
         .btn-logout { background: rgba(229, 57, 53, 0.1); color: var(--primary); border: 1px solid var(--primary); padding: 0 12px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 10px; transition: 0.2s; }
         
         .tabs { display: flex; padding: 10px 15px 0 15px; gap: 10px; border-bottom: 1px solid var(--border); background: var(--bg-main); flex-shrink: 0; overflow-x: auto; }
@@ -40,7 +43,6 @@
         .content-area { flex-grow: 1; overflow-y: auto; display: none; position: relative; }
         .content-area.active { display: block; }
 
-        /* KARTU PESANAN (Dipakai untuk Online & Self Service) */
         .order-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
         .order-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 12px; border: 1px solid var(--border); position: relative; overflow: hidden; }
         .order-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
@@ -55,8 +57,8 @@
         .btn-action { border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         .btn-proses { background: rgba(255, 179, 0, 0.2); color: var(--accent); border: 1px solid var(--accent); }
         .btn-selesai { background: var(--success); color: white; }
+        .btn-batal { background: rgba(229, 57, 53, 0.2); color: var(--primary); border: 1px solid var(--primary); }
 
-        /* KASIR OFFLINE */
         .pos-layout { display: flex; flex-direction: column; height: 100%; }
         .menu-section { flex-grow: 1; padding: 10px; overflow-y: auto; }
         .category-scroll { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; scrollbar-width: none; }
@@ -128,6 +130,8 @@
             <div style="text-align: right;">
                 <div class="header-info" id="header-email">-</div>
                 <div class="header-actions">
+                    <!-- TOMBOL INSTALL PWA -->
+                    <button class="btn-icon btn-install-pwa" id="btn-install-pwa" onclick="picuInstall()" title="Install Aplikasi Kasir"><i class="fa-solid fa-download"></i></button>
                     <button class="btn-icon" onclick="toggleFullscreen()" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
                     <a href="pengaturan-toko.html" id="btn-settings-admin" class="btn-icon btn-icon-admin" title="Buka Pengaturan Toko"><i class="fa-solid fa-gear"></i></a>
                     <button class="btn-logout" onclick="prosesLogout()">Tutup</button>
@@ -236,6 +240,21 @@
         let menuData = []; let cart = {}; let metodePembayaran = 'cash'; let currentCategory = 'makanan'; let unsubOnlineOrders = null; let unsubSelfOrders = null; let inputUangString = ""; 
         let isFirstLoadOnline = true; let knownOrderIdsOnline = new Set(); let isFirstLoadSelf = true; let knownOrderIdsSelf = new Set(); let audioCtx = null;
 
+        // PWA Install Logic
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('btn-install-pwa').style.display = 'flex'; });
+        window.picuInstall = () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') { console.log('User accepted install'); }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("Untuk Install Aplikasi: Klik titik tiga (⋮) di pojok kanan atas Chrome, lalu pilih 'Install App' atau 'Tambahkan ke Layar Utama'.");
+            }
+        };
+
         window.toggleFullscreen = () => { if (!document.fullscreenElement) { if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen().catch(err => { console.log(`Gagal: ${err.message}`); }); } } else { if (document.exitFullscreen) { document.exitFullscreen(); } } };
         document.body.addEventListener('click', function unlockAudio() { if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } if (audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
         function playNotifSound() { if (!audioCtx) return; try { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1); gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3); } catch (e) { console.log("Audio error", e); } }
@@ -256,9 +275,6 @@
             else { document.getElementById('area-offline').classList.add('active'); document.getElementById('tab-btn-offline').classList.add('active'); } 
         }
 
-        // ==========================================
-        // LOGIKA PESANAN WEB (SEPERTI SEBELUMNYA)
-        // ==========================================
         function listenOnlineOrders() {
             const q = query(collection(db, "transaksi_online"), orderBy("waktu", "desc"));
             unsubOnlineOrders = onSnapshot(q, (snapshot) => {
@@ -281,11 +297,7 @@
         }
         window.updateStatusOnline = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); } catch (error) { alert("Gagal: " + error.message); } }
 
-        // ==========================================
-        // LOGIKA PESANAN SELF SERVICE (BARU)
-        // ==========================================
         function listenSelfServiceOrders() {
-            // Hanya ambil yang belum selesai
             const q = query(collection(db, "transaksi_selfservice"), orderBy("waktu", "desc"));
             unsubSelfOrders = onSnapshot(q, (snapshot) => {
                 const list = document.getElementById('self-orders-list'); let html = ''; let countAktif = 0; let currentIds = new Set(); let newOrderArrived = false;
@@ -304,9 +316,11 @@
                         
                         let actionBtn = '';
                         if (isMenungguKasir) {
-                            actionBtn = `<button class="btn-action btn-proses" onclick="terimaPembayaranTunai('${docId}')"><i class="fa-solid fa-money-bill-wave"></i> Terima Tunai</button>`;
+                            actionBtn = `<button class="btn-action btn-batal" onclick="batalkanSelf('${docId}')"><i class="fa-solid fa-xmark"></i> Batal</button><button class="btn-action btn-proses" onclick="terimaPembayaranTunai('${docId}')"><i class="fa-solid fa-money-bill-wave"></i> Terima Tunai</button>`;
                         } else if (data.status === 'Sedang Dimasak' || isLunasQRIS) {
                             actionBtn = `<button class="btn-action btn-selesai" onclick="updateStatusSelf('${docId}', 'Selesai')"><i class="fa-solid fa-check"></i> Selesai</button>`;
+                        } else if (data.status === 'Menunggu Pembayaran QRIS') {
+                            actionBtn = `<button class="btn-action btn-batal" onclick="batalkanSelf('${docId}')"><i class="fa-solid fa-xmark"></i> Batal</button>`;
                         }
 
                         let detailPesanan = data.rincian.map(i => `▪ ${i.nama} (${i.qty}x)`).join('<br>');
@@ -344,12 +358,15 @@
             }
         }
 
+        window.batalkanSelf = async (docId) => {
+            if(confirm("Yakin ingin membatalkan pesanan ini?")) {
+                try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: 'Dibatalkan' }); } catch (error) { alert("Gagal: " + error.message); }
+            }
+        }
+
         window.updateStatusSelf = async (docId, newStatus) => { try { await updateDoc(doc(db, "transaksi_selfservice", docId), { status: newStatus }); } catch (error) { alert("Gagal: " + error.message); } }
 
 
-        // ==========================================
-        // KASIR OFFLINE
-        // ==========================================
         function loadMenuOffline() { onSnapshot(collection(db, "menu_kebab"), (snapshot) => { menuData = []; snapshot.forEach((doc) => { const data = doc.data(); menuData.push(data); }); menuData.sort((a, b) => a.id - b.id); renderPosMenu(); }); }
         window.switchCategory = (cat) => { currentCategory = cat; document.getElementById('cat-makanan').classList.remove('active'); document.getElementById('cat-minuman').classList.remove('active'); document.getElementById(`cat-${cat}`).classList.add('active'); renderPosMenu(); }
 
