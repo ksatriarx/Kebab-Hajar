@@ -222,6 +222,13 @@ body{background-image:
 .bpay{border:2px solid #000;box-shadow:4px 4px 0 #000}
 .pay-win{border:2px solid #000;box-shadow:6px 6px 0 #000,0 30px 60px rgba(0,0,0,.75)}
 .ibtn.on{border-color:var(--green);color:var(--green)}
+.lbox{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center}
+.lbox .lg{margin:0 auto 4px}
+.lin{width:100%;padding:12px 14px;border-radius:12px;background:#0a0a0a;border:2px solid #000;box-shadow:3px 3px 0 #000;color:#fff;font-size:14px;font-weight:700;outline:none}
+.lin:focus{border-color:var(--red)}
+.lmsg{font-size:11px;color:var(--amber);min-height:14px}
+.gbtn{width:100%;padding:12px;border-radius:14px;background:#161616;border:2px solid #000;box-shadow:3px 3px 0 #000;color:#fff;font-size:12px;font-weight:800}
+.gbtn:hover{border-color:var(--red)}
 .shlbl{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}
 /* ===== UANG CEPAT & RINGKASAN ===== */
 .quick{display:none;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0}
@@ -269,10 +276,16 @@ body{background-image:
 <body>
 
 <div class="access-denied" id="access-denied">
-  <i class="fa-solid fa-lock" style="font-size:46px;color:var(--red)"></i>
-  <h1>Akses Ditolak</h1>
-  <p>Halaman ini hanya untuk Akun Kasir resmi Kebab IDI.</p>
-  <a href="index.html" class="btn-back">Kembali ke Beranda</a>
+  <div class="lbox">
+    <div class="logo lg"><i class="fa-solid fa-utensils"></i></div>
+    <h1>Login Kasir</h1>
+    <p>Masuk dengan username dan password kasir.</p>
+    <input id="login-user" class="lin" placeholder="Username" autocapitalize="none" autocomplete="username">
+    <input id="login-pass" type="password" class="lin" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')loginKasir()">
+    <div id="login-msg" class="lmsg"></div>
+    <button class="bpay" onclick="loginKasir()">Masuk</button>
+    <button class="gbtn" onclick="loginGoogle()"><i class="fa-brands fa-google"></i> Masuk sebagai Owner (Google)</button>
+  </div>
 </div>
 
 <div class="app" id="pos-app">
@@ -411,8 +424,8 @@ body{background-image:
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
 const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
@@ -447,19 +460,44 @@ function playNotifSound() {
   } catch (e) {}
 }
 
-onAuthStateChanged(auth, user => {
-  if (user && user.email === ALLOWED_EMAIL) {
+const STAFF_DOMAIN = "@kasir.rxkebab.id";
+let started = false;
+async function isAllowed(user) {
+  if (user.email === ALLOWED_EMAIL) return true;
+  try { return (await getDoc(doc(db, "staff_kasir", user.email))).exists(); }
+  catch (e) { return false; }
+}
+function showLoginMsg(t) { document.getElementById('login-msg').innerText = t; }
+onAuthStateChanged(auth, async user => {
+  if (user && await isAllowed(user)) {
     document.getElementById('access-denied').style.display = 'none';
     document.getElementById('pos-app').style.display = 'flex';
     document.getElementById('header-email').innerText = user.email;
-    document.getElementById('btn-settings-admin').style.display = 'flex';
-    loadMenuOffline(); listenOnlineOrders();
+    const isOwner = user.email === ALLOWED_EMAIL;
+    document.getElementById('btn-settings-admin').style.display = isOwner ? 'flex' : 'none';
+    if (!started) {
+      started = true;
+      loadMenuOffline(); listenOnlineOrders();
+    }
     loadShift().catch(e => console.error("Shift:", e));
   } else {
+    if (user) { await signOut(auth); showLoginMsg("Akun ini belum terdaftar sebagai kasir."); }
     document.getElementById('access-denied').style.display = 'flex';
     document.getElementById('pos-app').style.display = 'none';
   }
 });
+window.loginKasir = async () => {
+  const u = document.getElementById('login-user').value.trim().toLowerCase();
+  const p = document.getElementById('login-pass').value;
+  if (!u || !p) { showLoginMsg("Isi username dan password."); return; }
+  showLoginMsg("Memeriksa...");
+  try { await signInWithEmailAndPassword(auth, u.includes('@') ? u : u + STAFF_DOMAIN, p); }
+  catch (e) { showLoginMsg("Username atau password salah."); }
+};
+window.loginGoogle = async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch (e) { showLoginMsg("Login Google gagal: " + e.code); }
+};
 
 window.switchTab = tab => {
   currentTab = tab;
@@ -982,7 +1020,7 @@ window.bukaRiwayat = async () => {
 window.cetakRiwayat = i => cetakStruk(riwayatCache[i]);
 
 window.prosesLogout = () => {
-  if (confirm("Tutup sesi kasir?")) signOut(auth).then(() => window.location.href = 'index.html');
+  if (confirm("Tutup sesi kasir?")) signOut(auth);
 };
 </script>
 </body>
