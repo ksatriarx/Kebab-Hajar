@@ -509,7 +509,7 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('btn-settings-admin').style.display = isOwner ? 'flex' : 'none';
     if (!started) {
       started = true;
-      loadMenuOffline(); listenOnlineOrders();
+      loadMenuOffline(); listenOnlineOrders(); listenBackground();
     }
     loadShift().catch(e => console.error("Shift:", e));
   } else {
@@ -953,6 +953,13 @@ window.tapPrinter = async () => {
   } catch (e) { alert("Printer: " + e.message); }
 };
 
+function listenBackground() {
+  onSnapshot(doc(db, "pengaturan", "toko"), snap => {
+    const url = snap.exists() ? (snap.data().bgImage || '') : '';
+    if (url) document.documentElement.style.setProperty('--bg-img', `url("${url.replace(/"/g, '%22')}")`);
+    else document.documentElement.style.removeProperty('--bg-img');
+  }, () => {});
+}
 window.toggleRx = () => document.getElementById('rx-menu').classList.toggle('open');
 document.addEventListener('click', e => {
   const m = document.getElementById('rx-menu');
