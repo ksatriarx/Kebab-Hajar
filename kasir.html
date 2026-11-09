@@ -486,7 +486,7 @@ function renderPosCart() {
   document.getElementById('float-count').innerText = `${itemCount()} Item`;
   document.getElementById('float-total').innerText = rp(total);
   renderCartBar();
-  if (!html) document.getElementById('cart-section').classList.remove('show');
+
 }
 
 function renderCartBar() {
@@ -495,7 +495,11 @@ function renderCartBar() {
 }
 
 window.resetCart = () => {
-  if (confirm("Kosongkan keranjang?")) { cart = {}; renderPosMenu(); renderPosCart(); toggleCart(); }
+  if (confirm("Kosongkan keranjang?")) { cart = {}; renderPosMenu(); renderPosCart(); closeCart(); }
+};
+window.closeCart = () => {
+  document.getElementById('cart-section').classList.remove('show');
+  document.getElementById('cart-overlay').classList.remove('show');
 };
 
 /* ===== POPUP PEMBAYARAN ===== */
