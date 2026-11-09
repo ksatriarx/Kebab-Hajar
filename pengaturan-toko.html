@@ -151,6 +151,19 @@
         #table-menu td[style*="flex"] { flex-wrap: wrap; min-width: 190px; }
         #table-menu td:last-child { min-width: 150px; }
         #table-menu td:last-child button { margin: 2px 4px 2px 0; }
+        /* Form tambah menu sebagai panel mengambang dari bawah */
+        .menu-sheet { position: fixed; left: 0; right: 0; bottom: 0; max-height: 85vh; overflow-y: auto; margin: 0; z-index: 150; border-radius: 22px 22px 0 0; border-bottom: none; transform: translateY(105%); transition: transform 0.3s ease; box-shadow: 0 -10px 0 var(--primary), 0 -20px 50px rgba(0,0,0,.8); padding: 20px; }
+        .menu-sheet.open { transform: translateY(0); }
+        .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .sheet-head h4 { font-size: 15px; font-weight: 900; }
+        .sheet-x { width: 32px; height: 32px; border-radius: 50%; background: #1c1c1c; border: 2px solid #000; color: #fff; }
+        .sheet-ov { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 140; display: none; }
+        .sheet-ov.show { display: block; }
+        .fab-add { position: fixed; right: 18px; bottom: 22px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #b71c1c); color: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-size: 18px; z-index: 120; cursor: pointer; }
+        @media (min-width: 769px) {
+            .menu-sheet { left: 50%; right: auto; width: 480px; transform: translate(-50%, 105%); }
+            .menu-sheet.open { transform: translate(-50%, 0); }
+        }
         @media (max-width: 768px) {
             .content-area { overflow-x: hidden; }
             .card-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -228,9 +241,11 @@
 
         <div class="content-area" id="area-menu-produk">
             <div class="card-header"><h3><i class="fa-solid fa-box-open"></i> Kelola Menu Produk</h3></div>
-            <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
-                <div class="card-panel">
-                    <h4 style="margin-bottom:15px; font-size:14px; font-weight:800;">Tambah Menu Baru</h4>
+            <div class="sheet-ov" id="menu-ov" onclick="tutupFormMenu()"></div>
+            <button class="fab-add" onclick="bukaFormMenu()" title="Tambah Menu"><i class="fa-solid fa-plus"></i></button>
+            <div class="dashboard-grid" style="grid-template-columns: 1fr;">
+                <div class="card-panel menu-sheet" id="menu-sheet">
+                    <div class="sheet-head"><h4>Tambah Menu Baru</h4><button class="sheet-x" onclick="tutupFormMenu()"><i class="fa-solid fa-xmark"></i></button></div>
                     <div class="form-group"><label class="form-label">Nama Menu</label><input type="text" id="menu-name" class="form-input" placeholder="Contoh: Kebab Spesial"></div>
                     <div class="form-group"><label class="form-label">Kategori</label><select id="menu-category" class="form-input"><option value="makanan">Makanan</option><option value="minuman">Minuman</option></select></div>
                     <div class="form-group"><label class="form-label">Label (opsional)</label><select id="menu-label" class="form-input"><option value="">Tanpa label</option><option>LEZAT</option><option>BEST</option><option>FAVORIT</option><option>PEDAS</option><option>BARU</option></select></div>
@@ -455,6 +470,8 @@
             } catch (error) { alert("Gagal: " + error.message); } 
         }
 
+        window.bukaFormMenu = () => { document.getElementById('menu-sheet').classList.add('open'); document.getElementById('menu-ov').classList.add('show'); };
+        window.tutupFormMenu = () => { document.getElementById('menu-sheet').classList.remove('open'); document.getElementById('menu-ov').classList.remove('show'); };
         window.loadMenuAdmin = () => { 
             if (unsubMenu) unsubMenu(); 
             const q = query(collection(db, "menu_kebab"), orderBy("id", "asc")); 
@@ -473,7 +490,7 @@
         window.toggleStatusMenu = async (docId, currentStatus) => { const newStatus = currentStatus === 'persiapan' ? 'ready' : 'persiapan'; try { await updateDoc(doc(db, "menu_kebab", docId), { status: newStatus }); } catch (error) { alert("Gagal: " + error.message); } }
         window.previewFile = (input) => { const file = input.files[0]; if (!file) return; const preview = document.getElementById('img-preview'); preview.src = URL.createObjectURL(file); preview.style.display = 'block'; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let width = img.width; let height = img.height; if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); canvas.toBlob((blob) => { if (blob) { compressedFile = new File([blob], "foto_menu.jpg", { type: "image/jpeg" }); } }, 'image/jpeg', 0.7); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
         window.tambahMenu = async () => { const name = document.getElementById('menu-name').value.trim(); const category = document.getElementById('menu-category').value; const price = parseInt(document.getElementById('menu-price').value); const imageUrl = document.getElementById('menu-image-url').value.trim(); if (!name || !price || (!compressedFile && !imageUrl)) { alert("Mohon isi Nama, Harga, dan Pilih Foto!"); return; } try { let finalImageUrl = imageUrl; if (compressedFile) { const reader = new FileReader(); reader.readAsDataURL(compressedFile); reader.onloadend = async () => { finalImageUrl = reader.result; await simpanMenuKeFirebase(name, category, price, finalImageUrl); }; } else { await simpanMenuKeFirebase(name, category, price, finalImageUrl); } } catch (error) { alert("❌ Gagal: " + error.message); } }
-        async function simpanMenuKeFirebase(name, category, price, image) { const newId = Date.now(); await setDoc(doc(db, "menu_kebab", newId.toString()), { id: newId, name: name, category: category, type: category === 'makanan' ? 'Kebab' : 'Minuman', price: price, status: 'ready', image: image, badge: "", label: document.getElementById('menu-label').value }); alert("✅ Menu berhasil ditambahkan!"); document.getElementById('menu-name').value = ''; document.getElementById('menu-price').value = ''; document.getElementById('menu-image-url').value = ''; document.getElementById('menu-label').value = ''; document.getElementById('menu-file').value = ''; document.getElementById('img-preview').style.display = 'none'; compressedFile = null; }
+        async function simpanMenuKeFirebase(name, category, price, image) { const newId = Date.now(); await setDoc(doc(db, "menu_kebab", newId.toString()), { id: newId, name: name, category: category, type: category === 'makanan' ? 'Kebab' : 'Minuman', price: price, status: 'ready', image: image, badge: "", label: document.getElementById('menu-label').value }); alert("✅ Menu berhasil ditambahkan!"); document.getElementById('menu-name').value = ''; document.getElementById('menu-price').value = ''; document.getElementById('menu-image-url').value = ''; document.getElementById('menu-label').value = ''; document.getElementById('menu-file').value = ''; document.getElementById('img-preview').style.display = 'none'; compressedFile = null; tutupFormMenu(); }
         window.editLabelMenu = async (docId, lama) => {
             const baru = prompt("Label menu (LEZAT, BEST, FAVORIT, PEDAS, BARU). Kosongkan untuk menghapus label:", lama);
             if (baru === null) return;
