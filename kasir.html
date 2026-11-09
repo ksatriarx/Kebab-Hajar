@@ -309,6 +309,120 @@
 
         .empty-state { font-size: 11px; letter-spacing: 0.2px; }
         .empty-state i { opacity: 0.25; }
+
+        /* ================= STICKER BOMB (gaya tas penuh stiker) ================= */
+        :root {
+            --sticker-white: #f5f5f5;
+            --sticker-shadow: 0 3px 0 rgba(0,0,0,0.55), 0 8px 18px rgba(0,0,0,0.5);
+        }
+
+        /* Latar: tekstur web Spider-Man + titik-titik grafiti */
+        body {
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255,179,0,0.07) 0 2px, transparent 3px) 0 0 / 46px 46px,
+                radial-gradient(circle at 80% 70%, rgba(16,185,129,0.07) 0 2px, transparent 3px) 0 0 / 58px 58px,
+                repeating-radial-gradient(circle at 50% -20%, transparent 0 22px, rgba(229,57,53,0.07) 23px 24px),
+                radial-gradient(900px 500px at 50% -10%, rgba(229,57,53,0.16), transparent 60%),
+                var(--bg-main);
+        }
+
+        /* Header: stiker brand + tekstur jaring */
+        .pos-header {
+            background:
+                repeating-conic-gradient(from 0deg at 100% 0%, rgba(255,255,255,0.03) 0 6deg, transparent 6deg 12deg),
+                rgba(10,10,10,0.9);
+        }
+        .header-brand i {
+            transform: rotate(-8deg);
+            border: 2px solid var(--sticker-white);
+            box-shadow: var(--sticker-shadow);
+        }
+        .header-brand { transform: rotate(-2deg); transform-origin: left center; }
+        .btn-icon, .btn-logout { box-shadow: 0 2px 0 rgba(0,0,0,0.5); }
+
+        /* Tab: stiker berbentuk label */
+        .tab-btn { transform: rotate(-1deg); }
+        .tab-btn:nth-child(2) { transform: rotate(1.5deg); }
+        .tab-btn.active {
+            border: 2px solid var(--sticker-white);
+            box-shadow: var(--sticker-shadow), 0 0 18px rgba(229,57,53,0.5);
+        }
+        .tab-btn.active::before {
+            content: '★'; position: absolute; top: -9px; right: -6px;
+            background: var(--accent); color: #000; font-size: 10px; width: 18px; height: 18px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 2px solid #fff; box-shadow: 0 2px 0 rgba(0,0,0,0.5);
+        }
+
+        /* Kartu pesanan online: stiker menempel di pojok, rotasi acak */
+        .online-card {
+            border: 2px solid #1d1d1d;
+            box-shadow: var(--sticker-shadow);
+            transform: rotate(-0.6deg);
+        }
+        .online-card:nth-child(even) { transform: rotate(0.7deg); }
+        .online-card:nth-child(3n) { transform: rotate(-0.3deg); }
+        .online-card::after {
+            content: '🔥'; position: absolute; top: 8px; right: 8px;
+            background: var(--sticker-white); width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 15px;
+            transform: rotate(14deg); box-shadow: 0 3px 0 rgba(0,0,0,0.5); border: 2px solid #111;
+        }
+        .online-card:nth-child(even)::after { content: '⚡'; background: var(--accent); transform: rotate(-12deg); }
+        .online-card:nth-child(3n)::after { content: '💀'; background: #fff; }
+
+        /* Kartu menu: stiker emoji di sudut, tiap kartu beda */
+        .pos-card {
+            border: 2px solid #1e1e1e;
+            box-shadow: var(--sticker-shadow);
+            position: relative; overflow: visible;
+        }
+        .pos-card:nth-child(4n+1) { transform: rotate(-1.2deg); }
+        .pos-card:nth-child(4n+2) { transform: rotate(0.8deg); }
+        .pos-card:nth-child(4n+3) { transform: rotate(-0.5deg); }
+        .pos-card:nth-child(4n) { transform: rotate(1.4deg); }
+        .pos-card::after {
+            content: '🕷️'; position: absolute; top: -8px; left: -6px;
+            font-size: 12px; background: var(--sticker-white); width: 24px; height: 24px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 2px solid #111; box-shadow: 0 2px 0 rgba(0,0,0,0.5); transform: rotate(-10deg);
+        }
+        .pos-card:nth-child(4n+2)::after { content: '🔥'; }
+        .pos-card:nth-child(4n+3)::after { content: '⚡'; background: var(--accent); }
+        .pos-card:nth-child(4n)::after { content: '💥'; }
+        .pos-card:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
+        .pos-title { text-shadow: 0 1px 0 #000; }
+
+        /* Keranjang: baris seperti stiker tempel */
+        .cart-row {
+            transform: rotate(-0.5deg); box-shadow: 0 3px 0 rgba(0,0,0,0.5);
+            border: 2px solid #222;
+        }
+        .cart-row:nth-child(even) { transform: rotate(0.6deg); }
+        .cart-row:nth-child(3n) { border-color: var(--primary); }
+        .cart-section { border-top: 3px solid var(--primary); }
+        .cart-section::after {
+            content: '🥙'; position: absolute; top: 14px; right: 16px; font-size: 22px;
+            transform: rotate(12deg);
+        }
+
+        /* Tombol: outline stiker putih */
+        .btn-checkout, .pos-add, .btn-action, .btn-confirm {
+            border: 2px solid var(--sticker-white);
+            box-shadow: var(--sticker-shadow);
+        }
+        .cat-btn.active { border: 2px solid var(--sticker-white); }
+        .floating-cart-bar {
+            border: 2px solid var(--sticker-white);
+            transform: translateX(-50%) translateY(150px) rotate(-1deg);
+        }
+        .floating-cart-bar.show { transform: translateX(-50%) translateY(0) rotate(-1deg); }
+        .cart-bar-btn { transform: rotate(3deg); }
+
+        /* Modal: stiker dekor di judul */
+        .modal-title::before { content: '😎 '; }
+        .modal-title::after { content: ' 🍢'; }
+        .btn-cancel, .pay-btn { box-shadow: 0 2px 0 rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
