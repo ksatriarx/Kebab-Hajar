@@ -221,6 +221,26 @@ body{background-image:
 .crow:nth-child(3n){border-color:var(--red)}
 .bpay{border:2px solid #000;box-shadow:4px 4px 0 #000}
 .pay-win{border:2px solid #000;box-shadow:6px 6px 0 #000,0 30px 60px rgba(0,0,0,.75)}
+/* ===== UANG CEPAT & RINGKASAN ===== */
+.quick{display:none;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0}
+.quick button{padding:8px 4px;border-radius:10px;background:#111;border:2px solid #000;box-shadow:2px 2px 0 #000;color:#fff;font-size:10.5px;font-weight:800}
+.quick button:hover{border-color:var(--amber);color:var(--amber)}
+.quick button.pas{border-color:#000;background:var(--green);color:#fff}
+.sum-win{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100vw - 24px));max-height:80vh;overflow:auto;display:none;flex-direction:column;background:linear-gradient(180deg,#151515,#0d0d0d);border:2px solid #000;border-radius:20px;box-shadow:6px 6px 0 #000,0 30px 60px rgba(0,0,0,.75);z-index:1005}
+.sum-win.open{display:flex}
+.sum-body{padding:12px;display:flex;flex-direction:column;gap:10px}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sum-card{background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;padding:10px}
+.sum-card span{display:block;font-size:9.5px;color:var(--muted);margin-bottom:3px;font-weight:700}
+.sum-card b{font-size:13px;font-weight:900}
+.sum-wide{grid-column:1/-1;background:linear-gradient(135deg,var(--red),var(--red2));border:2px solid #000;box-shadow:3px 3px 0 #000}
+.sum-wide span{color:#ffe0e0}
+.sum-wide b{font-size:20px}
+.sum-top{background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;padding:10px}
+.sum-top>span{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:700}
+.sum-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px dashed #222}
+.sum-row:last-child{border-bottom:none}
+.sum-row em{font-style:normal;color:var(--amber);font-weight:800}
 </style>
 </head>
 <body>
@@ -238,6 +258,7 @@ body{background-image:
     <div class="top-right">
       <div class="email" id="header-email">-</div>
       <div class="top-actions">
+        <button class="ibtn" onclick="bukaRingkasan()" title="Ringkasan Hari Ini"><i class="fa-solid fa-chart-column"></i></button>
         <button class="ibtn" onclick="toggleFullscreen()" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
         <a href="pengaturan-toko.html" id="btn-settings-admin" class="ibtn ibtn-admin" title="Pengaturan Toko"><i class="fa-solid fa-gear"></i></a>
         <button class="logout" onclick="prosesLogout()">Tutup</button>
@@ -303,6 +324,12 @@ body{background-image:
       <label>Uang Diterima (Rp)</label>
       <input type="text" id="uang-diterima" class="cashin" placeholder="0" readonly>
     </div>
+    <div class="quick" id="area-quick">
+      <button class="pas" onclick="setUang('pas')">Pas</button>
+      <button onclick="setUang(20000)">20rb</button>
+      <button onclick="setUang(50000)">50rb</button>
+      <button onclick="setUang(100000)">100rb</button>
+    </div>
     <div class="qris" id="area-qris"><i class="fa-solid fa-qrcode"></i>Scan QRIS untuk membayar</div>
     <div class="totals">
       <div><span>Total Tagihan</span><b id="modal-total">Rp 0</b></div>
@@ -324,10 +351,16 @@ body{background-image:
   <div class="resize" id="pay-resize"></div>
 </div>
 
+<div class="ov" id="sum-ov" onclick="tutupRingkasan()"></div>
+<div class="sum-win" id="sum-win">
+  <div class="phead"><h3>Ringkasan Hari Ini</h3><button class="psz" onclick="tutupRingkasan()"><i class="fa-solid fa-xmark"></i></button></div>
+  <div id="sum-body" class="sum-body"></div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
 const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
@@ -352,6 +385,7 @@ document.body.addEventListener('click', function unlockAudio() {
   if (audioCtx.state === 'suspended') audioCtx.resume();
 }, { once: true });
 function playNotifSound() {
+  try { navigator.vibrate?.([250, 120, 250]); } catch (e) {}
   if (!audioCtx) return;
   try {
     const o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = audioCtx.currentTime;
@@ -545,6 +579,7 @@ window.pilihMetode = metode => {
   document.getElementById('area-cash').style.display = cash ? 'block' : 'none';
   document.getElementById('custom-keypad-area').classList.toggle('hide', !cash);
   document.getElementById('area-qris').style.display = cash ? 'none' : 'flex';
+  document.getElementById('area-quick').style.display = cash ? 'grid' : 'none';
 };
 
 window.pressNum = num => {
@@ -634,6 +669,54 @@ window.selesaikanPesanan = async () => {
     document.getElementById('cart-section').classList.remove('show');
     document.getElementById('cart-overlay').classList.remove('show');
   } catch (e) { alert("❌ Gagal: " + e.message); }
+};
+
+window.setUang = v => {
+  inputUangString = String(v === 'pas' ? totalCart() : v);
+  updateInputUang();
+};
+
+window.bukaRingkasan = async () => {
+  document.getElementById('sum-ov').classList.add('show');
+  document.getElementById('sum-win').classList.add('open');
+  const box = document.getElementById('sum-body');
+  box.innerHTML = '<div class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Menghitung...</div>';
+  try {
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    const [kSnap, oSnap] = await Promise.all([getDocs(collection(db, "transaksi_kasir")), getDocs(collection(db, "transaksi_online"))]);
+    let omzetK = 0, trxK = 0, tunai = 0, qris = 0, omzetO = 0, trxO = 0;
+    const terlaris = {};
+    kSnap.forEach(d => {
+      const t = d.data();
+      if (!t.waktu || new Date(t.waktu) < start) return;
+      trxK++; omzetK += t.total || 0;
+      if (t.metode === 'cash') tunai += t.total || 0; else qris += t.total || 0;
+      (t.rincian || []).forEach(r => { terlaris[r.nama] = (terlaris[r.nama] || 0) + (r.qty || 0); });
+    });
+    oSnap.forEach(d => {
+      const t = d.data();
+      if (t.status !== 'Selesai' || !t.waktu || new Date(t.waktu) < start) return;
+      trxO++; omzetO += t.total_bayar || 0;
+    });
+    const top = Object.entries(terlaris).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    box.innerHTML = `
+      <div class="sum-grid">
+        <div class="sum-card sum-wide"><span>Total omzet hari ini</span><b>${rp(omzetK + omzetO)}</b></div>
+        <div class="sum-card"><span>Transaksi kasir</span><b>${trxK}</b></div>
+        <div class="sum-card"><span>Pesanan web selesai</span><b>${trxO}</b></div>
+        <div class="sum-card"><span>Tunai</span><b>${rp(tunai)}</b></div>
+        <div class="sum-card"><span>QRIS</span><b>${rp(qris)}</b></div>
+      </div>
+      <div class="sum-top"><span>Menu terlaris (kasir)</span>
+        ${top.length ? top.map((t, i) => `<div class="sum-row"><b>${i + 1}. ${esc(t[0])}</b><em>${t[1]} porsi</em></div>`).join('') : '<div class="sum-row"><em>Belum ada penjualan kasir hari ini.</em></div>'}
+      </div>`;
+  } catch (e) {
+    box.innerHTML = `<div class="empty">Gagal memuat: ${esc(e.message)}</div>`;
+  }
+};
+window.tutupRingkasan = () => {
+  document.getElementById('sum-ov').classList.remove('show');
+  document.getElementById('sum-win').classList.remove('open');
 };
 
 window.prosesLogout = () => {
