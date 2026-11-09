@@ -287,6 +287,11 @@ body{background-image:
   .struk .s-line{border-top:1px dashed #000;margin:4px 0}
   .struk .s-pre{white-space:pre-wrap}
 }
+/* ===== GAMBAR LATAR (ganti none dengan link gambarmu) =====
+   Contoh: :root{--bg-img:url("https://rxkebab.my.id/latar.jpg")}
+   Gunakan link langsung ke file gambar (berakhiran .jpg, .png, atau .webp). */
+:root{--bg-img:url("https://i.ibb.co.com/RT2kG2SL/9371472c-22f5-4dec-99d9-615b3de9c01b.jpg");--bg-dim:rgba(5,5,5,.84)}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(var(--bg-dim),var(--bg-dim)),var(--bg-img) center/cover no-repeat}
 </style>
 </head>
 <body>
