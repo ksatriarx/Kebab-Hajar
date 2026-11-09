@@ -181,6 +181,46 @@ main{flex:1;min-height:0;position:relative}
   .online-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
   .fcart{bottom:8px;padding:8px 12px;width:50%;max-width:320px}
 }
+/* ===== GAYA STIKER BERANTAKAN (tas penuh stiker) ===== */
+body{background-image:
+  radial-gradient(900px 500px at 50% -15%,rgba(229,57,53,.16),transparent 60%),
+  radial-gradient(circle,rgba(255,179,0,.09) 2px,transparent 3px),
+  repeating-radial-gradient(circle at 50% -20%,transparent 0 22px,rgba(229,57,53,.08) 23px 24px);
+  background-size:auto,44px 44px,auto}
+.top{position:relative;overflow:hidden}
+.top::before{content:'POW!';position:absolute;right:-6px;top:-8px;background:var(--amber);color:#000;font-size:11px;font-weight:900;padding:4px 14px 4px 10px;border:2px solid #000;box-shadow:2px 2px 0 #000;transform:rotate(-8deg);pointer-events:none;letter-spacing:.5px}
+.top::after{content:'★';position:absolute;left:150px;bottom:-9px;background:#fff;color:var(--red);width:20px;height:20px;border-radius:50%;border:2px solid #000;box-shadow:2px 2px 0 #000;font-size:10px;display:flex;align-items:center;justify-content:center;transform:rotate(12deg);pointer-events:none}
+.brand b{text-shadow:2px 2px 0 #000}
+.brand{text-shadow:2px 2px 0 #000}
+.tab{box-shadow:3px 3px 0 #000;border:2px solid #000}
+.tab:nth-child(1){transform:rotate(-2deg)}
+.tab:nth-child(2){transform:rotate(1.5deg)}
+.tab.active{border-color:#fff;box-shadow:3px 3px 0 #000,0 0 18px rgba(229,57,53,.5)}
+.cat{box-shadow:2px 2px 0 #000;border:2px solid #000}
+.cat:nth-child(1){transform:rotate(-2deg)}
+.cat:nth-child(2){transform:rotate(1.5deg)}
+.cat.active{border-color:#fff;color:#fff;background:var(--red)}
+.pcard{border:2px solid #000;box-shadow:4px 4px 0 #000;transition:transform .2s}
+.pcard:nth-child(4n+1){transform:rotate(-1.2deg)}
+.pcard:nth-child(4n+2){transform:rotate(.8deg)}
+.pcard:nth-child(4n+3){transform:rotate(-.5deg)}
+.pcard:nth-child(4n){transform:rotate(1.4deg)}
+.pcard:hover{transform:rotate(0) scale(1.03);z-index:2}
+.pcard:hover .lbl{transform:rotate(0)}
+.lbl{font-size:9px;padding:4px 8px;border:2px solid #000;box-shadow:3px 3px 0 #000;transform:rotate(-6deg)}
+.pcard:nth-child(even) .lbl{transform:rotate(5deg)}
+.pcard:nth-child(3n) .lbl{transform:rotate(-2deg)}
+.ocard{border:2px solid #000;box-shadow:4px 4px 0 #000}
+.ocard:nth-child(even){transform:rotate(.5deg)}
+.ocard:nth-child(3n){transform:rotate(-.4deg)}
+.fcart{border:2px solid #000;box-shadow:5px 5px 0 #000}
+.fcart .go{border:2px solid #000;box-shadow:2px 2px 0 #000}
+.sheet{box-shadow:0 -10px 0 var(--red),0 -20px 50px rgba(0,0,0,.9)}
+.crow{border:2px solid #000;box-shadow:3px 3px 0 #000}
+.crow:nth-child(even){transform:rotate(.6deg)}
+.crow:nth-child(3n){border-color:var(--red)}
+.bpay{border:2px solid #000;box-shadow:4px 4px 0 #000}
+.pay-win{border:2px solid #000;box-shadow:6px 6px 0 #000,0 30px 60px rgba(0,0,0,.75)}
 </style>
 </head>
 <body>
