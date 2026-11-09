@@ -221,6 +221,7 @@ body{background-image:
 .crow:nth-child(3n){border-color:var(--red)}
 .bpay{border:2px solid #000;box-shadow:4px 4px 0 #000}
 .pay-win{border:2px solid #000;box-shadow:6px 6px 0 #000,0 30px 60px rgba(0,0,0,.75)}
+.ibtn.on{border-color:var(--green);color:var(--green)}
 /* ===== UANG CEPAT & RINGKASAN ===== */
 .quick{display:none;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0}
 .quick button{padding:8px 4px;border-radius:10px;background:#111;border:2px solid #000;box-shadow:2px 2px 0 #000;color:#fff;font-size:10.5px;font-weight:800}
@@ -241,6 +242,27 @@ body{background-image:
 .sum-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px dashed #222}
 .sum-row:last-child{border-bottom:none}
 .sum-row em{font-style:normal;color:var(--amber);font-weight:800}
+/* ===== RIWAYAT & STRUK 58MM ===== */
+.sum-foot{padding:0 12px 12px}
+.sum-foot button{width:100%;padding:11px;border-radius:12px;background:#222;color:#fff;font-weight:800;font-size:12px;border:2px solid #000;box-shadow:2px 2px 0 #000}
+.rw-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px dashed #222}
+.rw-item b{font-size:12px;display:block;margin-bottom:2px}
+.rw-item small{font-size:10px;color:var(--muted)}
+.rw-btn{padding:7px 10px;border-radius:9px;background:var(--red);color:#fff;font-weight:800;font-size:10.5px;border:2px solid #000;box-shadow:2px 2px 0 #000;white-space:nowrap}
+.struk{display:none}
+@media print{
+  @page{size:58mm auto;margin:0}
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+  body *{visibility:hidden}
+  .struk,.struk *{visibility:visible}
+  .struk{display:block;position:absolute;left:0;top:0;width:58mm;padding:3mm 2mm;font:10px/1.35 monospace;color:#000;background:#fff}
+  .struk .s-title{text-align:center;font-weight:bold;font-size:13px;margin-bottom:2px}
+  .struk .s-c{text-align:center}
+  .struk .s-row{display:flex;justify-content:space-between;gap:4px}
+  .struk .s-bold{font-weight:bold}
+  .struk .s-line{border-top:1px dashed #000;margin:4px 0}
+  .struk .s-pre{white-space:pre-wrap}
+}
 </style>
 </head>
 <body>
@@ -258,6 +280,7 @@ body{background-image:
     <div class="top-right">
       <div class="email" id="header-email">-</div>
       <div class="top-actions">
+        <button class="ibtn" id="btn-printer" onclick="tapPrinter()" title="Printer Struk"><i class="fa-solid fa-print"></i></button>
         <button class="ibtn" onclick="bukaRingkasan()" title="Ringkasan Hari Ini"><i class="fa-solid fa-chart-column"></i></button>
         <button class="ibtn" onclick="toggleFullscreen()" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
         <a href="pengaturan-toko.html" id="btn-settings-admin" class="ibtn ibtn-admin" title="Pengaturan Toko"><i class="fa-solid fa-gear"></i></a>
@@ -355,7 +378,10 @@ body{background-image:
 <div class="sum-win" id="sum-win">
   <div class="phead"><h3>Ringkasan Hari Ini</h3><button class="psz" onclick="tutupRingkasan()"><i class="fa-solid fa-xmark"></i></button></div>
   <div id="sum-body" class="sum-body"></div>
+  <div class="sum-foot"><button onclick="bukaRiwayat()"><i class="fa-solid fa-print"></i> Riwayat &amp; Cetak Ulang</button></div>
 </div>
+
+<div class="struk" id="struk-print"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -658,17 +684,97 @@ window.selesaikanPesanan = async () => {
   const diterima = parseInt(inputUangString) || 0;
   if (metodePembayaran === 'cash' && diterima < total) { alert("Uang diterima kurang!"); return; }
   try {
-    await addDoc(collection(db, "transaksi_kasir"), {
+    const trx = {
       waktu: new Date().toISOString(), rincian, total, metode: metodePembayaran,
       uangDiterima: metodePembayaran === 'cash' ? diterima : total,
       kembalian: metodePembayaran === 'cash' ? (diterima - total) : 0,
       kasir: auth.currentUser.email
-    });
-    alert("✅ Transaksi Kasir Berhasil!");
+    };
+    await addDoc(collection(db, "transaksi_kasir"), trx);
+    lastReceipt = trx;
+    let pesan = "✅ Transaksi Kasir Berhasil!";
+    if (printerChar) {
+      try { await kirimKePrinter(buildReceipt(trx)); }
+      catch (e) { pesan += "\n\n⚠️ Struk gagal dicetak: " + e.message + "\nTekan tombol 🖨️ untuk cetak ulang."; }
+    } else {
+      pesan += "\n\nPrinter belum terhubung. Tekan 🖨️ di atas untuk menghubungkan.";
+    }
+    alert(pesan);
+    if (confirm("Cetak struk sekarang?")) {
+      cetakStruk({ waktu: new Date().toISOString(), rincian, total, metode: metodePembayaran, uang: metodePembayaran === 'cash' ? diterima : total, kembali: metodePembayaran === 'cash' ? (diterima - total) : 0, kasir: auth.currentUser.email });
+    }
     cart = {}; renderPosMenu(); renderPosCart(); tutupPembayaran();
     document.getElementById('cart-section').classList.remove('show');
     document.getElementById('cart-overlay').classList.remove('show');
   } catch (e) { alert("❌ Gagal: " + e.message); }
+};
+
+/* ===== CETAK STRUK 58MM (Web Bluetooth BLE + ESC/POS) ===== */
+let printerChar = null, lastReceipt = null;
+const enc = new TextEncoder();
+const cmd = (...b) => new Uint8Array(b);
+const txt = s => enc.encode(s + "\n");
+const rupiahStr = n => Number(n || 0).toLocaleString('id-ID');
+const lineLR = (l, r) => { const w = 32, sp = Math.max(1, w - l.length - r.length); return (l + " ".repeat(sp) + r).slice(0, w); };
+function concatBytes(arrs) {
+  const out = new Uint8Array(arrs.reduce((s, a) => s + a.length, 0));
+  let p = 0; arrs.forEach(a => { out.set(a, p); p += a.length; });
+  return out;
+}
+function buildReceipt(r) {
+  const parts = [cmd(0x1b, 0x40), cmd(0x1b, 0x61, 1), cmd(0x1b, 0x45, 1), txt("KEBABHAJAR"),
+    cmd(0x1b, 0x45, 0), txt("Struk Kasir"), cmd(0x1b, 0x61, 0), txt("-".repeat(32)),
+    txt(new Date(r.waktu).toLocaleString('id-ID')), txt("Kasir: " + (r.kasir || '-')), txt("-".repeat(32))];
+  (r.rincian || []).forEach(i => {
+    parts.push(txt(i.nama));
+    parts.push(txt(lineLR(`  ${i.qty} x ${rupiahStr(i.harga)}`, rupiahStr(i.harga * i.qty))));
+  });
+  parts.push(txt("-".repeat(32)));
+  parts.push(cmd(0x1b, 0x45, 1), txt(lineLR("TOTAL", rupiahStr(r.total))), cmd(0x1b, 0x45, 0));
+  parts.push(txt(lineLR("Metode", r.metode === 'cash' ? 'Tunai' : 'QRIS')));
+  if (r.metode === 'cash') {
+    parts.push(txt(lineLR("Bayar", rupiahStr(r.uangDiterima))));
+    parts.push(txt(lineLR("Kembali", rupiahStr(r.kembalian))));
+  }
+  parts.push(cmd(0x1b, 0x61, 1), txt("Terima kasih!"), txt("\n\n\n"), cmd(0x1d, 0x56, 66, 0));
+  return concatBytes(parts);
+}
+async function hubungkanPrinter() {
+  if (!navigator.bluetooth) throw new Error("Browser ini tidak mendukung Bluetooth. Pakai Chrome di Android.");
+  const dev = await navigator.bluetooth.requestDevice({
+    acceptAllDevices: true,
+    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb',
+      '0000ffe0-0000-1000-8000-00805f9b34fb', '0000fff0-0000-1000-8000-00805f9b34fb',
+      '49535343-fe7d-4ae5-8fa9-9fafd205e455', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2']
+  });
+  const server = await dev.gatt.connect();
+  let ch = null;
+  for (const s of await server.getPrimaryServices()) {
+    ch = (await s.getCharacteristics()).find(c => c.properties.write || c.properties.writeWithoutResponse);
+    if (ch) break;
+  }
+  if (!ch) throw new Error("Printer ini tidak punya saluran tulis BLE. Pastikan jenis printer BLE.");
+  printerChar = ch;
+  dev.addEventListener('gattserverdisconnected', () => { printerChar = null; updatePrinterBtn(); });
+  updatePrinterBtn();
+}
+async function kirimKePrinter(bytes) {
+  if (!printerChar) throw new Error("Printer belum terhubung.");
+  for (let i = 0; i < bytes.length; i += 100) {
+    const part = bytes.slice(i, i + 100);
+    if (printerChar.properties.writeWithoutResponse) await printerChar.writeValueWithoutResponse(part);
+    else await printerChar.writeValue(part);
+    await new Promise(res => setTimeout(res, 30));
+  }
+}
+function updatePrinterBtn() {
+  document.getElementById('btn-printer').classList.toggle('on', !!printerChar);
+}
+window.tapPrinter = async () => {
+  try {
+    if (!printerChar) { await hubungkanPrinter(); alert("🖨️ Printer terhubung."); }
+    else if (lastReceipt && confirm("Cetak ulang struk transaksi terakhir?")) await kirimKePrinter(buildReceipt(lastReceipt));
+  } catch (e) { alert("Printer: " + e.message); }
 };
 
 window.setUang = v => {
@@ -718,6 +824,56 @@ window.tutupRingkasan = () => {
   document.getElementById('sum-ov').classList.remove('show');
   document.getElementById('sum-win').classList.remove('open');
 };
+
+const fmt = n => Number(n || 0).toLocaleString('id-ID');
+function buatStruk(t) {
+  const tgl = new Date(t.waktu).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+  const isi = t.online
+    ? `<div class="s-row"><span>Pelanggan</span><span>${esc(t.nama)}</span></div><div class="s-line"></div><div class="s-pre">${esc(t.detail)}</div>`
+    : (t.rincian || []).map(r => `<div class="s-row"><span>${r.qty}x ${esc(r.nama)}</span><span>${fmt(r.qty * r.harga)}</span></div>`).join('');
+  const bayar = t.online
+    ? `<div class="s-row"><span>Sumber</span><span>Pesanan Web</span></div>`
+    : `<div class="s-row"><span>Metode</span><span>${t.metode === 'cash' ? 'Tunai' : 'QRIS'}</span></div>` +
+      (t.metode === 'cash' ? `<div class="s-row"><span>Diterima</span><span>${fmt(t.uang)}</span></div><div class="s-row"><span>Kembali</span><span>${fmt(t.kembali)}</span></div>` : '');
+  return `<div class="s-title">KEBAB HAJAR</div>
+    <div class="s-c">${tgl}</div>
+    ${t.kasir ? `<div class="s-c">${esc(t.kasir)}</div>` : ''}
+    <div class="s-line"></div>${isi}<div class="s-line"></div>
+    <div class="s-row s-bold"><span>TOTAL</span><span>${fmt(t.total)}</span></div>${bayar}
+    <div class="s-line"></div><div class="s-c">Terima kasih!</div>`;
+}
+function cetakStruk(t) {
+  document.getElementById('struk-print').innerHTML = buatStruk(t);
+  window.print();
+}
+
+let riwayatCache = [];
+window.bukaRiwayat = async () => {
+  const box = document.getElementById('sum-body');
+  box.innerHTML = '<div class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Memuat...</div>';
+  try {
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    const [kSnap, oSnap] = await Promise.all([getDocs(collection(db, "transaksi_kasir")), getDocs(collection(db, "transaksi_online"))]);
+    riwayatCache = [];
+    kSnap.forEach(d => {
+      const t = d.data();
+      if (!t.waktu || new Date(t.waktu) < start) return;
+      riwayatCache.push({ waktu: t.waktu, total: t.total || 0, metode: t.metode, rincian: t.rincian || [], uang: t.uangDiterima, kembali: t.kembalian, kasir: t.kasir, tipe: 'Kasir' });
+    });
+    oSnap.forEach(d => {
+      const t = d.data();
+      if (t.status !== 'Selesai' || !t.waktu || new Date(t.waktu) < start) return;
+      riwayatCache.push({ online: true, waktu: t.waktu, total: t.total_bayar || 0, nama: t.nama, detail: t.detail_pesanan, tipe: 'Web' });
+    });
+    riwayatCache.sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+    box.innerHTML = riwayatCache.length
+      ? riwayatCache.map((t, i) => `<div class="rw-item"><div><b>${t.tipe === 'Web' ? '🌐 ' + esc(t.nama) : '🧾 Kasir ' + (t.metode === 'cash' ? 'Tunai' : 'QRIS')}</b><small>${new Date(t.waktu).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} · Rp ${fmt(t.total)}</small></div><button class="rw-btn" onclick="cetakRiwayat(${i})"><i class="fa-solid fa-print"></i> Cetak</button></div>`).join('')
+      : '<div class="empty">Belum ada transaksi hari ini.</div>';
+  } catch (e) {
+    box.innerHTML = `<div class="empty">Gagal memuat: ${esc(e.message)}</div>`;
+  }
+};
+window.cetakRiwayat = i => cetakStruk(riwayatCache[i]);
 
 window.prosesLogout = () => {
   if (confirm("Tutup sesi kasir?")) signOut(auth).then(() => window.location.href = 'index.html');
