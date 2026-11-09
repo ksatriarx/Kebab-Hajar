@@ -146,6 +146,15 @@
             .nav-item { padding: 14px 15px; font-size: 14px; }
             .dashboard-grid { gap: 12px; }
         }
+        /* Perbaikan tabel menu: nama dan tombol aksi boleh turun baris */
+        #table-menu td { white-space: normal; }
+        #table-menu td[style*="flex"] { flex-wrap: wrap; min-width: 190px; }
+        #table-menu td:last-child { min-width: 150px; }
+        #table-menu td:last-child button { margin: 2px 4px 2px 0; }
+        @media (max-width: 768px) {
+            .content-area { overflow-x: hidden; }
+            .card-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        }
     </style>
 </head>
 <body>
@@ -329,7 +338,7 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`area-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
-            if(window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('show'); document.getElementById('mobile-overlay').classList.remove('show'); }
+            document.getElementById('sidebar').classList.remove('show'); document.getElementById('mobile-overlay').classList.remove('show');
             if (tab === 'laporan' && !isKasirLoaded) loadLaporanData();
         }
 
