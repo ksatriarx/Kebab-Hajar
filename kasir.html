@@ -156,6 +156,159 @@
             .modal-actions { gap: 4px; } .btn-cancel, .btn-confirm { padding: 6px; font-size: 10px; } .custom-keypad { gap: 3px; } .custom-keypad button { font-size: 12px; }
             .floating-cart-bar { bottom: 10px; width: 50%; max-width: 300px; padding: 8px; } .cart-bar-total { font-size: 12px; }
         }
+        /* ================= RESTYLE: modern & pro (warna asli tetap) ================= */
+        body {
+            background: radial-gradient(900px 500px at 50% -10%, rgba(229,57,53,0.14), transparent 60%), var(--bg-main);
+        }
+        ::selection { background: var(--primary); color: #fff; }
+        button { transition: transform 0.15s ease, filter 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+        button:active { transform: scale(0.96); }
+
+        /* Header */
+        .pos-header {
+            background: rgba(10,10,10,0.8);
+            padding: 12px 16px;
+            border-bottom: 1px solid transparent;
+            border-image: linear-gradient(90deg, transparent, var(--primary), transparent) 1;
+        }
+        .header-brand { font-size: 17px; letter-spacing: -0.3px; text-shadow: 0 0 18px rgba(229,57,53,0.35); }
+        .header-brand i { font-size: 15px; background: var(--primary); color: #fff; width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-style: normal; box-shadow: 0 4px 14px rgba(229,57,53,0.35); }
+        .header-info { font-size: 9px; letter-spacing: 0.3px; }
+        .btn-icon { background: rgba(255,255,255,0.05); border-radius: 10px; width: 34px; height: 34px; }
+        .btn-icon:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-logout { border-radius: 10px; height: 34px; letter-spacing: 0.3px; }
+        .btn-logout:hover { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(229,57,53,0.35); }
+
+        /* Tabs: segmented control */
+        .tabs {
+            padding: 12px 14px; gap: 6px; border-bottom: none; background: transparent;
+        }
+        .tab-btn {
+            background: #101010; border: 1px solid var(--border); border-radius: 12px;
+            padding: 11px 8px; font-size: 12px; color: var(--text-muted);
+        }
+        .tab-btn:hover { color: #fff; border-color: #3a3a3a; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), #b71c1c);
+            border-color: transparent; color: #fff;
+            box-shadow: 0 6px 18px rgba(229,57,53,0.35);
+        }
+        .tab-btn.active::after { display: none; }
+        .badge-notif { border-radius: 999px; margin-left: 2px; }
+
+        /* Pesanan online */
+        .online-list { padding: 14px; gap: 14px; }
+        .online-card {
+            background: linear-gradient(180deg, #161616 0%, #0f0f0f 100%);
+            border-radius: 16px; padding: 14px; border: 1px solid #222;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+        }
+        .online-card:hover { border-color: #333; }
+        .online-card::before { width: 3px; border-radius: 0 3px 3px 0; box-shadow: 0 0 12px rgba(255,179,0,0.5); }
+        .oc-header { font-size: 10px; margin-bottom: 8px; }
+        .order-badge { border-radius: 999px; padding: 4px 10px; font-size: 10px; letter-spacing: 0.4px; box-shadow: 0 4px 12px rgba(229,57,53,0.3); }
+        .oc-name { font-size: 15px; letter-spacing: -0.2px; }
+        .oc-email { font-size: 10px; opacity: 0.9; }
+        .oc-detail { font-size: 10.5px; background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 10px; padding: 10px; }
+        .oc-footer { border-top: 1px dashed #2a2a2a; }
+        .oc-total { font-size: 14px; color: #fff; }
+        .btn-action { border-radius: 8px; padding: 8px 11px; font-size: 10.5px; }
+        .btn-proses:hover { background: var(--accent); color: #000; }
+        .btn-selesai { box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        .btn-selesai:hover { filter: brightness(1.1); }
+
+        /* Menu kasir */
+        .menu-section { padding: 12px; }
+        .category-scroll { gap: 8px; margin-bottom: 12px; }
+        .cat-btn { border-radius: 999px; padding: 8px 16px; font-size: 11px; background: #111; }
+        .cat-btn:hover { color: #fff; border-color: #3a3a3a; }
+        .cat-btn.active { background: linear-gradient(135deg, rgba(229,57,53,0.22), rgba(229,57,53,0.06)); box-shadow: 0 4px 14px rgba(229,57,53,0.2); }
+        .menu-grid { gap: 10px; }
+        .pos-card {
+            background: linear-gradient(180deg, #161616 0%, #0f0f0f 100%);
+            border-radius: 14px; padding: 6px; border: 1px solid #222;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+        .pos-card:hover { border-color: #3a3a3a; }
+        .pos-img { border-radius: 10px; margin-bottom: 6px; }
+        .pos-title { font-size: 10px; margin-bottom: 3px; }
+        .pos-price { font-size: 10.5px; margin-bottom: 7px; }
+        .pos-add {
+            height: 32px; border-radius: 8px; font-size: 10px; letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(229,57,53,0.25);
+        }
+        .pos-add:hover { filter: brightness(1.12); }
+        .pos-add:disabled { box-shadow: none; }
+        .qty-control { height: 32px; border-radius: 8px; background: #0a0a0a; border-color: #2a2a2a; }
+        .qty-control button { width: 28px; font-size: 14px; border-radius: 6px; }
+        .qty-control button:hover { color: var(--primary); }
+        .qty-control span { font-size: 11px; }
+
+        /* Floating cart bar */
+        .floating-cart-bar {
+            background: linear-gradient(135deg, var(--primary), #b71c1c);
+            border-radius: 16px; padding: 12px 14px;
+            box-shadow: 0 12px 30px rgba(229,57,53,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .cart-bar-count { letter-spacing: 0.3px; text-transform: uppercase; font-size: 9px; }
+        .cart-bar-total { font-size: 15px; letter-spacing: -0.2px; }
+        .cart-bar-btn { border-radius: 10px; padding: 9px 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .cart-bar-btn:hover { background: #ffe9e9; }
+
+        /* Overlay & sheet keranjang */
+        .cart-overlay { background: rgba(0,0,0,0.7); }
+        .cart-section {
+            background: linear-gradient(180deg, #141414 0%, #0c0c0c 100%);
+            border-radius: 26px 26px 0 0; border-top: 1px solid #222;
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.9); padding: 26px 16px 18px;
+        }
+        .cart-section::before {
+            content: ''; position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 4px; border-radius: 4px; background: #333;
+        }
+        .cart-title-text { font-size: 15px; letter-spacing: -0.2px; }
+        .btn-close-cart { background: #1c1c1c; border: 1px solid #2a2a2a; width: 32px; height: 32px; }
+        .btn-close-cart:hover { border-color: var(--primary); color: var(--primary); }
+        .cart-list-pos { border-bottom-color: #222; }
+        .cart-row { padding: 10px 12px; margin-bottom: 8px; background: #161616; border: 1px solid #222; border-radius: 12px; }
+        .cart-row-name { font-size: 12px; }
+        .cart-row-price { font-size: 10.5px; }
+        .cart-total-val { font-size: 22px; letter-spacing: -0.5px; text-shadow: 0 0 20px rgba(229,57,53,0.3); }
+        .btn-checkout {
+            border-radius: 14px; padding: 16px; font-size: 14px; letter-spacing: 0.3px;
+            background: linear-gradient(135deg, var(--primary), #b71c1c);
+            box-shadow: 0 8px 22px rgba(229,57,53,0.35);
+        }
+        .btn-checkout:hover { filter: brightness(1.08); }
+
+        /* Modal pembayaran */
+        .modal-overlay-pay { background: rgba(0,0,0,0.85); }
+        .modal-box {
+            border-radius: 22px; border-color: #252525;
+            background: linear-gradient(180deg, #151515 0%, #0d0d0d 100%);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+        }
+        .modal-title { font-size: 15px; letter-spacing: -0.2px; }
+        .pay-methods { gap: 8px; }
+        .pay-btn { border-radius: 12px; padding: 10px; font-size: 11px; }
+        .pay-btn:hover { border-color: #3a3a3a; }
+        .pay-btn.active { box-shadow: 0 4px 14px rgba(229,57,53,0.2); }
+        .form-label { font-size: 10px; letter-spacing: 0.3px; }
+        .form-input { border-radius: 12px; padding: 10px; background: #0a0a0a; }
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(229,57,53,0.15); }
+        .change-box { border-radius: 12px; background: #0a0a0a; border-color: #2a2a2a; padding: 10px; }
+        .change-val { font-size: 15px; text-shadow: 0 0 14px rgba(255,179,0,0.25); }
+        .btn-cancel { border-radius: 12px; padding: 12px; font-size: 12px; }
+        .btn-cancel:hover { background: #3d3d3d; }
+        .btn-confirm { border-radius: 12px; padding: 12px; font-size: 12px; box-shadow: 0 6px 16px rgba(16,185,129,0.25); }
+        .btn-confirm:hover { filter: brightness(1.08); }
+        .custom-keypad { gap: 6px; }
+        .custom-keypad button { border-radius: 12px; font-size: 17px; background: #0a0a0a; border-color: #2a2a2a; }
+        .custom-keypad button:hover { border-color: #3a3a3a; }
+        .custom-keypad .btn-clear { color: var(--primary); }
+
+        .empty-state { font-size: 11px; letter-spacing: 0.2px; }
+        .empty-state i { opacity: 0.25; }
     </style>
 </head>
 <body>
