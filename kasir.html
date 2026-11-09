@@ -222,6 +222,7 @@ body{background-image:
 .bpay{border:2px solid #000;box-shadow:4px 4px 0 #000}
 .pay-win{border:2px solid #000;box-shadow:6px 6px 0 #000,0 30px 60px rgba(0,0,0,.75)}
 .ibtn.on{border-color:var(--green);color:var(--green)}
+.shlbl{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}
 /* ===== UANG CEPAT & RINGKASAN ===== */
 .quick{display:none;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0}
 .quick button{padding:8px 4px;border-radius:10px;background:#111;border:2px solid #000;box-shadow:2px 2px 0 #000;color:#fff;font-size:10.5px;font-weight:800}
@@ -280,6 +281,7 @@ body{background-image:
     <div class="top-right">
       <div class="email" id="header-email">-</div>
       <div class="top-actions">
+        <button class="ibtn" onclick="bukaShift()" title="Tutup Kasir / Ganti Sif"><i class="fa-solid fa-cash-register"></i></button>
         <button class="ibtn" id="btn-printer" onclick="tapPrinter()" title="Printer Struk"><i class="fa-solid fa-print"></i></button>
         <button class="ibtn" onclick="bukaRingkasan()" title="Ringkasan Hari Ini"><i class="fa-solid fa-chart-column"></i></button>
         <button class="ibtn" onclick="toggleFullscreen()" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
@@ -374,6 +376,30 @@ body{background-image:
   <div class="resize" id="pay-resize"></div>
 </div>
 
+<div class="ov" id="sh-ov" onclick="tutupShift()"></div>
+<div class="sum-win" id="sh-win">
+  <div class="phead"><h3>Tutup Kasir / Ganti Sif</h3><button class="psz" onclick="tutupShift()"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="sum-body">
+    <div class="sum-grid">
+      <div class="sum-card sum-wide"><span>Shift dimulai</span><b id="sh-mulai">-</b></div>
+      <div class="sum-card"><span>Tunai masuk</span><b id="sh-tunai">Rp 0</b></div>
+      <div class="sum-card"><span>QRIS masuk</span><b id="sh-qris">Rp 0</b></div>
+    </div>
+    <label class="shlbl">Kas awal (Rp)</label>
+    <input id="sh-awal" class="cashin" inputmode="numeric" value="0" oninput="hitungShift()">
+    <label class="shlbl">Uang fisik di laci (Rp)</label>
+    <input id="sh-fisik" class="cashin" inputmode="numeric" placeholder="0" oninput="hitungShift()">
+    <div class="sum-grid">
+      <div class="sum-card sum-wide"><span>Kas seharusnya</span><b id="sh-harus">Rp 0</b></div>
+      <div class="sum-card sum-wide"><span>Selisih</span><b id="sh-selisih">-</b></div>
+    </div>
+    <div class="pact"><button class="pcancel" onclick="tutupShift()">Batal</button></div>
+    <div class="pact">
+      <button class="pconfirm" onclick="simpanShift('ganti')">Ganti Sif</button>
+      <button class="pconfirm" style="background:var(--red)" onclick="simpanShift('tutup')">Tutup Kasir</button>
+    </div>
+  </div>
+</div>
 <div class="ov" id="sum-ov" onclick="tutupRingkasan()"></div>
 <div class="sum-win" id="sum-win">
   <div class="phead"><h3>Ringkasan Hari Ini</h3><button class="psz" onclick="tutupRingkasan()"><i class="fa-solid fa-xmark"></i></button></div>
@@ -428,6 +454,7 @@ onAuthStateChanged(auth, user => {
     document.getElementById('header-email').innerText = user.email;
     document.getElementById('btn-settings-admin').style.display = 'flex';
     loadMenuOffline(); listenOnlineOrders();
+    loadShift().catch(e => console.error("Shift:", e));
   } else {
     document.getElementById('access-denied').style.display = 'flex';
     document.getElementById('pos-app').style.display = 'none';
@@ -770,6 +797,85 @@ async function kirimKePrinter(bytes) {
 function updatePrinterBtn() {
   document.getElementById('btn-printer').classList.toggle('on', !!printerChar);
 }
+/* ===== SHIFT KASIR (tutup kasir / ganti sif) ===== */
+let currentShift = null, shiftSum = { tunai: 0, qris: 0 };
+async function loadShift() {
+  const snap = await getDocs(collection(db, "shift_kasir"));
+  let open = null, lastClosed = null;
+  snap.forEach(d => {
+    const s = { id: d.id, ...d.data() };
+    if (!s.selesai) { if (!open || s.mulai > open.mulai) open = s; }
+    else if (!lastClosed || s.selesai > lastClosed.selesai) lastClosed = s;
+  });
+  if (!open) {
+    const mulai = new Date().toISOString();
+    const kasAwal = lastClosed?.kasFisik ?? 0;
+    const ref = await addDoc(collection(db, "shift_kasir"), { mulai, selesai: null, kasir: auth.currentUser.email, kasAwal });
+    open = { id: ref.id, mulai, kasAwal };
+  }
+  currentShift = open;
+}
+const angka = id => parseInt(document.getElementById(id).value.replace(/\D/g, '')) || 0;
+window.hitungShift = () => {
+  const awal = angka('sh-awal'), fisikRaw = document.getElementById('sh-fisik').value.replace(/\D/g, '');
+  const harus = awal + shiftSum.tunai;
+  document.getElementById('sh-harus').innerText = rp(harus);
+  const el = document.getElementById('sh-selisih');
+  if (fisikRaw === '') { el.innerText = '-'; el.style.color = ''; return; }
+  const selisih = parseInt(fisikRaw) - harus;
+  el.innerText = (selisih >= 0 ? '+' : '-') + rp(Math.abs(selisih));
+  el.style.color = selisih === 0 ? 'var(--green)' : selisih > 0 ? 'var(--amber)' : 'var(--red)';
+};
+window.bukaShift = async () => {
+  try {
+    if (!currentShift) await loadShift();
+    shiftSum = { tunai: 0, qris: 0 };
+    const snap = await getDocs(collection(db, "transaksi_kasir"));
+    const mulai = new Date(currentShift.mulai);
+    snap.forEach(d => {
+      const t = d.data();
+      if (!t.waktu || new Date(t.waktu) < mulai) return;
+      if (t.metode === 'cash') shiftSum.tunai += t.total || 0; else shiftSum.qris += t.total || 0;
+    });
+    document.getElementById('sh-mulai').innerText = mulai.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+    document.getElementById('sh-tunai').innerText = rp(shiftSum.tunai);
+    document.getElementById('sh-qris').innerText = rp(shiftSum.qris);
+    document.getElementById('sh-awal').value = currentShift.kasAwal ?? 0;
+    document.getElementById('sh-fisik').value = '';
+    hitungShift();
+    document.getElementById('sh-ov').classList.add('show');
+    document.getElementById('sh-win').classList.add('open');
+  } catch (e) { alert("Gagal memuat shift: " + e.message); }
+};
+window.tutupShift = () => {
+  document.getElementById('sh-ov').classList.remove('show');
+  document.getElementById('sh-win').classList.remove('open');
+};
+window.simpanShift = async jenis => {
+  const fisikRaw = document.getElementById('sh-fisik').value.replace(/\D/g, '');
+  if (fisikRaw === '') { alert("Isi uang fisik di laci dulu."); return; }
+  const fisik = parseInt(fisikRaw), awal = angka('sh-awal'), harus = awal + shiftSum.tunai;
+  const selisih = fisik - harus, selesai = new Date().toISOString();
+  if (!confirm(jenis === 'ganti' ? "Ganti sif sekarang?" : "Tutup kasir sekarang?")) return;
+  try {
+    await updateDoc(doc(db, "shift_kasir", currentShift.id), {
+      selesai, kasAwal: awal, tunaiSistem: shiftSum.tunai, qrisSistem: shiftSum.qris,
+      kasFisik: fisik, kasHarus: harus, selisih, jenis
+    });
+    let info = `Shift ditutup.\nSelisih: ${selisih >= 0 ? '+' : '-'}${rp(Math.abs(selisih))}`;
+    if (jenis === 'ganti') {
+      const ref = await addDoc(collection(db, "shift_kasir"), { mulai: selesai, selesai: null, kasir: auth.currentUser.email, kasAwal: fisik });
+      currentShift = { id: ref.id, mulai: selesai, kasAwal: fisik };
+      info += `\nSif baru dimulai dengan kas awal ${rp(fisik)}.`;
+    } else {
+      currentShift = null;
+      info += "\nKasir ditutup. Shift baru akan dibuka otomatis saat dibuka lagi.";
+    }
+    alert(info);
+    tutupShift();
+  } catch (e) { alert("Gagal menyimpan shift: " + e.message); }
+};
+
 window.tapPrinter = async () => {
   try {
     if (!printerChar) { await hubungkanPrinter(); alert("🖨️ Printer terhubung."); }
