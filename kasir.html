@@ -187,7 +187,7 @@ body{background-image:
   radial-gradient(circle,rgba(255,179,0,.09) 2px,transparent 3px),
   repeating-radial-gradient(circle at 50% -20%,transparent 0 22px,rgba(229,57,53,.08) 23px 24px);
   background-size:auto,44px 44px,auto}
-.top{position:relative;overflow:hidden}
+.top{position:relative;overflow:visible;z-index:300}
 .top::before{content:'POW!';position:absolute;right:-6px;top:-8px;background:var(--amber);color:#000;font-size:11px;font-weight:900;padding:4px 14px 4px 10px;border:2px solid #000;box-shadow:2px 2px 0 #000;transform:rotate(-8deg);pointer-events:none;letter-spacing:.5px}
 .top::after{content:'★';position:absolute;left:150px;bottom:-9px;background:#fff;color:var(--red);width:20px;height:20px;border-radius:50%;border:2px solid #000;box-shadow:2px 2px 0 #000;font-size:10px;display:flex;align-items:center;justify-content:center;transform:rotate(12deg);pointer-events:none}
 .brand b{text-shadow:2px 2px 0 #000}
@@ -223,7 +223,10 @@ body{background-image:
 .pay-win{border:2px solid #000;box-shadow:6px 6px 0 #000,0 30px 60px rgba(0,0,0,.75)}
 .ibtn.on{border-color:var(--green);color:var(--green)}
 .rx-wrap{position:relative}
-.rx-fab{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;font-size:13px;font-weight:900;letter-spacing:.5px;border:2px solid #000;box-shadow:3px 3px 0 #000,0 6px 16px rgba(229,57,53,.4);transform:rotate(-6deg)}
+.rx-fab{width:38px;height:38px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;gap:1px;background:radial-gradient(circle at 30% 25%,#e8413c,#b71c1c 72%);color:#fff7ef;border:2px solid #7f0000;box-shadow:inset 0 0 8px rgba(0,0,0,.45),2px 3px 0 #000;transform:rotate(-8deg)}
+.rx-fab::before{content:'';position:absolute;inset:3px;border-radius:50%;background:radial-gradient(circle,rgba(0,0,0,.2) 1px,transparent 1.6px) 0 0/4px 4px;pointer-events:none}
+.rx-fab .r{font-size:17px;font-weight:900;line-height:1;letter-spacing:-.5px}
+.rx-fab .x{font-size:9px;font-weight:800;line-height:1;align-self:flex-end;margin-bottom:4px;margin-left:-1px}
 .rx-fab:hover{filter:brightness(1.1)}
 .rx-menu{display:none;position:absolute;top:54px;right:0;width:240px;flex-direction:column;gap:6px;padding:10px;background:linear-gradient(180deg,#161616,#0d0d0d);border:2px solid #000;border-radius:18px;box-shadow:5px 5px 0 #000,0 20px 40px rgba(0,0,0,.7);z-index:200}
 .rx-menu.open{display:flex}
@@ -308,7 +311,7 @@ body{background-image:
       
       <div class="top-actions">
         <div class="rx-wrap">
-          <button class="rx-fab" id="rx-fab" onclick="toggleRx()" title="Menu">RX</button>
+          <button class="rx-fab" id="rx-fab" onclick="toggleRx()" title="Menu"><span class="r">R</span><span class="x">x</span></button>
           <div class="rx-menu" id="rx-menu">
             <div class="rx-mail" id="header-email">-</div>
             <button class="rx-item" onclick="bukaShift()"><i class="fa-solid fa-cash-register"></i> Tutup Kasir / Ganti Sif</button>
