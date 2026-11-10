@@ -572,6 +572,7 @@ function listenOnlineOrders() {
         <div class="ocard-top"><span class="qno">Antrean #${queue}</span><span class="otime">${tgl}</span></div>
         <div class="oname">${esc(data.nama)}</div>
         <div class="omail"><i class="fa-solid fa-envelope"></i> ${esc(data.email)}</div>
+        <div class="omail" style="margin-top:-4px">🎟 ${String(data.email || '').includes('@') ? 'Stempel: +' + hitungStempel(daftarItem(data)) + (data.klaim_id ? ' • 🎁 pakai hadiah' : '') : 'Tamu (tanpa stempel)'}</div>
         <div class="odetail">${esc(data.detail_pesanan)}</div>
         <div class="ofoot"><div class="ototal">${rp(data.total_bayar)}</div>
           <div class="oacts">${aksi}<button class="bact bselesai" onclick="updateStatusOnline('${docId}','Selesai')"><i class="fa-solid fa-check"></i> Selesai</button></div></div>
@@ -593,22 +594,27 @@ function listenOnlineOrders() {
 // ===== STEMPEL: ditambah otomatis saat pesanan "Selesai" (aman dari dobel hitung) =====
 const STAMP_KEYWORDS = ['kebab']; // item yang namanya mengandung kata ini dihitung 1 stempel per porsi
 const hitungStempel = (r) => (r || []).reduce((n, i) => STAMP_KEYWORDS.some(k => String(i.nama || '').toLowerCase().includes(k)) ? n + (Number(i.qty) || 0) : n, 0);
+const daftarItem = (o) => (Array.isArray(o.rincian) && o.rincian.length) ? o.rincian : [...String(o.detail_pesanan || '').matchAll(/▪\s*(.+?)\s*\((\d+)x\)\s*=/g)].map(m => ({ nama: m[1], qty: Number(m[2]) })); // cadangan untuk pesanan dari aplikasi versi lama (tanpa "rincian")
+function kabarStempel(t) { const d = document.createElement('div'); d.textContent = '🎟 ' + t; d.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;border:2px solid #ffb300;border-radius:12px;padding:10px 14px;font:700 12px sans-serif;z-index:99999;max-width:90vw;text-align:center'; document.body.appendChild(d); setTimeout(() => d.remove(), 4000); }
 async function prosesSelesai(docId) {
+  let hasil = '';
   try {
     await runTransaction(db, async (tx) => {
       const oRef = doc(db, "transaksi_online", docId), oSnap = await tx.get(oRef);
       if (!oSnap.exists()) return; const o = oSnap.data();
-      if (o.status !== 'Selesai' || o.stempel_diproses) return;
+      if (o.status !== 'Selesai') return; if (o.stempel_diproses) { hasil = 'Stempel pesanan ini sudah pernah diproses.'; return; }
       const email = String(o.email || ''), valid = email.includes('@');
       let cRef = null, cSnap = null, kSnap = null, kRef = null;
       if (valid) { cRef = doc(db, "saldo_pelanggan", email.replace(/[^a-zA-Z0-9]/g, "")); cSnap = await tx.get(cRef); }
       if (o.klaim_id) { kRef = doc(db, "klaim_stempel", String(o.klaim_id)); kSnap = await tx.get(kRef); }
-      const n = valid ? hitungStempel(o.rincian) : 0;
+      const n = valid ? hitungStempel(daftarItem(o)) : 0;
+      hasil = !valid ? 'Pesanan tamu: tidak ada stempel.' : (!cSnap.exists() ? 'Akun pelanggan belum ada di database: stempel tidak masuk.' : (n > 0 ? '+' + n + ' stempel untuk ' + email : 'Tidak ada item kebab di pesanan ini (+0 stempel).'));
       if (n > 0 && cSnap && cSnap.exists()) tx.update(cRef, { stempel: (cSnap.data().stempel || 0) + n });
       if (kSnap && kSnap.exists() && kSnap.data().email === email && kSnap.data().status === 'Disetujui') tx.update(kRef, { status: 'Dipakai', order_id: o.order_id || docId, waktu_pakai: new Date().toISOString() });
       tx.update(oRef, { stempel_diproses: true, stempel_didapat: n });
     });
-  } catch (e) { console.error("Stempel gagal:", e); }
+  } catch (e) { console.error("Stempel gagal:", e); alert("Stempel gagal ditambahkan: " + e.message); hasil = ''; }
+  if (hasil) kabarStempel(hasil);
 }
 
 // ===== KLAIM STEMPEL (hanya Owner) =====
