@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SCRIPT MIDTRANS SNAP (SUDAH PRODUCTION) -->
+    <!-- Midtrans tetap dimuat, siapa tahu nanti mau dipakai lagi -->
     <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-J7afOgiDqBEkS0ud"></script>
     
     <style>
@@ -52,7 +52,7 @@
         .qty-control button { background: white; border: 1px solid var(--border); color: var(--text-main); width: 26px; height: 26px; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .qty-control span { font-weight: 800; font-size: 13px; }
 
-        /* CART AREA (Sisi Kanan di Tablet/Desktop, Bawah di HP) */
+        /* CART AREA */
         .cart-area { flex: 1; min-width: 300px; max-width: 350px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: 0 8px 30px rgba(0,0,0,0.06); display: flex; flex-direction: column; border: 1px solid #f0f0f0; }
         .cart-header { padding: 15px; border-bottom: 1px dashed var(--border); display: flex; justify-content: space-between; align-items: center; }
         .cart-header h2 { font-size: 16px; font-weight: 800; }
@@ -96,25 +96,22 @@
             .cart-footer { padding: 10px 15px; }
             .btn-checkout { padding: 12px; font-size: 14px; }
             
-            /* Tombol Keranjang Melayang */
             .floating-cart-btn { display: flex; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 800; box-shadow: 0 10px 25px rgba(255,126,103,0.5); z-index: 99; align-items: center; gap: 10px; border: none; cursor: pointer; width: 90%; justify-content: center; }
         }
         @media (min-width: 769px) {
             .floating-cart-btn { display: none; }
         }
-        /* ===== GAYA STIKER TINTA CARTOON + KEMIRINGAN ACAK (hanya tampilan) ===== */
+        /* ===== GAYA STIKER TINTA CARTOON ===== */
         :root { --bg-main: #0b0b0b; --bg-card: #151515; --text-main: #f5f5f5; --text-muted: #a3a3a3; --primary: #e53935; --primary-hover: #b71c1c; --accent: #ffb300; --success: #34d399; --border: #000; }
         body { background: radial-gradient(900px 500px at 50% -15%, rgba(229,57,53,.16), transparent 60%), radial-gradient(circle, rgba(255,179,0,.09) 2px, transparent 3px) 0 0 / 44px 44px, var(--bg-main); }
         .header { background: #111; border-bottom: 3px solid #000; box-shadow: 0 5px 0 #000; border-radius: 0 0 22px 22px; }
         .header h1 { font-weight: 900; font-size: 20px; text-shadow: 2px 2px 0 #000; transform: rotate(-2deg); }
         .header h1 span { color: #fff; }
         .header > div:last-child { background: var(--accent) !important; color: #000 !important; border: 2px solid #000; box-shadow: 2px 2px 0 #000; transform: rotate(3deg); font-weight: 900; }
-
         .cat-pill { background: #1a1a1a; color: #ddd; border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-weight: 900; border-radius: 14px; padding: 9px 20px; }
         .cat-pill:nth-child(1) { transform: rotate(-2deg); }
         .cat-pill:nth-child(2) { transform: rotate(2deg); }
         .cat-pill.active { background: linear-gradient(135deg, var(--primary), #b71c1c); color: #fff; border-color: #fff; box-shadow: 3px 3px 0 #000, 0 0 18px rgba(229,57,53,.5); }
-
         .menu-card { position: relative; background: linear-gradient(180deg, #1b1b1b, #0e0e0e); border: 2px solid #000; border-radius: 18px; box-shadow: 4px 4px 0 #000; padding: 10px; }
         .menu-card:nth-child(4n+1) { transform: rotate(-1.5deg); }
         .menu-card:nth-child(4n+2) { transform: rotate(1deg); }
@@ -132,7 +129,6 @@
         .qty-control { background: #0a0a0a; border: 2px solid #000; border-radius: 10px; box-shadow: 2px 2px 0 #000; }
         .qty-control button { background: #1c1c1c; color: #fff; border: 2px solid #000; border-radius: 8px; box-shadow: 1px 1px 0 #000; }
         .qty-control span { color: #fff; }
-
         .cart-area { background: linear-gradient(180deg, #141414, #0c0c0c); border: 2px solid #000; box-shadow: 6px 6px 0 #000; }
         .cart-header { border-bottom: 2px dashed #333; }
         .cart-header h2 { color: #fff; font-weight: 900; text-shadow: 2px 2px 0 #000; }
@@ -145,7 +141,6 @@
         .btn-checkout { background: linear-gradient(135deg, var(--primary), #b71c1c); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-weight: 900; transform: rotate(-1deg); }
         .btn-checkout:active { transform: rotate(-1deg) scale(.97); }
         .floating-cart-btn { background: linear-gradient(135deg, var(--primary), #b71c1c); border: 2px solid #000; box-shadow: 5px 5px 0 #000, 0 10px 25px rgba(229,57,53,.5); }
-
         .modal-overlay { background: rgba(0,0,0,.75); backdrop-filter: blur(3px); }
         .modal-box { background: linear-gradient(180deg, #171717, #0d0d0d); border: 2px solid #000; box-shadow: 6px 6px 0 #000, 0 30px 60px rgba(0,0,0,.7); }
         .modal-box h3 { color: #fff; font-weight: 900; text-shadow: 2px 2px 0 #000; }
@@ -185,7 +180,7 @@
             <div class="cart-area" id="cart-area">
                 <div class="cart-header">
                     <h2>Pesanan Anda</h2>
-                    <button onclick="toggleCart()" style="display: none; background:none; border:none; font-size: 20px;" id="btn-close-cart-mobile"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="toggleCart()" style="display: none; background:none; border:none; font-size: 20px; color: white;" id="btn-close-cart-mobile"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="cart-list" id="cart-list">
                     <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 20px;">Belum ada pesanan.</p>
@@ -226,6 +221,20 @@
             </div>
             
             <button class="btn-close-modal" onclick="closeModal('payment-modal')">Batal</button>
+        </div>
+    </div>
+
+    <!-- MODAL QRIS MANUAL (STATIS) -->
+    <div class="modal-overlay" id="qris-manual-modal" style="z-index: 1002;">
+        <div class="modal-box" style="padding: 15px;">
+            <h3>Scan QRIS</h3>
+            <p>Scan menggunakan aplikasi e-wallet atau m-banking Anda</p>
+            <div style="background: white; padding: 10px; border-radius: 12px; display: inline-block; margin-bottom: 15px; border: 2px solid #000; box-shadow: 3px 3px 0 #000;">
+                <img src="https://i.ibb.co.com/C38H9sTC/no-mark-React-Native-snapshot-image.png" style="width: 220px; height: auto; border-radius: 8px;" alt="QRIS Kebab Hajar">
+            </div>
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--accent); text-shadow: 2px 2px 0 #000;" id="qris-total-display">Rp 0</h2>
+            <button class="btn-checkout" onclick="konfirmasiQRISManual()" style="margin-top: 15px;">Saya Sudah Bayar</button>
+            <button class="btn-close-modal" onclick="closeModal('qris-manual-modal')">Batal</button>
         </div>
     </div>
 
@@ -323,7 +332,7 @@
                                 <div class="cart-item-name">${item.name}</div>
                                 <div class="cart-item-price">${qty} x Rp ${item.price.toLocaleString('id-ID')}</div>
                             </div>
-                            <div style="font-weight: 800; font-size: 13px;">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
+                            <div style="font-weight: 800; font-size: 13px; color: white;">Rp ${(item.price * qty).toLocaleString('id-ID')}</div>
                         </div>
                     `;
                 }
@@ -404,50 +413,30 @@
             }
         }
 
-        // Skenario 2: QRIS (Midtrans)
-        window.prosesQRIS = async () => {
+        // Skenario 2: QRIS (Manual menggunakan gambar statis)
+        window.prosesQRIS = () => {
             closeModal('payment-modal');
+            // Hitung total untuk ditampilkan di modal QRIS
+            let total = 0;
+            Object.keys(cart).forEach(id => {
+                const item = menuData.find(i => i.id === parseInt(id));
+                if(item) total += item.price * cart[id];
+            });
+            document.getElementById('qris-total-display').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('qris-manual-modal').style.display = 'flex';
+        }
+
+        // Konfirmasi setelah pelanggan scan dan bayar
+        window.konfirmasiQRISManual = async () => {
+            closeModal('qris-manual-modal');
             try {
-                // 1. Simpan pesanan sementara
-                const res = await simpanPesanan('QRIS', 'Menunggu Pembayaran QRIS');
-                
-                // 2. Panggil Vercel untuk minta Token
-                const response = await fetch('https://kebab-backend.vercel.app/api/checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        order_id: res.orderId,
-                        gross_amount: res.total,
-                        nama_pembeli: "Pelanggan Self Service",
-                        email_pembeli: "selfservice@kebabidi.com"
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.token) {
-                    window.snap.pay(data.token, {
-                        onSuccess: function(result){
-                            // Karena webhook akan mengupdate status, kita langsung tampilkan sukses
-                            document.getElementById('success-title').innerText = "Pembayaran Berhasil!";
-                            document.getElementById('success-desc').innerText = "Terima kasih. Pesanan Anda sedang disiapkan.";
-                            document.getElementById('display-queue').innerText = res.queueNum;
-                            document.getElementById('success-modal').style.display = 'flex';
-                        },
-                        onPending: function(result){
-                            alert("⏳ Menunggu pembayaran.");
-                            kembaliKeAwal();
-                        },
-                        onError: function(result){
-                            alert("❌ Pembayaran gagal.");
-                            kembaliKeAwal();
-                        }
-                    });
-                } else {
-                    alert("Gagal memuat sistem pembayaran.");
-                }
+                const res = await simpanPesanan('QRIS (Manual)', 'Menunggu Verifikasi Kasir');
+                document.getElementById('success-title').innerText = "Pesanan Dibuat!";
+                document.getElementById('success-desc').innerText = "Pembayaran Anda akan diverifikasi oleh Kasir. Tunjukkan bukti transfer & nomor antrean.";
+                document.getElementById('display-queue').innerText = res.queueNum;
+                document.getElementById('success-modal').style.display = 'flex';
             } catch (e) {
-                alert("Error: " + e.message);
+                alert("Gagal membuat pesanan: " + e.message);
             }
         }
 
