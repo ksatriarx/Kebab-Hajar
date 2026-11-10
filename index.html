@@ -735,6 +735,7 @@
                 if (totals.potongan > 0) { html += `<div class="summary-row" style="color:#4caf50;"><span>Diskon Voucher (${appliedVoucher.code})</span><span>-Rp ${totals.potongan.toLocaleString('id-ID')}</span></div>`; }
                 if(deliveryMethod === 'delivery'){ html += `<div class="summary-row"><span>Ongkir (${distanceKm.toFixed(1)} km)</span><span>Rp ${shippingFee.toLocaleString('id-ID')}</span></div>`; } else { html += `<div class="summary-row"><span>Ongkir</span><span style="color:#4caf50;">GRATIS</span></div>`; }
                 html += `<div class="summary-row total"><span>TOTAL</span><span>Rp ${totals.total.toLocaleString('id-ID')}</span></div>`;
+                if (isTamu) html += `<div class="summary-row" style="color:var(--accent); margin-top:8px; margin-bottom:0;"><span>🎟 Masuk Google agar pesanan ini dapat stempel</span><span style="text-decoration:underline; cursor:pointer;" onclick="closeConfirmModal(); loginGoogle();">Masuk</span></div>`;
                 document.getElementById('confirm-summary').innerHTML = html; cekTombolSaldo(); document.getElementById('confirm-modal').classList.add('show');
             }
             window.closeConfirmModal = () => { document.getElementById('confirm-modal').classList.remove('show'); }
