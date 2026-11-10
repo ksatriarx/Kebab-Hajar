@@ -105,7 +105,7 @@
         .header { background: #111; border-bottom: 3px solid #000; box-shadow: 0 5px 0 #000; border-radius: 0 0 22px 22px; }
         .header h1 { font-weight: 900; font-size: 20px; text-shadow: 2px 2px 0 #000; transform: rotate(-2deg); }
         .header h1 span { color: #fff; }
-        .header > div:last-child { background: var(--accent) !important; color: #000 !important; border: 2px solid #000; box-shadow: 2px 2px 0 #000; transform: rotate(3deg); font-weight: 900; }
+        .header > .ss-btn { background: var(--accent) !important; color: #000 !important; border: 2px solid #000; box-shadow: 2px 2px 0 #000; transform: rotate(3deg); font-weight: 900; }
 
         .cat-pill { background: #1a1a1a; color: #ddd; border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-weight: 900; border-radius: 14px; padding: 9px 20px; }
         .cat-pill:nth-child(1) { transform: rotate(-2deg); }
@@ -158,7 +158,7 @@
         .queue-number { color: var(--accent); text-shadow: 3px 3px 0 #000; transform: rotate(-3deg); }
         /* ===== MINIMALIS: hanya huruf yang dikecilkan, stiker & kemiringan tetap ===== */
         .header h1 { font-size: 15px; }
-        .header > div:last-child { font-size: 10px !important; padding: 3px 9px !important; }
+        .header > .ss-btn { font-size: 10px !important; padding: 3px 9px !important; }
         .cat-pill { font-size: 11px; padding: 6px 14px; }
         .menu-title { font-size: 11px; }
         .menu-price { font-size: 11px; }
@@ -184,6 +184,20 @@
         /* ===== FULLSCREEN ===== */
         .fs-btn { width: 30px; height: 30px; border-radius: 8px; background: #1a1a1a; border: 1px solid #2a2a2a; color: #ddd; font-size: 12px; margin-right: 8px; }
         .fs-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* ===== TOMBOL SELF SERVICE = LAYAR PENUH ===== */
+        .ss-btn { font-family: inherit; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 20px; background: var(--accent); color: #000; border: 1px solid #000; box-shadow: 2px 2px 0 #000; transform: rotate(3deg); cursor: pointer; }
+        .ss-btn:active { transform: rotate(3deg) scale(.95); }
+        /* ===== RESET, TAMBAH, DAN SARAN KERANJANG ===== */
+        .cart-reset { margin-left: auto; margin-right: 10px; background: none; border: 1px solid #444; color: #ddd; border-radius: 8px; font-size: 10px; font-weight: 800; padding: 4px 9px; cursor: pointer; }
+        .cart-reset:active { transform: scale(.95); }
+        .cart-more { width: 100%; background: #1a1a1a; color: #fff; border: 2px solid #000; box-shadow: 2px 2px 0 #000; border-radius: 10px; padding: 8px; font-size: 11px; font-weight: 800; margin-bottom: 10px; cursor: pointer; }
+        .suggest { margin-top: 10px; padding-top: 10px; border-top: 2px dashed #333; }
+        .suggest-title { font-size: 11px; font-weight: 900; color: var(--accent); margin-bottom: 8px; transform: rotate(-1deg); }
+        .sug-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 9px; margin-bottom: 6px; background: #1a1a1a; border: 1px solid #000; border-radius: 10px; }
+        .sug-item b { color: #fff; font-size: 11px; font-weight: 800; }
+        .sug-price { color: var(--accent); font-size: 10px; font-weight: 800; }
+        .sug-add { width: 26px; height: 26px; border-radius: 8px; background: var(--primary); color: #fff; border: 2px solid #000; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -191,8 +205,7 @@
     <div class="kiosk-container">
         <div class="header">
             <h1><i class="fa-solid fa-utensils"></i> Kebab <span>Hajar</span></h1>
-            <button class="fs-btn" onclick="toggleFullscreen()" title="Layar penuh"><i class="fa-solid fa-expand"></i></button>
-            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); background: #f0f0f0; padding: 5px 12px; border-radius: 20px;">Self Service</div>
+            <button class="ss-btn" onclick="toggleFullscreen()" title="Layar penuh">Self Service</button>
         </div>
 
         <div class="main-layout">
@@ -212,12 +225,14 @@
             <div class="cart-area" id="cart-area">
                 <div class="cart-header">
                     <h2>Pesanan Anda</h2>
+                    <button class="cart-reset" onclick="resetCart()">Reset</button>
                     <button onclick="toggleCart()" style="display: none; background:none; border:none; font-size: 20px;" id="btn-close-cart-mobile"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="cart-list" id="cart-list">
                     <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 20px;">Belum ada pesanan.</p>
                 </div>
                 <div class="cart-footer">
+                    <button class="cart-more" onclick="toggleCart()">+ Tambah Menu</button>
                     <div class="total-row">
                         <span>Total:</span>
                         <span id="cart-total">Rp 0</span>
@@ -356,6 +371,7 @@
                 }
             });
 
+            if (html !== '') html += buildSuggest();
             if (html === '') html = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 20px;">Belum ada pesanan.</p>`;
             
             list.innerHTML = html;
@@ -366,6 +382,24 @@
         window.toggleFullscreen = () => {
             if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
             else document.exitFullscreen?.();
+        };
+        function buildSuggest() {
+            const cats = new Set();
+            Object.keys(cart).forEach(id => { const it = menuData.find(i => i.id === parseInt(id)); if (it) cats.add(it.category); });
+            if (cats.size !== 1) return '';
+            const only = [...cats][0];
+            const other = only === 'makanan' ? 'minuman' : 'makanan';
+            const picks = menuData.filter(i => i.category === other && i.status !== 'persiapan').slice(0, 3);
+            if (!picks.length) return '';
+            const title = other === 'minuman' ? 'Mau minum juga?' : 'Mau makan juga?';
+            return `<div class="suggest"><div class="suggest-title">${title}</div>` + picks.map(i =>
+                `<div class="sug-item"><div><b>${i.name}</b><div class="sug-price">Rp ${i.price.toLocaleString('id-ID')}</div></div><button class="sug-add" onclick="addToCart(${i.id})">+</button></div>`
+            ).join('') + `</div>`;
+        }
+        window.resetCart = () => {
+            if (Object.keys(cart).length === 0) return;
+            if (!confirm("Kosongkan pesanan?")) return;
+            cart = {}; renderMenu(); renderCart();
         };
         window.toggleCart = () => {
             const cartArea = document.getElementById('cart-area');
