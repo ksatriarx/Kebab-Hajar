@@ -12,7 +12,7 @@ Claude
 
 
 Sw · JS
-const CACHE_NAME = 'kebab-pwa-v15'; // naikkan angka ini setiap kali kamu mengubah file aplikasi
+const CACHE_NAME = 'kebab-pwa-v16'; // naikkan angka ini setiap kali kamu mengubah file aplikasi
 const urlsToCache = [
   './',
   './index.html',
