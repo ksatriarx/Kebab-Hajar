@@ -183,6 +183,26 @@
         .history-detail { font-size: 10px; line-height: 1.4; color: var(--text-main); }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         .animate-bounce { animation: bounce 1s infinite; display: inline-block; }
+        /* ===== KARTU STEMPEL ===== */
+        .stamp-card{background:var(--bg-card);border-radius:var(--radius-lg);padding:12px;margin-bottom:14px;border:1px dashed var(--border)}
+        .stamp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .stamp-title{font-size:11px;font-weight:800}.stamp-sub{font-size:8px;color:var(--text-muted);margin-top:2px}
+        .stamp-count{font-size:12px;font-weight:800;color:var(--accent)}
+        .stamp-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:10px}
+        .stamp-cell{aspect-ratio:1/1;border-radius:50%;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--text-muted)}
+        .stamp-cell.gift{border-color:var(--accent);color:var(--accent);font-size:9px}
+        .stamp-cell.on{background:var(--primary);border:1px solid var(--primary);color:#fff;font-size:8px;font-weight:700}
+        .stamp-cell.new{animation:stampIn .45s cubic-bezier(.2,1.6,.4,1)}
+        @keyframes stampIn{0%{transform:scale(2.4) rotate(-25deg);opacity:0}60%{transform:scale(.85) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+        .stamp-btn{width:100%;border:none;border-radius:var(--radius-sm);padding:9px;font-size:10px;font-weight:800;cursor:pointer;background:var(--primary);color:#fff}
+        .stamp-btn:disabled{background:var(--bg-input);color:var(--text-muted);cursor:default}
+        .stamp-btn.ready{background:var(--accent);color:#000;animation:stampPulse 1.4s infinite}
+        @keyframes stampPulse{0%{box-shadow:0 0 0 0 rgba(255,179,0,.5)}70%{box-shadow:0 0 0 9px rgba(255,179,0,0)}100%{box-shadow:0 0 0 0 rgba(255,179,0,0)}}
+        .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:10010;overflow:hidden}
+        .fx-confetti i{position:absolute;top:-12px;width:7px;height:11px;border-radius:2px;animation:fxFall 1.6s ease-in forwards}
+        @keyframes fxFall{to{transform:translateY(105vh) rotate(720deg)}}
+        @media (prefers-reduced-motion:reduce){.stamp-cell.new,.stamp-btn.ready,.fx-confetti i{animation:none}}
+
     </style>
 </head>
 <body>
@@ -244,6 +264,7 @@
 
         <div class="main">
             <div class="reorder-banner" id="reorder-banner"><div class="reorder-text">Halo <b id="reorder-name">Kak</b>, mau pesan yang sama?</div><button class="btn-reorder" onclick="prosesPesanLagi()">Pesan Lagi</button></div>
+            <div class="stamp-card" id="stamp-card"></div>
             <div class="category-scroll hide-scrollbar">
                 <div class="cat-card active" id="tab-makanan" onclick="switchCategory('makanan')"><img src="https://images.unsplash.com/photo-1561651823-34feb02250e4?q=80&w=100&auto=format&fit=crop" alt="Kebab"><span>Makanan</span></div>
                 <div class="cat-card" id="tab-minuman" onclick="switchCategory('minuman')"><img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=100&auto=format&fit=crop" alt="Minuman"><span>Minuman</span></div>
@@ -394,6 +415,51 @@
         window.masukTamu = () => { localStorage.setItem('kebabGuest', 'true'); isTamu = true; bukaAplikasi("Tamu", "Mode Tamu", "", "Tamu"); };
         window.prosesLogout = () => { showCustomConfirm("Yakin ingin keluar dari akun Anda?", () => { localStorage.removeItem('kebabGuest'); signOut(auth); if(typeof tutupProfil === 'function') tutupProfil(); isTamu = true; authScreen.style.display = 'flex'; appScreen.classList.remove('show'); }); };
 
+                // ===== KARTU STEMPEL & HADIAH (ubah angka di sini bila perlu) =====
+        const STAMP_TARGET = 30, REWARD_NAME = "Telur Sosis", FREE_SHIP_MAX_KM = 5;
+        let stampN = null, klaimList = [], rewardKlaimId = null, unsubStamp = [];
+        function fxConfetti() {
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const w = document.createElement('div'); w.className = 'fx-confetti'; const c = ['#e53935', '#ffb300', '#4caf50', '#ffffff', '#3b82f6'];
+            for (let i = 0; i < 36; i++) { const p = document.createElement('i'); p.style.left = Math.random() * 100 + '%'; p.style.background = c[i % 5]; p.style.animationDelay = Math.random() * .5 + 's'; p.style.animationDuration = (1.2 + Math.random() * .8) + 's'; w.appendChild(p); }
+            document.body.appendChild(w); setTimeout(() => w.remove(), 2800);
+        }
+        function renderStampCard(oldN = null) {
+            const el = document.getElementById('stamp-card'); if (!el) return;
+            const head = (right) => `<div class="stamp-head"><div><div class="stamp-title">Kartu Stempel</div><div class="stamp-sub">Beli ${STAMP_TARGET} kebab, gratis 1 ${REWARD_NAME}</div></div>${right}</div>`;
+            if (isTamu) { el.innerHTML = head('') + `<button class="stamp-btn" onclick="loginGoogle()">Masuk Google untuk mulai mengumpulkan stempel</button>`; return; }
+            const n = stampN || 0, shown = Math.min(n, STAMP_TARGET); let cells = '';
+            for (let i = 1; i <= STAMP_TARGET; i++) { const on = i <= shown, isNew = on && oldN !== null && i > oldN; cells += `<div class="stamp-cell${i === STAMP_TARGET ? ' gift' : ''}${on ? ' on' : ''}${isNew ? ' new' : ''}">${i === STAMP_TARGET ? '<i class="fa-solid fa-gift"></i>' : i}</div>`; }
+            const pending = klaimList.find(k => k.status === 'Menunggu'), ready = klaimList.find(k => k.status === 'Disetujui'); let btn;
+            if (pending) btn = `<button class="stamp-btn" disabled>Menunggu persetujuan toko...</button>`;
+            else if (ready) btn = rewardKlaimId === ready.id ? `<button class="stamp-btn" onclick="pakaiHadiah('')">✓ Hadiah dipakai di pesanan ini (batalkan)</button>` : `<button class="stamp-btn ready" onclick="pakaiHadiah('${ready.id}')">Pakai Hadiah: Gratis ${REWARD_NAME}</button>`;
+            else if (n >= STAMP_TARGET) btn = `<button class="stamp-btn ready" onclick="klaimStempel()">Klaim Hadiah ${REWARD_NAME}</button>`;
+            else btn = `<button class="stamp-btn" disabled>Kurang ${STAMP_TARGET - n} kebab lagi</button>`;
+            el.innerHTML = head(`<div class="stamp-count">${shown}/${STAMP_TARGET}</div>`) + `<div class="stamp-grid">${cells}</div>` + btn;
+        }
+        function mulaiStempel(email) {
+            unsubStamp.forEach(f => f()); unsubStamp = []; stampN = null; klaimList = []; renderStampCard();
+            const key = email.replace(/[^a-zA-Z0-9]/g, "");
+            unsubStamp.push(onSnapshot(doc(db, "saldo_pelanggan", key), (s) => {
+                const old = stampN, n = s.exists() ? (s.data().stempel || 0) : 0; stampN = n;
+                if (old !== null && n > old) { navigator.vibrate?.(60); showToast(`Stempel +${n - old}! Total ${Math.min(n, STAMP_TARGET)}/${STAMP_TARGET}`, "success"); }
+                renderStampCard(old);
+            }, () => {}));
+            unsubStamp.push(onSnapshot(query(collection(db, "klaim_stempel"), where("email", "==", email)), (s) => {
+                const old = klaimList; klaimList = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                klaimList.forEach(k => { const was = old.find(o => o.id === k.id); if (was && was.status === 'Menunggu' && k.status === 'Disetujui') { fxConfetti(); navigator.vibrate?.([80, 40, 80]); showToast("Klaim disetujui! Hadiahmu siap dipakai 🎁", "success"); } if (was && was.status === 'Menunggu' && k.status === 'Ditolak') showToast("Klaim belum disetujui toko.", "error"); });
+                if (rewardKlaimId && !klaimList.some(k => k.id === rewardKlaimId && k.status === 'Disetujui')) rewardKlaimId = null;
+                renderStampCard();
+            }, () => {}));
+        }
+        window.klaimStempel = async () => {
+            if (isTamu || (stampN || 0) < STAMP_TARGET || klaimList.some(k => k.status === 'Menunggu')) return;
+            showLoading();
+            try { await addDoc(collection(db, "klaim_stempel"), { email: auth.currentUser.email, nama: auth.currentUser.displayName || "", status: "Menunggu", stempel: STAMP_TARGET, hadiah: REWARD_NAME, waktu: new Date().toISOString() }); showToast("Klaim terkirim! Menunggu persetujuan toko.", "success"); }
+            catch (e) { showToast("Gagal klaim: " + e.message, "error"); } finally { hideLoading(); }
+        };
+        window.pakaiHadiah = (id) => { rewardKlaimId = id || null; renderStampCard(); showToast(id ? "Hadiah ditambahkan ke pesananmu 🎁" : "Hadiah dibatalkan.", "info"); };
+
         function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
             authScreen.style.display = 'none'; appScreen.classList.add('show'); buyerNameInput.value = namaUser; btnLogout.style.display = 'flex';
             
@@ -413,13 +479,14 @@
                 // ---------------------------------------------------------
 
                 // Panggil FCM setelah 2 detik agar web tidak lag
-                setTimeout(() => { mintaIzinNotifikasi(emailUser); }, 2000); 
+                setTimeout(() => { mintaIzinNotifikasi(emailUser); }, 2000); mulaiStempel(emailUser); 
             } else {
                 isTamu = true;
             }
             
             if (typeof isiDataProfil === 'function') { isiDataProfil(namaUser, emailUser || "Tidak ada email", fotoUser, tipeUser); document.getElementById('prof-type').innerText = tipeUser; }
             cekTombolSaldo(); initApp();
+            if (isTamu) { unsubStamp.forEach(f => f()); unsubStamp = []; stampN = null; klaimList = []; rewardKlaimId = null; renderStampCard(); }
         }
 
         onAuthStateChanged(auth, (user) => {
@@ -516,7 +583,7 @@
                 try {
                     const namaPembeli = document.getElementById('buyer-name').value.trim() || "Pelanggan";
                     const emailPembeli = isTamu ? "Tamu (Tanpa Email)" : auth.currentUser.email;
-                    await addDoc(collection(db, "transaksi_online"), { order_id: orderId, nama: namaPembeli, email: emailPembeli, total_bayar: total, metode: statusText, status: "Menunggu Konfirmasi Toko", waktu: new Date().toISOString(), detail_pesanan: waText, rincian: rincianPesananArray });
+                    await addDoc(collection(db, "transaksi_online"), { order_id: orderId, nama: namaPembeli, email: emailPembeli, total_bayar: total, metode: statusText, status: "Menunggu Konfirmasi Toko", waktu: new Date().toISOString(), detail_pesanan: waText, rincian: rewardKlaimId ? [...rincianPesananArray, { nama: REWARD_NAME + " (Hadiah Stempel)", qty: 1, harga: 0 }] : rincianPesananArray, klaim_id: rewardKlaimId || null }); if (rewardKlaimId) { rewardKlaimId = null; renderStampCard(); }
                 } catch (error) { console.error("Gagal kirim pesanan ke Firebase: ", error); }
             }
 
@@ -622,7 +689,7 @@
             }
 
             function updateVoucherUI() { const vStatus = document.getElementById('voucher-status'); const vInput = document.getElementById('voucher-input'); if (appliedVoucher) { vStatus.className = 'voucher-status success'; vStatus.innerHTML = `✓ Voucher <b>${appliedVoucher.code}</b> Aktif. Diskon: ${appliedVoucher.desc} <span style="cursor:pointer; text-decoration:underline; margin-left:10px;" onclick="removeVoucher()">Hapus</span>`; vInput.value = appliedVoucher.code; vInput.disabled = true; } else { vStatus.className = 'voucher-status'; vStatus.innerHTML = ''; vInput.value = ''; vInput.disabled = false; } }
-            window.applyVoucher = () => { const input = document.getElementById('voucher-input').value.trim().toUpperCase(); const vStatus = document.getElementById('voucher-status'); if (!input) { showToast("Masukkan kode voucher terlebih dahulu.", "info"); return; } let disc = 0; let desc = ""; if (input === 'PROMO10') { let subtotal = 0; Object.keys(cart).forEach(k => { const item = menuData.find(i => i.id === parseInt(k.split('-')[0])); if(item) subtotal += item.price * cart[k]; }); disc = subtotal * 0.10; if (disc > 10000) disc = 10000; desc = "10% (Maks Rp 10.000)"; } else if (input === 'KEBAB5K') { disc = 5000; desc = "Rp 5.000"; } else { vStatus.className = 'voucher-status error'; vStatus.innerText = "❌ Kode voucher tidak valid atau sudah kadaluarsa."; appliedVoucher = null; setTimeout(() => { vStatus.className = 'voucher-status'; vStatus.innerText = ""; }, 3000); return; } appliedVoucher = { code: input, discount: disc, desc: desc }; showToast("Voucher berhasil digunakan!", "success"); updateVoucherUI(); calculateTotal(); }
+            window.applyVoucher = () => { const input = document.getElementById('voucher-input').value.trim().toUpperCase(); const vStatus = document.getElementById('voucher-status'); if (!input) { showToast("Masukkan kode voucher terlebih dahulu.", "info"); return; } let disc = 0; let desc = ""; if (input === 'PROMO10') { let subtotal = 0; Object.keys(cart).forEach(k => { const item = menuData.find(i => i.id === parseInt(k.split('-')[0])); if(item) subtotal += item.price * cart[k]; }); disc = subtotal * 0.10; if (disc > 10000) disc = 10000; desc = "10% (Maks Rp 10.000)"; } else if (input === 'KEBAB5K') { disc = 5000; desc = "Rp 5.000"; } else if (input === 'GRATISONGKIR') { calculateTotal(); if (deliveryMethod !== 'delivery' || !userCoords) { showToast("Gratis ongkir hanya untuk pesanan antar. Pastikan lokasi GPS aktif.", "info"); return; } if (shippingFee <= 0 || distanceKm > FREE_SHIP_MAX_KM) { vStatus.className = 'voucher-status error'; vStatus.innerText = `❌ Gratis ongkir berlaku maks ${FREE_SHIP_MAX_KM} km (jarakmu ${distanceKm.toFixed(1)} km).`; appliedVoucher = null; setTimeout(() => { vStatus.className = 'voucher-status'; vStatus.innerText = ""; }, 3500); return; } disc = shippingFee; desc = `Gratis Ongkir (maks ${FREE_SHIP_MAX_KM} km)`; } else { vStatus.className = 'voucher-status error'; vStatus.innerText = "❌ Kode voucher tidak valid atau sudah kadaluarsa."; appliedVoucher = null; setTimeout(() => { vStatus.className = 'voucher-status'; vStatus.innerText = ""; }, 3000); return; } appliedVoucher = { code: input, discount: disc, desc: desc }; showToast("Voucher berhasil digunakan!", "success"); updateVoucherUI(); calculateTotal(); }
             window.removeVoucher = () => { appliedVoucher = null; updateVoucherUI(); calculateTotal(); showToast("Voucher dihapus.", "info"); }
             window.hapusItem = (cartKey) => { delete cart[cartKey]; localStorage.setItem('kebabCart', JSON.stringify(cart)); renderMenu(); calculateTotal(); renderCartModal(); const totals = calculateTotal(); if (totals.itemCount === 0) { closeCartModal(); if(appliedVoucher) removeVoucher(); } }
             window.prosesResetCart = () => { closeCartModal(); setTimeout(() => { showCustomConfirm("Yakin ingin mengosongkan keranjang belanja Anda?", () => { cart = {}; appliedVoucher = null; localStorage.setItem('kebabCart', JSON.stringify(cart)); renderMenu(); calculateTotal(); showToast("Keranjang telah dikosongkan.", "success"); }); }, 300); }
@@ -634,7 +701,7 @@
                 let subtotal = 0, itemCount = 0;
                 Object.keys(cart).forEach(cartKey => { const qty = cart[cartKey]; const parts = cartKey.split('-'); const itemId = parseInt(parts[0]); const item = menuData.find(i => i.id === itemId); if (item) { subtotal += qty * item.price; itemCount += qty; } });
                 if (deliveryMethod === 'delivery' && userCoords) { const R = 6371; const dLat = (userCoords.lat - STORE_LAT) * Math.PI / 180; const dLon = (userCoords.lon - STORE_LON) * Math.PI / 180; const a = Math.sin(dLat/2)**2 + Math.cos(STORE_LAT*Math.PI/180) * Math.cos(userCoords.lat*Math.PI/180) * Math.sin(dLon/2)**2; distanceKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); if (distanceKm > MAX_DELIVERY_KM) { shippingFee = -1; } else { shippingFee = 15000; for (const rate of SHIPPING_RATES) { if (distanceKm <= rate.maxKm) { shippingFee = rate.fee; break; } } } }
-                let potongan = 0; if (appliedVoucher) { if (appliedVoucher.code === 'PROMO10') { potongan = subtotal * 0.10; if (potongan > 10000) potongan = 10000; } else if (appliedVoucher.code === 'KEBAB5K') { potongan = 5000; } if (potongan > subtotal) potongan = subtotal; }
+                let potongan = 0; if (appliedVoucher) { if (appliedVoucher.code === 'PROMO10') { potongan = subtotal * 0.10; if (potongan > 10000) potongan = 10000; } else if (appliedVoucher.code === 'KEBAB5K') { potongan = 5000; } else if (appliedVoucher.code === 'GRATISONGKIR') { potongan = (deliveryMethod === 'delivery' && userCoords && shippingFee > 0 && distanceKm <= FREE_SHIP_MAX_KM) ? shippingFee : 0; } if (appliedVoucher.code !== 'GRATISONGKIR' && potongan > subtotal) potongan = subtotal; }
                 const total = (subtotal - potongan) + (shippingFee > 0 ? shippingFee : 0);
                 const cartBar = document.getElementById('cart-bar');
                 if (itemCount > 0) { cartBar.classList.add('show'); document.getElementById('cart-count').innerText = `${itemCount} Item`; document.getElementById('cart-total').innerText = `Rp ${total.toLocaleString('id-ID')}`; } else { cartBar.classList.remove('show'); }
@@ -669,7 +736,7 @@
                     const notes = document.getElementById('order-notes').value.trim(); const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) }; localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
                     let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`; txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n💳 Pembayaran: *${statusPembayaran}*\n--------------------------------\n`;
                     Object.keys(cart).forEach(cartKey => { const qty = cart[cartKey]; if (qty > 0) { const parts = cartKey.split('-'); const itemId = parseInt(parts[0]); const variant = parts[1] ? ` (${parts[1]})` : ''; const item = menuData.find(i => i.id === itemId); if (item) { txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`; } } });
-                    txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`; if (totals.potongan > 0) { txt += `Diskon Voucher (${appliedVoucher.code}): -Rp ${totals.potongan.toLocaleString('id-ID')}\n`; } if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`; else txt += `Ongkir: GRATIS\n`; txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`; if (notes) txt += `📝 Catatan: ${notes}\n\n`; txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
+                    txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`; if (totals.potongan > 0) { txt += `Diskon Voucher (${appliedVoucher.code}): -Rp ${totals.potongan.toLocaleString('id-ID')}\n`; } if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`; else txt += `Ongkir: GRATIS\n`; txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`; if (notes) txt += `📝 Catatan: ${notes}\n\n`; txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`; if (rewardKlaimId) txt += "\n\n🎁 HADIAH STEMPEL: GRATIS 1 " + REWARD_NAME + " (sudah disetujui toko)";
                     let rincianArray = []; Object.keys(cart).forEach(cartKey => { const qty = cart[cartKey]; if (qty > 0) { const parts = cartKey.split('-'); const itemId = parseInt(parts[0]); const item = menuData.find(i => i.id === itemId); if(item) rincianArray.push({ nama: item.name, qty: qty, harga: item.price }); } });
                     await simpanRiwayatPesanan('KEBAB-SALDO-' + Date.now(), totals.total, txt, statusRiwayat, rincianArray);
                     cart = {}; appliedVoucher = null; localStorage.removeItem('kebabCart'); renderMenu(); calculateTotal(); closeConfirmModal(); closeCartModal(); hideLoading();
@@ -681,7 +748,7 @@
                 closeConfirmModal(); const name = document.getElementById('buyer-name').value.trim(); const notes = document.getElementById('order-notes').value.trim(); const totals = calculateTotal(); const orderHistory = { nama: name, notes: notes, metode: deliveryMethod, cart: JSON.parse(JSON.stringify(cart)) }; localStorage.setItem('kebabLastOrder', JSON.stringify(orderHistory));
                 let txt = `*PESANAN ${STORE_NAME.toUpperCase()}*\n--------------------------------\n`; txt += `👤 Nama: ${name}\n🛍️ Metode: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : 'Diantar'}\n💳 Pembayaran: *Transfer Manual / Bayar di Tempat*\n--------------------------------\n`;
                 Object.keys(cart).forEach(cartKey => { const qty = cart[cartKey]; if (qty > 0) { const parts = cartKey.split('-'); const itemId = parseInt(parts[0]); const variant = parts[1] ? ` (${parts[1]})` : ''; const item = menuData.find(i => i.id === itemId); if (item) { txt += `▪ ${item.name}${variant} (${qty}x) = Rp ${(item.price*qty).toLocaleString('id-ID')}\n`; } } });
-                txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`; if (totals.potongan > 0) { txt += `Diskon Voucher (${appliedVoucher.code}): -Rp ${totals.potongan.toLocaleString('id-ID')}\n`; } if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`; else txt += `Ongkir: GRATIS\n`; txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`; if (notes) txt += `📝 Catatan: ${notes}\n\n`; txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`;
+                txt += `--------------------------------\nSubtotal: Rp ${totals.subtotal.toLocaleString('id-ID')}\n`; if (totals.potongan > 0) { txt += `Diskon Voucher (${appliedVoucher.code}): -Rp ${totals.potongan.toLocaleString('id-ID')}\n`; } if (deliveryMethod === 'delivery') txt += `Ongkir (${distanceKm.toFixed(1)} km): Rp ${shippingFee.toLocaleString('id-ID')}\n`; else txt += `Ongkir: GRATIS\n`; txt += `*Total: Rp ${totals.total.toLocaleString('id-ID')}*\n\n`; if (notes) txt += `📝 Catatan: ${notes}\n\n`; txt += `📍 Lokasi: ${deliveryMethod === 'pickup' ? 'Ambil di Toko' : userLocation}`; if (rewardKlaimId) txt += "\n\n🎁 HADIAH STEMPEL: GRATIS 1 " + REWARD_NAME + " (sudah disetujui toko)";
                 let rincianArray = []; Object.keys(cart).forEach(cartKey => { const qty = cart[cartKey]; if (qty > 0) { const parts = cartKey.split('-'); const itemId = parseInt(parts[0]); const item = menuData.find(i => i.id === itemId); if(item) rincianArray.push({ nama: item.name, qty: qty, harga: item.price }); } });
                 await simpanRiwayatPesanan('KEBAB-MANUAL-' + Date.now(), totals.total, txt, "Menunggu Pembayaran/Konfirmasi", rincianArray);
                 cart = {}; appliedVoucher = null; localStorage.removeItem('kebabCart'); renderMenu(); calculateTotal(); const waUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(txt)}`; showWaFallback(txt, waUrl);
