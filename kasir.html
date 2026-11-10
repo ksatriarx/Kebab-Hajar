@@ -323,6 +323,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
             <button class="rx-item" id="btn-printer" onclick="tapPrinter()"><i class="fa-solid fa-print"></i> Printer Struk</button>
             <button class="rx-item" onclick="bukaRingkasan()"><i class="fa-solid fa-chart-column"></i> Ringkasan Hari Ini</button>
             <button class="rx-item" onclick="toggleFullscreen()"><i class="fa-solid fa-expand"></i> Layar Penuh</button>
+            <button class="rx-item" id="btn-klaim" onclick="bukaKlaim()" style="display:none"><i class="fa-solid fa-stamp"></i> Klaim Stempel <span id="badge-klaim" class="badge">0</span></button>
             <a href="pengaturan-toko.html" id="btn-settings-admin" class="rx-item" style="display:none"><i class="fa-solid fa-gear"></i> Pengaturan Toko</a>
             <button class="rx-item rx-danger" onclick="prosesLogout()"><i class="fa-solid fa-right-from-bracket"></i> Tutup Sesi</button>
           </div>
@@ -452,12 +453,18 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
   <div class="sum-foot"><button onclick="bukaRiwayat()"><i class="fa-solid fa-print"></i> Riwayat &amp; Cetak Ulang</button></div>
 </div>
 
+<div class="ov" id="kl-ov" onclick="tutupKlaim()"></div>
+<div class="sum-win" id="kl-win">
+  <div class="phead"><h3>Klaim Stempel</h3><button class="psz" onclick="tutupKlaim()"><i class="fa-solid fa-xmark"></i></button></div>
+  <div id="kl-body" class="sum-body"></div>
+</div>
+
 <div class="struk" id="struk-print"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, getDocs, getDoc, where, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
 const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
@@ -507,9 +514,10 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('header-email').innerText = user.email;
     const isOwner = user.email === ALLOWED_EMAIL;
     document.getElementById('btn-settings-admin').style.display = isOwner ? 'flex' : 'none';
+    document.getElementById('btn-klaim').style.display = isOwner ? 'flex' : 'none';
     if (!started) {
       started = true;
-      loadMenuOffline(); listenOnlineOrders(); listenBackground();
+      loadMenuOffline(); listenOnlineOrders(); listenBackground(); if (isOwner) listenKlaim();
     }
     loadShift().catch(e => console.error("Shift:", e));
   } else {
@@ -582,8 +590,63 @@ function listenOnlineOrders() {
   });
 }
 
+// ===== STEMPEL: ditambah otomatis saat pesanan "Selesai" (aman dari dobel hitung) =====
+const STAMP_KEYWORDS = ['kebab']; // item yang namanya mengandung kata ini dihitung 1 stempel per porsi
+const hitungStempel = (r) => (r || []).reduce((n, i) => STAMP_KEYWORDS.some(k => String(i.nama || '').toLowerCase().includes(k)) ? n + (Number(i.qty) || 0) : n, 0);
+async function prosesSelesai(docId) {
+  try {
+    await runTransaction(db, async (tx) => {
+      const oRef = doc(db, "transaksi_online", docId), oSnap = await tx.get(oRef);
+      if (!oSnap.exists()) return; const o = oSnap.data();
+      if (o.status !== 'Selesai' || o.stempel_diproses) return;
+      const email = String(o.email || ''), valid = email.includes('@');
+      let cRef = null, cSnap = null, kSnap = null, kRef = null;
+      if (valid) { cRef = doc(db, "saldo_pelanggan", email.replace(/[^a-zA-Z0-9]/g, "")); cSnap = await tx.get(cRef); }
+      if (o.klaim_id) { kRef = doc(db, "klaim_stempel", String(o.klaim_id)); kSnap = await tx.get(kRef); }
+      const n = valid ? hitungStempel(o.rincian) : 0;
+      if (n > 0 && cSnap && cSnap.exists()) tx.update(cRef, { stempel: (cSnap.data().stempel || 0) + n });
+      if (kSnap && kSnap.exists() && kSnap.data().email === email && kSnap.data().status === 'Disetujui') tx.update(kRef, { status: 'Dipakai', order_id: o.order_id || docId, waktu_pakai: new Date().toISOString() });
+      tx.update(oRef, { stempel_diproses: true, stempel_didapat: n });
+    });
+  } catch (e) { console.error("Stempel gagal:", e); }
+}
+
+// ===== KLAIM STEMPEL (hanya Owner) =====
+const STAMP_TARGET = 30;
+let klaimMenunggu = [];
+function listenKlaim() {
+  onSnapshot(query(collection(db, "klaim_stempel"), where("status", "==", "Menunggu")), s => {
+    klaimMenunggu = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    const b = document.getElementById('badge-klaim'); b.innerText = klaimMenunggu.length; b.classList.toggle('show', klaimMenunggu.length > 0);
+    renderKlaim();
+  }, e => console.error("Klaim:", e));
+}
+function renderKlaim() {
+  document.getElementById('kl-body').innerHTML = klaimMenunggu.length ? klaimMenunggu.map(k => `<div class="sum-top"><b>${esc(k.nama || '-')}</b><div class="omail">${esc(k.email)}</div><div class="sum-row"><span>Hadiah</span><em>${esc(k.hadiah || '')}</em></div><div class="pact"><button class="pcancel" onclick="tolakKlaim('${esc(k.id)}')">Tolak</button><button class="pconfirm" onclick="setujuiKlaim('${esc(k.id)}')">Setujui</button></div></div>`).join('') : `<div class="empty"><i class="fa-solid fa-stamp"></i>Belum ada klaim menunggu.</div>`;
+}
+window.bukaKlaim = () => { document.getElementById('rx-menu').classList.remove('open'); renderKlaim(); document.getElementById('kl-ov').classList.add('show'); document.getElementById('kl-win').classList.add('open'); };
+window.tutupKlaim = () => { document.getElementById('kl-ov').classList.remove('show'); document.getElementById('kl-win').classList.remove('open'); };
+window.setujuiKlaim = async (id) => {
+  try {
+    await runTransaction(db, async (tx) => {
+      const kRef = doc(db, "klaim_stempel", id), k = await tx.get(kRef);
+      if (!k.exists() || k.data().status !== 'Menunggu') throw new Error("Klaim sudah diproses.");
+      const cRef = doc(db, "saldo_pelanggan", String(k.data().email).replace(/[^a-zA-Z0-9]/g, "")), c = await tx.get(cRef);
+      const n = c.exists() ? (c.data().stempel || 0) : 0;
+      if (n < STAMP_TARGET) throw new Error("Stempel pelanggan belum cukup.");
+      tx.update(cRef, { stempel: n - STAMP_TARGET });
+      tx.update(kRef, { status: 'Disetujui', disetujui_oleh: auth.currentUser.email, waktu_setuju: new Date().toISOString() });
+    });
+  } catch (e) { alert("Gagal: " + e.message); }
+};
+window.tolakKlaim = async (id) => {
+  if (!confirm("Tolak klaim ini?")) return;
+  try { await updateDoc(doc(db, "klaim_stempel", id), { status: 'Ditolak', ditolak_oleh: auth.currentUser.email }); }
+  catch (e) { alert("Gagal: " + e.message); }
+};
+
 window.updateStatusOnline = async (docId, newStatus) => {
-  try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); }
+  try { await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); if (newStatus === 'Selesai') await prosesSelesai(docId); }
   catch (e) { alert("Gagal: " + e.message); }
 };
 
