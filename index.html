@@ -679,7 +679,7 @@
                         actionButton = totalQty === 0 ? `<button class="btn-add" onclick="updateQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>` : `<div class="qty-wrap"><button class="qty-btn" onclick="updateQty('${item.id}', -1)"><i class="fa-solid fa-minus"></i></button><span class="qty-num">${totalQty}</span><button class="qty-btn" onclick="updateQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button></div>`;
                     }
 
-                    return `<div class="menu-card">${item.badge ? `<span class="menu-badge">${item.badge}</span>` : ''}<img src="${imgUrl}" class="menu-img" loading="lazy" alt="${item.name}"><div class="menu-title">${item.name}</div><div class="menu-type">${item.type}</div><div class="menu-bottom"><span class="menu-price">Rp${(item.price/1000)}k</span>${actionButton}</div></div>`;
+                    return `<div class="menu-card">${(item.label || item.badge) ? `<span class="menu-badge">${String(item.label || item.badge).trim().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</span>` : ''}<img src="${imgUrl}" class="menu-img" loading="lazy" alt="${item.name}"><div class="menu-title">${item.name}</div><div class="menu-type">${item.type}</div><div class="menu-bottom"><span class="menu-price">Rp${(item.price/1000)}k</span>${actionButton}</div></div>`;
                 }).join('');
             }
 
