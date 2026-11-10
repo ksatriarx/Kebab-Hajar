@@ -1,24 +1,10 @@
-Claude
-
-
-
-
-
-
-
-
-
-
-
-
-Sw · JS
 const CACHE_NAME = 'kebab-pwa-v16'; // naikkan angka ini setiap kali kamu mengubah file aplikasi
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
- 
+
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -26,7 +12,7 @@ self.addEventListener('install', event => {
       .then(cache => cache.addAll(urlsToCache))
   );
 });
- 
+
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -41,7 +27,7 @@ self.addEventListener('activate', event => {
   );
   self.clients.claim();
 });
- 
+
 // Jaringan dulu supaya pelanggan selalu dapat versi terbaru; cache hanya cadangan saat offline.
 self.addEventListener('fetch', event => {
   const req = event.request;
@@ -58,5 +44,3 @@ self.addEventListener('fetch', event => {
       .catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
   );
 });
- 
-Claude selesai menulis balasan
