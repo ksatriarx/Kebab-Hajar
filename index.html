@@ -184,14 +184,14 @@
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         .animate-bounce { animation: bounce 1s infinite; display: inline-block; }
         /* ===== KARTU STEMPEL ===== */
-        .stamp-card{background:var(--bg-card);border-radius:var(--radius-lg);padding:12px;margin-bottom:14px;border:1px dashed var(--border)}
+        .stamp-card{background:var(--bg-input);border-radius:var(--radius-lg);padding:14px;border:1px dashed var(--border)}
         .stamp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
         .stamp-title{font-size:11px;font-weight:800}.stamp-sub{font-size:8px;color:var(--text-muted);margin-top:2px}
         .stamp-count{font-size:12px;font-weight:800;color:var(--accent)}
-        .stamp-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:10px}
-        .stamp-cell{aspect-ratio:1/1;border-radius:50%;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--text-muted)}
-        .stamp-cell.gift{border-color:var(--accent);color:var(--accent);font-size:9px}
-        .stamp-cell.on{background:var(--primary);border:1px solid var(--primary);color:#fff;font-size:8px;font-weight:700}
+        .stamp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-width:300px;margin:0 auto 12px}
+        .stamp-cell{aspect-ratio:1/1;border-radius:50%;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted)}
+        .stamp-cell.gift{border-color:var(--accent);color:var(--accent);font-size:16px}
+        .stamp-cell.on{background:var(--primary);border:1px solid var(--primary);color:#fff;font-size:11px;font-weight:700}
         .stamp-cell.new{animation:stampIn .45s cubic-bezier(.2,1.6,.4,1)}
         @keyframes stampIn{0%{transform:scale(2.4) rotate(-25deg);opacity:0}60%{transform:scale(.85) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
         .stamp-btn{width:100%;border:none;border-radius:var(--radius-sm);padding:9px;font-size:10px;font-weight:800;cursor:pointer;background:var(--primary);color:#fff}
@@ -264,7 +264,6 @@
 
         <div class="main">
             <div class="reorder-banner" id="reorder-banner"><div class="reorder-text">Halo <b id="reorder-name">Kak</b>, mau pesan yang sama?</div><button class="btn-reorder" onclick="prosesPesanLagi()">Pesan Lagi</button></div>
-            <div class="stamp-card" id="stamp-card"></div>
             <div class="category-scroll hide-scrollbar">
                 <div class="cat-card active" id="tab-makanan" onclick="switchCategory('makanan')"><img src="https://images.unsplash.com/photo-1561651823-34feb02250e4?q=80&w=100&auto=format&fit=crop" alt="Kebab"><span>Makanan</span></div>
                 <div class="cat-card" id="tab-minuman" onclick="switchCategory('minuman')"><img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=100&auto=format&fit=crop" alt="Minuman"><span>Minuman</span></div>
@@ -347,6 +346,15 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="stamp-modal" onclick="if(event.target===this) closeStampModal()">
+        <div class="modal-box">
+            <div class="modal-handle"></div>
+            <h3 class="modal-title">Kartu Stempel</h3>
+            <div class="cart-list"><div class="stamp-card" id="stamp-card"></div></div>
+            <button onclick="closeStampModal()" style="width:100%; background:transparent; border:none; color:var(--text-muted); padding:10px; font-size:10px; font-weight:700; cursor:pointer;">Tutup</button>
+        </div>
+    </div>
+
     <button class="profile-toggle-btn" onclick="bukaProfil()"><i class="fa-solid fa-user"></i></button>
     <div class="profile-overlay" id="profile-overlay" onclick="tutupProfil()"></div>
     <div class="profile-sidebar" id="profile-sidebar">
@@ -360,6 +368,7 @@
             <div class="wallet-card" style="display: none;"><div class="wallet-info"><span class="wallet-label">Saldo Anda</span><span class="wallet-balance" id="prof-saldo">Rp 0</span></div><button class="btn-topup" onclick="simulasiTopUp()"><i class="fa-solid fa-plus"></i> Top Up</button></div>
             <div class="detail-item"><label>Status Akun</label><div class="value" id="prof-type">-</div></div>
             <button onclick="openHistoryModal()" style="margin-top: 15px; width: 100%; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Pesanan</button>
+            <button onclick="openStampModal()" style="width: 100%; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;"><i class="fa-solid fa-stamp"></i> Kartu Stempel <span id="stamp-mini" style="font-size: 10px; font-weight: 800;"></span></button>
         </div>
         <button class="btn-logout-sidebar" id="btn-logout-sidebar"><i class="fa-solid fa-right-from-bracket"></i> Keluar Akun</button>
     </div>
@@ -417,7 +426,7 @@
 
                 // ===== KARTU STEMPEL & HADIAH (ubah angka di sini bila perlu) =====
         const STAMP_TARGET = 30, REWARD_NAME = "Telur Sosis", FREE_SHIP_MAX_KM = 5;
-        let stampN = null, klaimList = [], rewardKlaimId = null, unsubStamp = [];
+        let stampSeen = null, stampN = null, klaimList = [], rewardKlaimId = null, unsubStamp = [];
         function fxConfetti() {
             if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             const w = document.createElement('div'); w.className = 'fx-confetti'; const c = ['#e53935', '#ffb300', '#4caf50', '#ffffff', '#3b82f6'];
@@ -425,6 +434,8 @@
             document.body.appendChild(w); setTimeout(() => w.remove(), 2800);
         }
         function renderStampCard(oldN = null) {
+            const mini = document.getElementById('stamp-mini');
+            if (mini) { const nn = Math.min(stampN || 0, STAMP_TARGET); mini.style.color = 'var(--accent)'; mini.innerText = isTamu ? '' : (klaimList.some(k => k.status === 'Disetujui') ? '🎁 Siap' : (nn >= STAMP_TARGET ? 'Klaim!' : nn + '/' + STAMP_TARGET)); }
             const el = document.getElementById('stamp-card'); if (!el) return;
             const head = (right) => `<div class="stamp-head"><div><div class="stamp-title">Kartu Stempel</div><div class="stamp-sub">Beli ${STAMP_TARGET} kebab, gratis 1 ${REWARD_NAME}</div></div>${right}</div>`;
             if (isTamu) { el.innerHTML = head('') + `<button class="stamp-btn" onclick="loginGoogle()">Masuk Google untuk mulai mengumpulkan stempel</button>`; return; }
@@ -458,7 +469,13 @@
             try { await addDoc(collection(db, "klaim_stempel"), { email: auth.currentUser.email, nama: auth.currentUser.displayName || "", status: "Menunggu", stempel: STAMP_TARGET, hadiah: REWARD_NAME, waktu: new Date().toISOString() }); showToast("Klaim terkirim! Menunggu persetujuan toko.", "success"); }
             catch (e) { showToast("Gagal klaim: " + e.message, "error"); } finally { hideLoading(); }
         };
-        window.pakaiHadiah = (id) => { rewardKlaimId = id || null; renderStampCard(); showToast(id ? "Hadiah ditambahkan ke pesananmu 🎁" : "Hadiah dibatalkan.", "info"); };
+        window.openStampModal = () => {
+            if (typeof tutupProfil === 'function') tutupProfil();
+            renderStampCard(stampSeen); stampSeen = stampN || 0;
+            document.getElementById('stamp-modal').classList.add('show');
+        };
+        window.closeStampModal = () => { document.getElementById('stamp-modal').classList.remove('show'); };
+        window.pakaiHadiah = (id) => { rewardKlaimId = id || null; renderStampCard(); if (id) closeStampModal(); showToast(id ? "Hadiah ditambahkan ke pesananmu 🎁" : "Hadiah dibatalkan.", "info"); };
 
         function bukaAplikasi(namaUser, emailUser = "", fotoUser = "", tipeUser = "Tamu") {
             authScreen.style.display = 'none'; appScreen.classList.add('show'); buyerNameInput.value = namaUser; btnLogout.style.display = 'flex';
