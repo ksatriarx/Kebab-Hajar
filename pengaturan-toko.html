@@ -323,7 +323,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc, getDocs, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
@@ -463,10 +463,31 @@
             } catch (error) { console.log("Gagal kirim notif:", error); }
         }
 
-        window.updateStatusPesanan = async (docId, newStatus, emailPembeli) => { 
+        // ===== STEMPEL: ditambah otomatis saat pesanan "Selesai" (aman dari dobel hitung) =====
+const STAMP_KEYWORDS = ['kebab']; // item yang namanya mengandung kata ini dihitung 1 stempel per porsi
+const hitungStempel = (r) => (r || []).reduce((n, i) => STAMP_KEYWORDS.some(k => String(i.nama || '').toLowerCase().includes(k)) ? n + (Number(i.qty) || 0) : n, 0);
+async function prosesSelesai(docId) {
+  try {
+    await runTransaction(db, async (tx) => {
+      const oRef = doc(db, "transaksi_online", docId), oSnap = await tx.get(oRef);
+      if (!oSnap.exists()) return; const o = oSnap.data();
+      if (o.status !== 'Selesai' || o.stempel_diproses) return;
+      const email = String(o.email || ''), valid = email.includes('@');
+      let cRef = null, cSnap = null, kSnap = null, kRef = null;
+      if (valid) { cRef = doc(db, "saldo_pelanggan", email.replace(/[^a-zA-Z0-9]/g, "")); cSnap = await tx.get(cRef); }
+      if (o.klaim_id) { kRef = doc(db, "klaim_stempel", String(o.klaim_id)); kSnap = await tx.get(kRef); }
+      const n = valid ? hitungStempel(o.rincian) : 0;
+      if (n > 0 && cSnap && cSnap.exists()) tx.update(cRef, { stempel: (cSnap.data().stempel || 0) + n });
+      if (kSnap && kSnap.exists() && kSnap.data().email === email && kSnap.data().status === 'Disetujui') tx.update(kRef, { status: 'Dipakai', order_id: o.order_id || docId, waktu_pakai: new Date().toISOString() });
+      tx.update(oRef, { stempel_diproses: true, stempel_didapat: n });
+    });
+  } catch (e) { console.error("Stempel gagal:", e); }
+}
+
+window.updateStatusPesanan = async (docId, newStatus, emailPembeli) => { 
             try { 
                 await updateDoc(doc(db, "transaksi_online", docId), { status: newStatus }); 
-                kirimNotifKePelanggan(emailPembeli, newStatus);
+                kirimNotifKePelanggan(emailPembeli, newStatus); if (newStatus === 'Selesai') prosesSelesai(docId);
             } catch (error) { alert("Gagal: " + error.message); } 
         }
 
