@@ -317,13 +317,38 @@
                     <button class="btn-primary" id="btn-save" onclick="simpanPengaturan()" disabled style="width:100%; justify-content:center; margin-top:20px;"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
                 </div>
             </div>
+            <div class="card-panel" style="margin-top:22px;">
+                <div class="card-header" style="margin-bottom:15px;"><h3><i class="fa-solid fa-basket-shopping"></i> Belanja & Pengeluaran Harian</h3></div>
+                <p style="font-size:12px;color:var(--text-muted);margin:-5px 0 18px;">Catat setiap belanja bahan dan biaya usaha. Isi jumlah, satuan, serta harga per satuan agar total pengeluaran dihitung otomatis.</p>
+                <div class="stats-grid" style="margin-bottom:18px;">
+                    <div class="stat-card"><div class="stat-details"><h4>Omzet Hari Dipilih</h4><h2 id="belanja-omzet">Rp 0</h2></div></div>
+                    <div class="stat-card"><div class="stat-details"><h4>Total Belanja / Pengeluaran</h4><h2 id="belanja-total" style="color:var(--primary);">Rp 0</h2></div></div>
+                    <div class="stat-card"><div class="stat-details"><h4>Sisa Setelah Belanja (Estimasi)</h4><h2 id="belanja-sisa" style="color:var(--success);">Rp 0</h2></div></div>
+                </div>
+                <div style="background:var(--bg-body);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:18px;">
+                    <h4 style="font-size:14px;font-weight:800;margin-bottom:12px;">Tambah Catatan Belanja</h4>
+                    <div class="form-group"><label class="form-label">Nama bahan / keperluan</label><input class="form-input" id="expense-name" list="expense-items" placeholder="Contoh: Tortila"><datalist id="expense-items"><option value="Tortila"><option value="Timun"><option value="Selada"><option value="Saus Sasa"><option value="Saus Extra Pedas"><option value="Mayones"><option value="Abon"><option value="Sosis"><option value="Daging Kebab"><option value="Daging Burger"><option value="Mentega"><option value="Roti Burger"><option value="Lapisan Burger"><option value="Kotak Burger"></datalist></div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
+                        <div class="form-group"><label class="form-label">Jumlah</label><input class="form-input" type="number" id="expense-qty" min="0.01" step="0.01" placeholder="Contoh: 2" oninput="hitungTotalBelanja()"></div>
+                        <div class="form-group"><label class="form-label">Satuan</label><select class="form-input" id="expense-unit"><option value="kg">Kilogram (kg)</option><option value="gram">Gram (g)</option><option value="pcs">Piece / buah (pcs)</option><option value="pack">Pack</option><option value="botol">Botol</option><option value="liter">Liter</option><option value="lembar">Lembar</option><option value="ikat">Ikat</option></select></div>
+                        <div class="form-group"><label class="form-label">Harga per satuan (Rp)</label><input class="form-input" type="number" id="expense-price" min="0" step="1" placeholder="Contoh: 25000" oninput="hitungTotalBelanja()"></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;"><span style="font-size:13px;color:var(--text-muted);font-weight:700;">Total pengeluaran</span><strong id="expense-total-preview" style="font-size:20px;color:var(--primary);">Rp 0</strong></div>
+                    <div class="form-group"><label class="form-label">Tanggal belanja</label><input class="form-input" type="date" id="expense-date"></div>
+                    <div class="form-group"><label class="form-label">Catatan (opsional)</label><input class="form-input" id="expense-note" placeholder="Contoh: beli di pasar / nama toko"></div>
+                    <button class="btn-primary" id="btn-save-expense" onclick="simpanBelanja()" style="width:100%;justify-content:center;"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengeluaran</button>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;"><h4 style="font-size:14px;font-weight:800;">Riwayat Belanja</h4><input class="form-input" type="date" id="expense-filter-date" style="max-width:190px;" onchange="muatBelanja()"></div>
+                <div class="table-responsive"><table class="data-table"><thead><tr><th>Bahan / Keperluan</th><th>Jumlah</th><th>Harga Satuan</th><th>Total</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody id="expense-history"><tr><td colspan="6" style="text-align:center;">Pilih tanggal untuk melihat belanja.</td></tr></tbody></table></div>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:12px;line-height:1.6;">Catatan: “Sisa setelah belanja” adalah omzet dikurangi belanja/pengeluaran yang dicatat pada tanggal tersebut. Ini belum tentu laba bersih akuntansi, karena bahan yang dibeli bisa masih menjadi stok dan belum seluruhnya terpakai. Catat juga biaya lain seperti gas, listrik, transportasi, dan kemasan agar estimasinya lebih lengkap.</p>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc, getDocs, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, updateDoc, deleteDoc, getDocs, getDoc, runTransaction, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
@@ -343,7 +368,7 @@
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === ALLOWED_EMAIL) {
                 document.getElementById('admin-email').innerText = user.email;
-                loadStatus(); loadPesanan(); loadMenuAdmin(); loadPelanggan(); initChart();
+                loadStatus(); loadPesanan(); loadMenuAdmin(); loadPelanggan(); initChart(); initBelanja();
             } else { alert("Akses Ditolak."); window.location.href = 'index.html'; }
         });
 
@@ -663,6 +688,30 @@ window.updateStatusPesanan = async (docId, newStatus, emailPembeli) => {
             byMenu.forEach(item=>{ html += `<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);font-size:11px;"><span>${item.nama} · Rp ${item.harga.toLocaleString('id-ID')} · ${item.qty} porsi</span><b>Rp ${item.pendapatan.toLocaleString('id-ID')}</b></div>`; });
             listMenu.innerHTML = html;
         }
+
+        const rupiah = v => 'Rp ' + (Number(v)||0).toLocaleString('id-ID');
+        const tanggalHariIni = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+        window.hitungTotalBelanja = () => { const q=Number(document.getElementById('expense-qty').value)||0; const p=Number(document.getElementById('expense-price').value)||0; document.getElementById('expense-total-preview').innerText=rupiah(Math.round(q*p)); };
+        window.simpanBelanja = async () => {
+            const nama=document.getElementById('expense-name').value.trim(); const qty=Number(document.getElementById('expense-qty').value); const unit=document.getElementById('expense-unit').value; const harga=Number(document.getElementById('expense-price').value); const tanggal=document.getElementById('expense-date').value; const catatan=document.getElementById('expense-note').value.trim();
+            if(!nama || !(qty>0) || !(harga>=0) || !tanggal){ alert('Lengkapi nama, jumlah, harga satuan, dan tanggal belanja.'); return; }
+            const btn=document.getElementById('btn-save-expense'); btn.disabled=true;
+            try { await addDoc(collection(db,'pengeluaran_bahan'),{nama,qty,unit,hargaSatuan:harga,total:Math.round(qty*harga),tanggal,catatan,dibuatPada:new Date().toISOString(),dibuatOleh:auth.currentUser?.email||''}); document.getElementById('expense-name').value=''; document.getElementById('expense-qty').value=''; document.getElementById('expense-price').value=''; document.getElementById('expense-note').value=''; hitungTotalBelanja(); document.getElementById('expense-filter-date').value=tanggal; await muatBelanja(); alert('Belanja berhasil disimpan.'); }
+            catch(e){ alert('Gagal menyimpan belanja: '+e.message); } finally { btn.disabled=false; }
+        };
+        window.hapusBelanja = async id => { if(!confirm('Hapus catatan pengeluaran ini?')) return; try { await deleteDoc(doc(db,'pengeluaran_bahan',id)); await muatBelanja(); } catch(e){ alert('Gagal menghapus: '+e.message); } };
+        window.muatBelanja = async () => {
+            const tanggal=document.getElementById('expense-filter-date').value||tanggalHariIni(); const tbody=document.getElementById('expense-history'); tbody.innerHTML='<tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>';
+            try {
+                const [snapPengeluaran, semuaTransaksi]=await Promise.all([getDocs(collection(db,'pengeluaran_bahan')),ambilSemuaTransaksi()]);
+                const daftar=[]; snapPengeluaran.forEach(d=>{const x=d.data(); if(x.tanggal===tanggal) daftar.push({id:d.id,...x});}); daftar.sort((a,b)=>String(b.dibuatPada||'').localeCompare(String(a.dibuatPada||'')));
+                const totalKeluar=daftar.reduce((a,x)=>a+(Number(x.total)||0),0); const omzet=semuaTransaksi.filter(t=>`${t.tanggal.getFullYear()}-${String(t.tanggal.getMonth()+1).padStart(2,'0')}-${String(t.tanggal.getDate()).padStart(2,'0')}`===tanggal).reduce((a,t)=>a+t.nilai,0);
+                document.getElementById('belanja-omzet').innerText=rupiah(omzet); document.getElementById('belanja-total').innerText=rupiah(totalKeluar); const sisa=omzet-totalKeluar; const sisaEl=document.getElementById('belanja-sisa'); sisaEl.innerText=rupiah(sisa); sisaEl.style.color=sisa>=0?'var(--success)':'var(--primary)';
+                if(!daftar.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;">Belum ada catatan belanja pada tanggal ini.</td></tr>';return;}
+                tbody.innerHTML=daftar.map(x=>`<tr><td style="font-weight:700;">${String(x.nama||'-').replace(/[<>]/g,'')}</td><td>${Number(x.qty)||0} ${String(x.unit||'')}</td><td>${rupiah(x.hargaSatuan)}</td><td style="font-weight:800;">${rupiah(x.total)}</td><td>${String(x.catatan||'-').replace(/[<>]/g,'')}</td><td><button class="btn-primary" style="padding:5px 9px;background:var(--primary);" onclick="hapusBelanja('${x.id}')"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
+            } catch(e){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--primary);">Gagal memuat: ${e.message}</td></tr>`; }
+        };
+        function initBelanja(){ const today=tanggalHariIni(); document.getElementById('expense-date').value=today; document.getElementById('expense-filter-date').value=today; muatBelanja(); }
 
         function loadStatus() { onSnapshot(doc(db, "pengaturan", "toko"), (docSnap) => { if (docSnap.exists()) { statusSaatIni = docSnap.data().status || "auto"; alasanSaatIni = docSnap.data().alasanTutup || ""; } else { statusSaatIni = "auto"; alasanSaatIni = ""; } statusTerpilih = statusSaatIni; alasanTerpilih = alasanSaatIni; tampilkanStatus(statusSaatIni); highlightOption(statusSaatIni); document.getElementById('pilih-alasan').value = alasanSaatIni;
             if (!bgLoaded) { document.getElementById('bg-image-url').value = docSnap.exists() ? (docSnap.data().bgImage || '') : ''; bgLoaded = true; }
