@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kebab-pwa-v17-offline-pos';
+const CACHE_NAME = 'kebab-pwa-v18-offline-pos';
 const APP_SHELL = [
   './',
   './index.html',
