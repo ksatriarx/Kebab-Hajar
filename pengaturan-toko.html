@@ -339,6 +339,46 @@
             #area-pengaturan .card-panel [style*="grid-template-columns:repeat(auto-fit"] { grid-template-columns: 1fr !important; }
         }
 
+
+        /* ===== THEME SWITCH: DARK DEFAULT + CLEAN LIGHT ===== */
+        .theme-toggle{display:inline-flex;align-items:center;gap:7px;border:1px solid #303a49;background:#202938;color:#e7edf5;border-radius:10px;padding:8px 11px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
+        .theme-toggle:hover{border-color:#e94343;transform:translateY(-1px)}
+        body[data-theme="light"]{--bg-body:#f3f5f9;--bg-card:#ffffff;--text-main:#202938;--text-muted:#758195;--border:#e3e8ef;background:radial-gradient(900px 480px at 78% -12%,rgba(239,68,68,.06),transparent 62%),var(--bg-body);color:var(--text-main)}
+        body[data-theme="light"] .topbar{background:rgba(255,255,255,.94);border-color:#e3e8ef;box-shadow:0 5px 20px rgba(31,41,55,.05)}
+        body[data-theme="light"] .search-box{background:#f5f7fa;border-color:#e1e6ee}
+        body[data-theme="light"] .search-box input{color:#202938}
+        body[data-theme="light"] .icon-btn-top{background:#f3f5f8;border-color:#e1e6ee;color:#657186}
+        body[data-theme="light"] .theme-toggle{background:#fff;color:#39465a;border-color:#dce2ea}
+        body[data-theme="light"] .stat-card,body[data-theme="light"] .card-panel{background:#fff;border-color:#e4e9f0;box-shadow:0 7px 22px rgba(31,41,55,.045)}
+        body[data-theme="light"] .stat-details h4{color:#788397}
+        body[data-theme="light"] .stat-details h2{color:#202938}
+        body[data-theme="light"] .card-header h3,body[data-theme="light"] .card-header h3 span{color:#263247}
+        body[data-theme="light"] .data-table th,body[data-theme="light"] .data-table td{border-bottom-color:#e9edf3;color:#354258}
+        body[data-theme="light"] .data-table th{color:#7b8799}
+        body[data-theme="light"] .data-table tbody tr:hover{background:#f7f9fc}
+        body[data-theme="light"] .form-label{color:#4b586d}
+        body[data-theme="light"] .form-input,body[data-theme="light"] input,body[data-theme="light"] select,body[data-theme="light"] textarea{color:#263247}
+        body[data-theme="light"] .form-input{background:#f8fafc;border-color:#dfe5ed}
+        body[data-theme="light"] .form-input:focus{background:#fff}
+        body[data-theme="light"] #area-pengaturan .form-label{color:#4b586d!important}
+        body[data-theme="light"] #area-pengaturan #status-info,body[data-theme="light"] #area-pengaturan .card-panel>p{color:#718096!important}
+        body[data-theme="light"] #area-pengaturan .option-btn{background:#fff!important;border-color:#e1e6ee!important;color:#344054}
+        body[data-theme="light"] #area-pengaturan .option-btn h4{color:#263247}
+        body[data-theme="light"] #area-pengaturan .option-btn p{color:#778397}
+        body[data-theme="light"] #area-pengaturan .option-btn>div:first-child{background:#f0f3f8!important;color:#59677c}
+        body[data-theme="light"] #area-pengaturan .card-panel [style*="background:var(--bg-body)"],body[data-theme="light"] #area-pengaturan [style*="background: #101722"]{background:#f6f8fb!important;border-color:#e2e7ef!important}
+        body[data-theme="light"] #area-pengaturan #status-display{background:#f8fafc!important}
+        body[data-theme="light"] .menu-sheet{background:#fff;border-color:#e1e6ee;box-shadow:0 -8px 35px rgba(31,41,55,.15);color:#263247}
+        body[data-theme="light"] .sheet-x{background:#f1f4f8;border-color:#dce2ea;color:#344054}
+        body[data-theme="light"] .content-area{color:#263247}
+        body[data-theme="light"] .admin-profile-top span{color:#263247}
+        body[data-theme="light"] .hero-banner{box-shadow:0 12px 30px rgba(31,41,55,.08)}
+        body[data-theme="light"] .sidebar{background:linear-gradient(180deg,#111620 0%,#0d1118 100%);color:#fff}
+        body[data-theme="light"] .sidebar .brand p,body[data-theme="light"] .sidebar .profile-info p{color:#8791a2}
+        body[data-theme="light"] .sidebar .nav-item{color:#aab3c2}
+        body[data-theme="light"] .sidebar .nav-item.active{color:#fff}
+        @media(max-width:520px){.theme-toggle{padding:8px 9px;gap:5px}.theme-toggle span{font-size:9px}.topbar-right{gap:7px}.status-badge{display:none}}
+
     </style>
 </head>
 <body>
@@ -373,6 +413,7 @@
                 <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Cari pesanan, pelanggan..."></div>
             </div>
             <div class="topbar-right">
+                <button type="button" class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Ganti tema"><i class="fa-solid fa-sun"></i><span>Mode Terang</span></button>
                 <div class="status-badge"><div class="dot"></div> Online</div>
                 <div class="icon-btn-top"><i class="fa-regular fa-bell"></i><div class="notif-dot"></div></div>
                 <div class="admin-profile-top"><div class="profile-icon" style="width:30px; height:30px; font-size:12px;">A</div><span style="font-size:13px; font-weight:700; display:none; @media(min-width:768px){display:block;}">Admin</span></div>
@@ -902,5 +943,29 @@ window.updateStatusPesanan = async (docId, newStatus, emailPembeli) => {
         window.simpanPengaturan = async () => { const btn = document.getElementById('btn-save'); btn.disabled = true; try { await setDoc(doc(db, "pengaturan", "toko"), { status: statusTerpilih, alasanTutup: alasanTerpilih, updatedAt: new Date().toISOString(), updatedBy: auth.currentUser.email }, { merge: true }); statusSaatIni = statusTerpilih; alasanSaatIni = alasanTerpilih; alert("✅ Pengaturan disimpan!"); } catch (error) { alert("❌ Gagal: " + error.message); btn.disabled = false; } };
 
     </script>
+
+<script>
+(function(){
+  const saved=localStorage.getItem('rxkebab-admin-theme');
+  const theme=saved==='light'?'light':'dark';
+  document.body.setAttribute('data-theme',theme);
+  function paintThemeButton(){
+    const btn=document.getElementById('theme-toggle');
+    if(!btn)return;
+    const light=document.body.getAttribute('data-theme')==='light';
+    btn.innerHTML=light?'<i class="fa-solid fa-moon"></i><span>Mode Gelap</span>':'<i class="fa-solid fa-sun"></i><span>Mode Terang</span>';
+    btn.setAttribute('aria-label',light?'Aktifkan mode gelap':'Aktifkan mode terang');
+  }
+  window.toggleTheme=function(){
+    const next=document.body.getAttribute('data-theme')==='light'?'dark':'light';
+    document.body.setAttribute('data-theme',next);
+    localStorage.setItem('rxkebab-admin-theme',next);
+    paintThemeButton();
+  };
+  document.addEventListener('DOMContentLoaded',paintThemeButton);
+  if(document.readyState!=='loading')paintThemeButton();
+})();
+</script>
+
 </body>
 </html>
