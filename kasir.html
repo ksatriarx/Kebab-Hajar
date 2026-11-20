@@ -464,11 +464,34 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, getDocs, getDoc, where, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, getDocs, getDoc, getDocFromCache, where, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = { apiKey: "AIzaSyCceiYONY_sx9ivD0CDDQGoB9OXm05h4CY", authDomain: "kebab-idi.firebaseapp.com", projectId: "kebab-idi", storageBucket: "kebab-idi.firebasestorage.app", messagingSenderId: "303997052314", appId: "1:303997052314:web:1db122bc5911297b710623" };
-const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+// Cache Firestore persisten di IndexedDB agar menu dan transaksi tetap tersedia
+// saat koneksi terputus. Multiple-tab manager memungkinkan beberapa tab/perangkat
+// pada browser yang sama memakai cache tanpa saling mengunci.
+let db;
+try {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+  });
+} catch (e) {
+  console.warn("Persistent cache tidak tersedia, memakai Firestore standar:", e);
+  db = getFirestore(app);
+}
 const ALLOWED_EMAIL = "rxstore101@gmail.com";
+const DEVICE_ID_KEY = "rxkebab_pos_device_id_v1";
+function getDeviceId() {
+  let id = localStorage.getItem(DEVICE_ID_KEY);
+  if (!id) {
+    id = (globalThis.crypto?.randomUUID?.() || ("dev-" + Date.now() + "-" + Math.random().toString(16).slice(2)));
+    localStorage.setItem(DEVICE_ID_KEY, id);
+  }
+  return id;
+}
+const POS_DEVICE_ID = getDeviceId();
 
 let menuData = [], cart = {}, metodePembayaran = 'cash', currentCategory = 'makanan', currentTab = 'online';
 let inputUangString = "", isFirstLoad = true, knownOrderIds = new Set(), audioCtx = null;
@@ -503,8 +526,15 @@ const STAFF_DOMAIN = "@kasir.rxkebab.id";
 let started = false;
 async function isAllowed(user) {
   if (user.email === ALLOWED_EMAIL) return true;
-  try { return (await getDoc(doc(db, "staff_kasir", user.email))).exists(); }
-  catch (e) { return false; }
+  const staffRef = doc(db, "staff_kasir", user.email);
+  try {
+    // Utamakan validasi terbaru dari server; bila benar-benar offline,
+    // gunakan data staff yang pernah tersimpan saat perangkat online.
+    return (await getDoc(staffRef)).exists();
+  } catch (e) {
+    try { return (await getDocFromCache(staffRef)).exists(); }
+    catch (_) { return false; }
+  }
 }
 function showLoginMsg(t) { document.getElementById('login-msg').innerText = t; }
 onAuthStateChanged(auth, async user => {
@@ -849,16 +879,30 @@ window.selesaikanPesanan = async () => {
   if (total === 0) { alert("Pilih menu dulu!"); return; }
   const diterima = parseInt(inputUangString) || 0;
   if (metodePembayaran === 'cash' && diterima < total) { alert("Uang diterima kurang!"); return; }
+  if (metodePembayaran !== 'cash' && !navigator.onLine) {
+    alert("Pembayaran non-tunai tidak dapat diverifikasi saat offline. Gunakan Tunai atau tunggu internet kembali.");
+    return;
+  }
   try {
     const trx = {
       waktu: new Date().toISOString(), rincian, total, metode: metodePembayaran,
       uangDiterima: metodePembayaran === 'cash' ? diterima : total,
       kembalian: metodePembayaran === 'cash' ? (diterima - total) : 0,
-      kasir: auth.currentUser.email
+      kasir: auth.currentUser.email,
+      deviceId: POS_DEVICE_ID,
+      transactionId: (globalThis.crypto?.randomUUID?.() || ("trx-" + Date.now() + "-" + Math.random().toString(16).slice(2))),
+      sumber: 'kasir'
     };
-    await addDoc(collection(db, "transaksi_kasir"), trx);
+    // addDoc pada Firestore dengan persistent cache akan menulis ke cache lokal
+    // dan mengantrekan sinkronisasi ke server bila perangkat sedang offline.
+    const savePromise = addDoc(collection(db, "transaksi_kasir"), trx);
+    // Jangan menunggu server: ketika offline, promise Firestore baru selesai
+    // setelah jaringan pulih. Mutasi sudah masuk antrean lokal IndexedDB.
+    savePromise.catch(e => alert("⚠️ Transaksi " + trx.transactionId + " gagal disinkronkan: " + e.message));
     lastReceipt = trx;
-    let pesan = "✅ Transaksi Kasir Berhasil!";
+    let pesan = navigator.onLine
+      ? "✅ Transaksi dicatat. Sinkronisasi Firebase berjalan di latar belakang."
+      : "✅ Transaksi tersimpan di perangkat ini. Akan dikirim ke Firebase saat internet kembali.";
     if (printerChar) {
       try { await kirimKePrinter(buildReceipt(trx)); }
       catch (e) { pesan += "\n\n⚠️ Struk gagal dicetak: " + e.message + "\nTekan tombol 🖨️ untuk cetak ulang."; }
